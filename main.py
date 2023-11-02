@@ -18,7 +18,7 @@ DATA_PATH = "./data/data.csv"
 DATA_HEADER = ["ID", "StudentName", "StudentSurname", "StudentEmail", "StudentPhone", "SudentSchool", "LessonDate", "LessonMode", "LessonDuration", "LessonSubject"]
 
 def saveDataToFile(data: Dict[str, List[str]], filepath: str):
-    file = open(filepath, "w")
+    file = open(filepath, "w", encoding='utf-8')
     counter = 0
     for ID in data.keys():
         elem = data[ID]
