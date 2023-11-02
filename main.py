@@ -32,14 +32,14 @@ def saveDataToFile(data: Dict[str, List[str]], filepath: str):
         
 def loadDataFromFile(filepath: str) -> Dict[str, List[str]]:
     file = open(filepath, "r")
-    alloggi = dict()
+    data = dict()
     lines = file.readlines()
     for line in lines:
         elem = line.replace("\n", "").split("|")
         ID = elem[0]
-        alloggi[ID] = elem
+        data[ID] = elem
     file.close()
-    return alloggi
+    return data
 
 def addData(data: Dict[str, List[str]], ID: str, StudentName: str, StudentSurname: str, StudentEmail: str, StudentPhone: str, StudentSchool: str, LessonDate: str, LessonMode: str, LessonDuration: str, LessonSubject: str):
     if ID not in data:
@@ -48,7 +48,6 @@ def addData(data: Dict[str, List[str]], ID: str, StudentName: str, StudentSurnam
     else:
         pass
         #print(f"ID {ID} is already in the dictionary. Skipping duplicate data.")
-
 
 def editBodyEvent(service, event):
     event["summary"] = "Lezioni Private Prenotabili (Luca Lallo)"
@@ -84,27 +83,27 @@ def editBodyEvent(service, event):
         
 def createEvent(service):
     # set values for the event
-    titolo_evento = "Lezioni Private Prenotabili (Lorenzo Bertinelli)"
-    colore_evento_id = 5  # Puoi trovare l'ID del colore nella documentazione Google Calendar
-    data_inizio = dt.datetime(2023, 2, 24,  14, 30, 0)  # Data e ora di inizio dell'evento
-    data_fine   = dt.datetime(2023, 2, 24,  16, 30, 0)  # Data e ora di fine dell'evento
+    title_event = "Lezioni Private Prenotabili (Lorenzo Bertinelli)"
+    color_event_id = 5  # Puoi trovare l'ID del colore nella documentazione Google Calendar
+    start_date = dt.datetime(2023, 2, 24,  14, 30, 0)  # Data e ora di inizio dell'evento
+    end_date   = dt.datetime(2023, 2, 24,  16, 30, 0)  # Data e ora di fine dell'evento
 
     # set the event
-    evento = {
-        'summary': titolo_evento,
+    event = {
+        'summary': title_event,
         'start': {
-            'dateTime': data_inizio.isoformat(),
+            'dateTime': start_date.isoformat(),
             'timeZone': 'Europe/Rome',
         },
         'end': {
-            'dateTime': data_fine.isoformat(),
+            'dateTime': end_date.isoformat(),
             'timeZone': 'Europe/Rome',
         },
-        'colorId': colore_evento_id,
+        'colorId': color_event_id,
     }
 
     # create the event
-    service.events().insert(calendarId='primary', body=evento).execute()
+    service.events().insert(calendarId='primary', body=event).execute()
 
 def getAllLessons(creds: Credentials, filepath: str):
     # load data from file
@@ -216,7 +215,6 @@ def getAllLessons(creds: Credentials, filepath: str):
         
     except HttpError as error:
         print("An error has occurred: ", error.reason())
-
 
 def connectionSetup():
     creds = None
