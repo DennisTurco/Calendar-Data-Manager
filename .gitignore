@@ -1,6 +1,8 @@
 
 # Ignore credentials and tokens
+./settings/*.json
 *.json
 
 # Ignore data.csv
+./data/data.csv
 *.csv
