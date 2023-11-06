@@ -83,10 +83,10 @@ def editBodyEvent(service, event):
         
 def createEvent(service):
     # set values for the event
-    title_event = "Lezioni Private Prenotabili (Lorenzo Bertinelli)"
-    color_event_id = 5  # Puoi trovare l'ID del colore nella documentazione Google Calendar
-    start_date = dt.datetime(2023, 2, 24,  14, 30, 0)  # Data e ora di inizio dell'evento
-    end_date   = dt.datetime(2023, 2, 24,  16, 30, 0)  # Data e ora di fine dell'evento
+    title_event = "Lezioni Private Prenotabili (Luca Ballestrieri)"
+    color_event_id = 5  
+    start_date = dt.datetime(2023, 7, 5,  18, 30, 0)
+    end_date   = dt.datetime(2023, 7, 5,  19, 30, 0)
 
     # set the event
     event = {
@@ -112,13 +112,7 @@ def getAllLessons(creds: Credentials, filepath: str):
     try:
         service = build("calendar", "v3", credentials=creds)
         
-        now = dt.datetime.now().isoformat() + "Z"
-        
-        #event_result = service.events().list(calendarId="primary", maxResults=500, timeMax=now, singleEvents=True, orderBy="startTime").execute()
-        #events = event_result.get("items", [])
-        
-        # createEvent(service)
-        # return       
+        now = dt.datetime.now().isoformat() + "Z" 
         
         # loop until i find all the events (500 occurrences by step) 
         start_date_search = None 

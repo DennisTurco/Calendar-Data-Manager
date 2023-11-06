@@ -1,2 +1,7 @@
-settings/*
-data/*
+
+# Ignore credentials and tokens
+/settings/credentials.json
+/settings/token.json
+
+# Ignore data.csv
+/data/data.csv
