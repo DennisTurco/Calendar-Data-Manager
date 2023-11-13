@@ -1,31 +1,86 @@
 import customtkinter
 from CTkMenuBar import *
 from CTkMessagebox import *
+import tkinter as tk
+from tkinter import ttk
+from PIL import Image
+import os
 
 import webbrowser
+
+import JSONSettings as js
 import GoogleCalendarEventsManager as gc
 
-
-class MyCheckboxFrame(customtkinter.CTkFrame):
-    def __init__(self, master):
-        super().__init__(master)
-        self.checkbox_1 = customtkinter.CTkCheckBox(self, text="checkbox 1")
-        self.checkbox_1.grid(row=0, column=0, padx=10, pady=(10, 0), sticky="w")
-        self.checkbox_2 = customtkinter.CTkCheckBox(self, text="checkbox 2")
-        self.checkbox_2.grid(row=1, column=0, padx=10, pady=(10, 0), sticky="w")
-        self.checkbox_3 = customtkinter.CTkCheckBox(self, text="checkbox 3")
-        self.checkbox_3.grid(row=2, column=0, padx=10, pady=(10, 0), sticky="w")
+#?###########################################################
+class MainFrame(customtkinter.CTkFrame):
+    
+    main_class = None
+    
+    def __init__(self, parent, main_class):
+        customtkinter.CTkFrame.__init__(self, parent)
+        self.main_class = main_class
         
-class SetupFrame(customtkinter.CTkFrame):
-    def __init__(self, master):
-        button = customtkinter.CTkButton(master=master, text="Google Calendar", command=lambda: webbrowser.open('https://calendar.google.com/'))
+        # text title
+        label = customtkinter.CTkLabel(self, text="Choose the action", fg_color="transparent", font=("Arial", 32))
+        label.pack(padx=20, pady=20)
+        
+        # buttons action
+        button = customtkinter.CTkButton(master=self, text="New Events", command=None)
         button.pack(padx=20, pady=10)
-        button1 = customtkinter.CTkButton(master=master, text="Tutorial Setup", command=lambda: webbrowser.open('https://developers.google.com/workspace/guides/get-started'))
+        button1 = customtkinter.CTkButton(master=self, text="Edit Events", command=None)
         button1.pack(padx=20, pady=10)
-        button2 = customtkinter.CTkButton(master=master, text="First Setup", command=lambda: self.setCredentialsPath())
+        button2 = customtkinter.CTkButton(master=self, text="Get Events", command=None)
         button2.pack(padx=20, pady=10)
+        
+#?###########################################################
 
+#?###########################################################   
+class SetupFrame(customtkinter.CTkFrame):
+    width = 900
+    height = 600
+    main_class = None
+    
+    def __init__(self, parent, main_class):
+        customtkinter.CTkFrame.__init__(self, parent)
+        self.main_class = main_class
+        
+        # text title
+        label = customtkinter.CTkLabel(self, text="Set Credentials", fg_color="transparent", font=("Arial", 32))
+        label.pack(padx=20, pady=20)
+        
+        # buttons action
+        button = customtkinter.CTkButton(master=self, text="Google Calendar", width=140, height=50, command=lambda: webbrowser.open('https://calendar.google.com/'))
+        button.pack(padx=20, pady=10)
+        button1 = customtkinter.CTkButton(master=self, text="Tutorial Setup", width=140, height=50, command=lambda: webbrowser.open('https://developers.google.com/workspace/guides/get-started'))
+        button1.pack(padx=20, pady=10)
+        button2 = customtkinter.CTkButton(master=self, text="First Setup", width=140, height=50, command=lambda: self.setCredentialsPath())
+        button2.pack(padx=20, pady=10)
+    
+    def setCredentialsPath(self):
+        # get response from dialog
+        dialog = customtkinter.CTkInputDialog(title="New Credentials", text="Insert credentials path")
+        credentials_path = dialog.get_input()
+        token_path = credentials_path.rsplit("\\", 1)[0] + "\\" + "token.json"
 
+        # get credentials
+        credentials = gc.GoogleCalendarEventsManager.connectionSetup(credentials_path, gc.GoogleCalendarEventsManager.SCOPE, token_path)
+        
+        # response message box
+        if credentials is not None:
+            CTkMessagebox(message="Credentials setted succeffully", icon="check", option_1="Ok")
+            
+            # set credentials values to main class
+            self.main_class.set_credentials(credentials, credentials_path, token_path)
+            
+            self.main_class.show_frame(MainFrame)
+        else:
+            msg = CTkMessagebox(title="Credentials error", message="Do you wish to retry?", icon="cancel", option_1="No", option_2="Yes")
+            response = msg.get()
+            if response=="Yes":
+                self.setCredentialsPath()
+#?###########################################################
+
+#*###########################################################
 class App(): 
     root = None
     credentials_path = None
@@ -35,12 +90,24 @@ class App():
     def __init__(self):
         root = customtkinter.CTk()
         self.root = root
+        
+        # read data from json to get path from last session
+        listRes = js.SJONSettings.ReadFromJSON()
+        if listRes != None:
+            self.credentials_path = listRes["CredentialsPath"]
+            self.token_path = listRes["TokenPath"]
+            self.credentials = gc.GoogleCalendarEventsManager.connectionSetup(self.credentials_path, gc.GoogleCalendarEventsManager.SCOPE, self.token_path)
             
         self.init_window()
         self.init_menu()
-        self.initial_page()
+        self.page_controller()
         
-        root.mainloop()
+        self.root.mainloop()
+        
+    # to display the current frame passed as parameter
+    def show_frame(self, cont):
+        frame = self.frames[cont]
+        frame.tkraise()
     
     def init_window(self):
         # configure window
@@ -58,9 +125,9 @@ class App():
 
         dropdown1 = CustomDropdownMenu(widget=button_1)
         dropdown1.add_option(option="New Credentials", command=lambda: self.setCredentialsPath())
-        dropdown1.add_option(option="Open", command=lambda: print("Open"))
+        dropdown1.add_option(option="Open")
         dropdown1.add_option(option="Save")
-        dropdown1.add_option(option="Exit", command=lambda: self.exit_app())
+        dropdown1.add_option(option="Exit", command=lambda: exit())
 
         dropdown1.add_separator()
 
@@ -79,35 +146,39 @@ class App():
 
         dropdown4 = CustomDropdownMenu(widget=button_4)
         dropdown4.add_option(option="Share")
-
-    def setCredentialsPath(self):
-        # get response from dialog
-        dialog = customtkinter.CTkInputDialog(title="New Credentials", text="Insert credentials path")
-        self.credentials_path = dialog.get_input()
-        substring = self.credentials_path.rsplit("\\", 1)[0] + "\\" + "token.json"
-
-        # get credentials
-        self.credentials = gc.GoogleCalendarEventsManager.connectionSetup(self.credentials_path, gc.GoogleCalendarEventsManager.SCOPE, substring)
         
-        # response message box
-        if self.credentials is not None:
-            CTkMessagebox(message="Credentials setted succeffully", icon="check", option_1="Ok")
-            #TODO: change frame
-            self.checkbox_frame = MyCheckboxFrame(self.root)
-            self.checkbox_frame.grid(row=0, column=0, padx=10, pady=(10, 0), sticky="nsw")
+    def page_controller(self):
+        # creating a container
+        container = customtkinter.CTkFrame(self.root) 
+        container.pack(side = "top", fill = "both", expand = True) 
+
+        container.grid_rowconfigure(0, weight = 1)
+        container.grid_columnconfigure(0, weight = 1)        
+
+        # initializing frames to an empty array
+        self.frames = {} 
+
+        # iterating through a tuple consisting of the different page layouts
+        for F in (SetupFrame, MainFrame):
+
+            frame = F(container, self)
+
+            # initializing frame of that object from pages for loop
+            self.frames[F] = frame 
+
+            frame.grid(row = 0, column = 0, sticky ="nsew")
+
+        if self.credentials is None or self.credentials_path is None:
+            self.show_frame(SetupFrame)
         else:
-            msg = CTkMessagebox(title="Credentials error", message="Do you wish to retry?", icon="cancel", option_1="No", option_2="Yes")
-            response = msg.get()
-            if response=="Yes":
-                self.setCredentialsPath()
+            self.show_frame(MainFrame)
 
-    def initial_page(self):
-        checkbox_frame = SetupFrame(self.root)
-        checkbox_frame.grid(row=0, column=0, padx=10, pady=(10, 0), sticky="w")
-        
-    def exit_app(self):
-        self.root.quit()
-
+    def set_credentials(self, credentials, credentials_path, token_path):
+        self.credentials = credentials
+        self.credentials_path = credentials_path
+        self.token_path = token_path
+        js.SJONSettings.WriteToJSON(self.credentials_path, self.token_path)
+#*###########################################################
 
 if __name__ == "__main__":
     app = App()
