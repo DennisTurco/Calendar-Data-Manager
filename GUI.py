@@ -1,17 +1,34 @@
-import customtkinter
-from CTkMenuBar import *
-from CTkMessagebox import *
-import tkinter as tk
-from tkinter import ttk
-from PIL import Image
-import os
-
-import webbrowser
-
-import JSONSettings as js
 import GoogleCalendarEventsManager as gc
+import webbrowser
+import JSONSettings as js
+import io, subprocess, sys
+
+try:
+    import customtkinter
+except:
+    subprocess.call([sys.executable, "-m", "pip", "install", "customtkinter"])
+    import customtkinter
+try:
+    from CTkMenuBar import *
+except:
+    subprocess.call([sys.executable, "-m", "pip", "install", "CTkMenuBar"])
+    from CTkMenuBar import *
+try:
+    from CTkMessagebox import *
+except:
+    subprocess.call([sys.executable, "-m", "pip", "install", "CTkMessagebox"])
+    from CTkMessagebox import *
 
 #?###########################################################
+class NewEventFrame(customtkinter.CTkFrame):
+    
+    main_class = None
+    
+    def __init__(self, parent, main_class):
+        customtkinter.CTkFrame.__init__(self, parent)
+        self.main_class = main_class
+
+
 class MainFrame(customtkinter.CTkFrame):
     
     main_class = None
@@ -25,12 +42,15 @@ class MainFrame(customtkinter.CTkFrame):
         label.pack(padx=20, pady=20)
         
         # buttons action
-        button = customtkinter.CTkButton(master=self, text="New Events", command=None)
+        button = customtkinter.CTkButton(master=self, text="New Events", command=self.show_frame("NewEventFrame"))
         button.pack(padx=20, pady=10)
         button1 = customtkinter.CTkButton(master=self, text="Edit Events", command=None)
         button1.pack(padx=20, pady=10)
         button2 = customtkinter.CTkButton(master=self, text="Get Events", command=None)
         button2.pack(padx=20, pady=10)
+        
+    def show_frame(self, frame: str):
+        self.main_class.show_frame(frame)
         
 #?###########################################################
 
@@ -78,6 +98,8 @@ class SetupFrame(customtkinter.CTkFrame):
             response = msg.get()
             if response=="Yes":
                 self.setCredentialsPath()
+
+    
 #?###########################################################
 
 #*###########################################################
@@ -159,7 +181,7 @@ class App():
         self.frames = {} 
 
         # iterating through a tuple consisting of the different page layouts
-        for F in (SetupFrame, MainFrame):
+        for F in (SetupFrame, MainFrame, NewEventFrame):
 
             frame = F(container, self)
 

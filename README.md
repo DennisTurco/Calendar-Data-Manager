@@ -8,12 +8,8 @@ These files are created by following the "Python Quick Guide" step
 ## Google API
 [Setup](https://developers.google.com/calendar/api/quickstart/python?hl=it)
 
-1. ```python 
-    pip install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib`
-    ```
 
-
-## Install Python libraries
+## Python libraries
 1. **GoogleCalendarEventsManager.py**
     1.  ```python
         pip install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib

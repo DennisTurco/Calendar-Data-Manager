@@ -45,9 +45,6 @@ def addData(data: Dict[str, List[str]], ID: str, StudentName: str, StudentSurnam
     if ID not in data:
         data[ID] = [ID, StudentName, StudentSurname, StudentEmail, StudentPhone, StudentSchool, LessonDate, LessonMode, LessonDuration, LessonSubject]
         print(f"Lesson for \"{StudentName} {StudentSurname}\" has been saved in \"{DATA_PATH}\" file")
-    else:
-        pass
-        #print(f"ID {ID} is already in the dictionary. Skipping duplicate data.")
 
 def editBodyEvent(service, event):
     event["summary"] = "Lezioni Private Prenotabili (Luca Lallo)"

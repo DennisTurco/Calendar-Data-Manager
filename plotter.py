@@ -1,7 +1,19 @@
-import matplotlib.pyplot as plt
-import pandas as pd
 import datetime as dt
-from matplotlib.font_manager import FontProperties
+import io, subprocess, sys
+
+try:
+    import pandas as pd
+except:
+    subprocess.call([sys.executable, "-m", "pip", "install", "pygame"])
+    import pandas as pd
+try:
+    import matplotlib.pyplot as plt
+    from matplotlib.font_manager import FontProperties
+except:
+    subprocess.call([sys.executable, "-m", "pip", "install", "matplotlib"])
+    import matplotlib.pyplot as plt
+    from matplotlib.font_manager import FontProperties
+
 
 def loadData():
     # Load data from the CSV file
