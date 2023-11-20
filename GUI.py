@@ -20,15 +20,36 @@ except:
     from CTkMessagebox import *
 
 #?###########################################################
-class NewEventFrame(customtkinter.CTkFrame):
+class NewEventsFrame(customtkinter.CTkFrame):
     
     main_class = None
     
     def __init__(self, parent, main_class):
         customtkinter.CTkFrame.__init__(self, parent)
         self.main_class = main_class
+#?###########################################################
 
+#?###########################################################
+class EditEventsFrame(customtkinter.CTkFrame):
+    
+    main_class = None
+    
+    def __init__(self, parent, main_class):
+        customtkinter.CTkFrame.__init__(self, parent)
+        self.main_class = main_class
+#?###########################################################
 
+#?###########################################################
+class GetEventsFrame(customtkinter.CTkFrame):
+    
+    main_class = None
+    
+    def __init__(self, parent, main_class):
+        customtkinter.CTkFrame.__init__(self, parent)
+        self.main_class = main_class
+#?###########################################################
+
+#?###########################################################
 class MainFrame(customtkinter.CTkFrame):
     
     main_class = None
@@ -42,15 +63,21 @@ class MainFrame(customtkinter.CTkFrame):
         label.pack(padx=20, pady=20)
         
         # buttons action
-        button = customtkinter.CTkButton(master=self, text="New Events", command=self.show_frame("NewEventFrame"))
+        button = customtkinter.CTkButton(master=self, text="New Events", command=self.got_to_new_events_frame)
         button.pack(padx=20, pady=10)
-        button1 = customtkinter.CTkButton(master=self, text="Edit Events", command=None)
+        button1 = customtkinter.CTkButton(master=self, text="Edit Events", command=self.got_to_edit_events_frame)
         button1.pack(padx=20, pady=10)
-        button2 = customtkinter.CTkButton(master=self, text="Get Events", command=None)
+        button2 = customtkinter.CTkButton(master=self, text="Get Events", command=self.got_to_get_events_frame)
         button2.pack(padx=20, pady=10)
-        
-    def show_frame(self, frame: str):
-        self.main_class.show_frame(frame)
+    
+    def got_to_new_events_frame(self):
+        self.main_class.show_frame(NewEventsFrame)
+    
+    def got_to_edit_events_frame(self):
+        self.main_class.show_frame(EditEventsFrame)
+    
+    def got_to_get_events_frame(self):
+        self.main_class.show_frame(GetEventsFrame)
         
 #?###########################################################
 
@@ -181,7 +208,7 @@ class App():
         self.frames = {} 
 
         # iterating through a tuple consisting of the different page layouts
-        for F in (SetupFrame, MainFrame, NewEventFrame):
+        for F in (SetupFrame, MainFrame, NewEventsFrame, EditEventsFrame, GetEventsFrame):
 
             frame = F(container, self)
 
