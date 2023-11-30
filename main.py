@@ -10,6 +10,8 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
+import GoogleCalendarEventsManager as gc
+
 SCOPES = ["https://www.googleapis.com/auth/calendar"]
 
 TOKEN_PATH = "./settings/token.json"
@@ -222,6 +224,13 @@ def connectionSetup():
             
         with open(TOKEN_PATH, "w") as token:
             token.write(creds.to_json())
+    
+    #res = gc.GoogleCalendarEventsManager.editEventsTitleByTitle(creds, "Lezioni Private Prenotabili (Feberico)", "Lezioni Private Prenotabili (Federico)")
+    #res = gc.GoogleCalendarEventsManager.editEventsTitleByTitle(creds, "Lezioni Private Prenotabili (Lucrezia Piccione)", "Lezioni Private Prenotabili (Lucrezia Moschini)")
+    res = gc.GoogleCalendarEventsManager.editEventsTitleByTitle(creds, "Lezioni Private Prenotabili (Marco Moya)", "Lezioni Private Prenotabili (Marco Moya Gutierrez)")
+    print (res)
+    
+    return 
     
     getAllLessons(creds, DATA_PATH)
     
