@@ -74,13 +74,19 @@ class NewEventsFrame(customtkinter.CTkFrame):
         # main entry
         self.main_frame = customtkinter.CTkFrame(self)
         self.main_frame.grid(row=1, column=1, padx=(10, 10), pady=(10, 0), sticky="nsew")
+        self.label_summary = customtkinter.CTkLabel(self.main_frame, text="Summary:", anchor="w")
+        self.label_summary.grid(row=0, column=0, padx=10, pady=(10, 0))
         self.entry_summary = customtkinter.CTkEntry(self.main_frame, placeholder_text="summary")
         self.entry_summary.grid(row=0, column=1, columnspan=2, padx=(10, 10), pady=(10, 10), sticky="nsew")
+        self.label_description = customtkinter.CTkLabel(self.main_frame, text="Description:", anchor="w")
+        self.label_description.grid(row=1, column=0, padx=10, pady=(10, 0))
         self.entry_description = customtkinter.CTkTextbox(self.main_frame, width=250, height=100)
         self.entry_description.grid(row=1, column=1, padx=(0, 0), pady=(10, 0), sticky="nsew")
+        self.label_color = customtkinter.CTkLabel(self.main_frame, text="Color:", anchor="w")
+        self.label_color.grid(row=2, column=0, pady=(10, 0))
         self.multi_selection = customtkinter.CTkComboBox(self.main_frame, values=list(self.event_color.keys()))
         self.multi_selection.set("Lavender")
-        self.multi_selection.grid(row=2, column=2, padx=10, pady=(10, 10))
+        self.multi_selection.grid(row=2, column=1, pady=(10, 10))
         self.color_preview = customtkinter.CTkCanvas(self.main_frame, width=15, height=15)
         self.color_preview.grid(row=2, column=3)
         self.color_preview.configure(bg=self.event_color.get('Lavender'))
@@ -113,44 +119,7 @@ class NewEventsFrame(customtkinter.CTkFrame):
         self.log_box.grid(row=4, column=1, columnspan=2, padx=(0, 0), pady=(20, 0), sticky="nsew")
     
     def date_picker(self, type):
-        if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
-            self.toplevel_window = customtkinter.CTkToplevel() # create window if its None or destroyed
-            self.calendar = Calendar(self.toplevel_window)
-            self.calendar.grid(row=0, column=0, padx=(0, 0), pady=(10, 10), sticky="nsew")
-            
-            if type == 1:
-                self.toplevel_window.title("Date From")
-                self.confirm_button = customtkinter.CTkButton(self.toplevel_window, text="Confirm", command=lambda: self.get_date(1))
-            elif type == 2:
-                self.toplevel_window.title("Date To")
-                self.confirm_button = customtkinter.CTkButton(self.toplevel_window, text="Confirm", command=lambda: self.get_date(2))
-            else:
-                Exception("type option doesn't exists")
-            
-            self.confirm_button.grid(row=1, column=0, padx=(0, 0), pady=(10, 10), sticky="nsew") 
-            
-            self.toplevel_window.attributes("-topmost", True) # focus to this windows
-            self.toplevel_window.resizable(False, False)
-        else:
-            self.toplevel_window.focus()  # if window exists focus it
-    
-    def get_date(self, type):
-        date = self.calendar.get_date() # get the date from the calendar
-        #TODO:
-        #date = datetime.strptime(date, "%m-%d-%y") # convert the date string to datetime
-        #date = datetime.strftime(date, "%d-%m-%Y") # edit the date format
-        if type == 1:
-            self.write_log("Date Selected From: " + date)
-            self.entry_date_from.delete("0", tkinter.END)
-            self.entry_date_from.insert("0", date)
-        elif type == 2:
-            self.write_log("Date Selected To: " + date)
-            self.entry_date_to.delete("0", tkinter.END)
-            self.entry_date_to.insert("0", date)
-        else:
-            Exception("type option doesn't exists")
-        
-        self.toplevel_window.destroy() 
+        self.toplevel_window = self.main_class.date_picker(type, self.toplevel_window, self.entry_date_from, self.entry_date_to, self.log_box)
     
     def go_to_new_events_frame(self):
         self.main_class.show_frame(NewEventsFrame)
@@ -159,10 +128,7 @@ class NewEventsFrame(customtkinter.CTkFrame):
         self.main_class.show_frame(EditEventsFrame)
     
     def go_to_get_events_by_title_frame(self):
-        self.main_class.show_frame(GetEventsByTitleFrame)
-    
-    def write_log(self, message):
-        self.log_box.insert(tkinter.END, "\n" + str(datetime.now()) + ": " + message)
+        self.main_class.show_frame(GetEventsByFrame)
 
 #?###########################################################
 
@@ -209,13 +175,14 @@ class EditEventsFrame(customtkinter.CTkFrame):
         self.main_class.show_frame(EditEventsFrame)
     
     def go_to_get_events_by_title_frame(self):
-        self.main_class.show_frame(GetEventsByTitleFrame) 
+        self.main_class.show_frame(GetEventsByFrame) 
 #?###########################################################
 
 #?###########################################################
-class GetEventsByTitleFrame(customtkinter.CTkFrame):
-    
+class GetEventsByFrame(customtkinter.CTkFrame):
     main_class = None
+    toplevel_window = None
+    event_color = {"Tomato": "#d50000", "Flamingo": "#e67c73", "Tangerine": "#f4511e", "Banana": "#f6bf26", "Sage": "#33b679", "Basil": "#0b8043", "Peacock": "#039be5", "Blueberry": "#3f51b5", "Lavender": "#7986cb", "Wine": "#8e24aa", "Graphite": "#616161"}
     
     def __init__(self, parent, main_class):
         customtkinter.CTkFrame.__init__(self, parent)
@@ -247,6 +214,60 @@ class GetEventsByTitleFrame(customtkinter.CTkFrame):
         self.sidebar_button_3.grid(row=3, column=0, padx=20, pady=10)
         self.google_calendar_link = customtkinter.CTkButton(self.sidebar_frame, image=self.google_image, text="Google Calendar", command=lambda: webbrowser.open('https://calendar.google.com/'))
         self.google_calendar_link.grid(row=6, column=0, padx=20, pady=(10, 10))
+        
+        # create main panel
+        self.title_label_main = customtkinter.CTkLabel(self, text="Get Events", font=customtkinter.CTkFont(size=20, weight="bold"))
+        self.title_label_main.grid(row=0, column=1, padx=20, pady=(20, 10), sticky="nsew")
+        
+        # main entry
+        self.main_frame = customtkinter.CTkFrame(self)
+        self.main_frame.grid(row=1, column=1, padx=(10, 10), pady=(10, 0), sticky="nsew")
+        self.label_summary = customtkinter.CTkLabel(self.main_frame, text="Summary:", anchor="w")
+        self.label_summary.grid(row=0, column=0, padx=10, pady=(10, 0))
+        self.entry_summary = customtkinter.CTkEntry(self.main_frame, placeholder_text="summary")
+        self.entry_summary.grid(row=0, column=1, columnspan=2, padx=(10, 10), pady=(10, 10), sticky="nsew")
+        self.label_description = customtkinter.CTkLabel(self.main_frame, text="Description:", anchor="w")
+        self.label_description.grid(row=1, column=0, padx=10, pady=(10, 0))
+        self.entry_description = customtkinter.CTkTextbox(self.main_frame, width=250, height=100)
+        self.entry_description.grid(row=1, column=1, padx=(0, 0), pady=(10, 0), sticky="nsew")
+        self.label_color = customtkinter.CTkLabel(self.main_frame, text="Color:", anchor="w")
+        self.label_color.grid(row=2, column=0, pady=(10, 0))
+        self.multi_selection = customtkinter.CTkComboBox(self.main_frame, values=list(self.event_color.keys()))
+        self.multi_selection.set("Lavender")
+        self.multi_selection.grid(row=2, column=1, pady=(10, 10))
+        self.color_preview = customtkinter.CTkCanvas(self.main_frame, width=15, height=15)
+        self.color_preview.grid(row=2, column=3)
+        self.color_preview.configure(bg=self.event_color.get('Lavender'))
+        
+        # date frame
+        self.date_frame = customtkinter.CTkFrame(self, width=400)
+        self.date_frame.grid(row=2, column=1, padx=(10, 10), pady=(10, 10), sticky="nsew")
+        self.label_date_frame = customtkinter.CTkLabel(master=self.date_frame, text="Date Interval")
+        self.label_date_frame.grid(row=0, column=1, padx=10, pady=10, sticky="")
+        self.label_date_from = customtkinter.CTkLabel(self.date_frame, text="From:", anchor="w")
+        self.label_date_from.grid(row=1, column=0, padx=20, pady=(10, 0))
+        self.entry_date_from = customtkinter.CTkEntry(self.date_frame, placeholder_text="dd/mm/yyyy")
+        self.entry_date_from.grid(row=1, column=1, padx=(0, 0), pady=(10, 10), sticky="nsew")
+        self.entry_date_button = customtkinter.CTkButton(self.date_frame, text="", width=10, image=self.calendar_image, command=lambda: self.date_picker(1))
+        self.entry_date_button.grid(row=1, column=2, padx=(0, 0), pady=(10, 10))
+        self.label_date_to = customtkinter.CTkLabel(self.date_frame, text="To:", anchor="w")
+        self.label_date_to.grid(row=2, column=0, padx=20, pady=(10, 0))
+        self.entry_date_to = customtkinter.CTkEntry(self.date_frame, placeholder_text="dd/mm/yyyy")
+        self.entry_date_to.grid(row=2, column=1, padx=(0, 0), pady=(10, 10), sticky="nsew")
+        self.entry_date_button2 = customtkinter.CTkButton(self.date_frame, text="", width=10, image=self.calendar_image, command=lambda: self.date_picker(2))
+        self.entry_date_button2.grid(row=2, column=2, padx=(0, 0), pady=(0, 0))
+        
+        # get list button
+        self.get_button = customtkinter.CTkButton(self, command=None, image=self.list_image, text="Get")
+        self.get_button.grid(row=3, column=1, padx=20, pady=20)
+        
+        # create log textbox
+        self.log_box = customtkinter.CTkTextbox(self, width=250, height=100)
+        self.log_box.bind("<Key>", lambda e: "break")  # set the textbox readonly
+        self.log_box.grid(row=4, column=1, columnspan=2, padx=(0, 0), pady=(20, 0), sticky="nsew")
+    
+    def date_picker(self, type):
+        self.toplevel_window = self.main_class.date_picker(type, self.toplevel_window, self.entry_date_from, self.entry_date_to, self.log_box)
     
     def go_to_new_events_frame(self):
         self.main_class.show_frame(NewEventsFrame)
@@ -255,7 +276,7 @@ class GetEventsByTitleFrame(customtkinter.CTkFrame):
         self.main_class.show_frame(EditEventsFrame)
     
     def go_to_get_events_by_title_frame(self):
-        self.main_class.show_frame(GetEventsByTitleFrame)
+        self.main_class.show_frame(GetEventsByFrame)
 #?###########################################################
 
 #?###########################################################
@@ -286,7 +307,7 @@ class MainFrame(customtkinter.CTkFrame):
         self.main_class.show_frame(EditEventsFrame)
     
     def go_to_get_events_by_title_frame(self):
-        self.main_class.show_frame(GetEventsByTitleFrame)
+        self.main_class.show_frame(GetEventsByFrame)
         
 #?###########################################################
 
@@ -427,7 +448,7 @@ class App():
         self.frames = {} 
 
         # iterating through a tuple consisting of the different page layouts
-        for F in (SetupFrame, MainFrame, NewEventsFrame, EditEventsFrame, GetEventsByTitleFrame):
+        for F in (SetupFrame, MainFrame, NewEventsFrame, EditEventsFrame, GetEventsByFrame):
 
             frame = F(container, self)
 
@@ -450,6 +471,51 @@ class App():
         self.credentials_path = credentials_path
         self.token_path = token_path
         js.SJONSettings.WriteToJSON(self.credentials_path, self.token_path)
+
+    def date_picker(self, type, toplevel_window, entry_date_from, entry_date_to, log_box):
+        if toplevel_window is None or not toplevel_window.winfo_exists():
+            toplevel_window = customtkinter.CTkToplevel() # create window if its None or destroyed
+            calendar = Calendar(toplevel_window)
+            calendar.grid(row=0, column=0, padx=(0, 0), pady=(10, 10), sticky="nsew")
+            
+            if type == 1:
+                toplevel_window.title("Date From")
+                confirm_button = customtkinter.CTkButton(toplevel_window, text="Confirm", command=lambda: self.get_date(1, toplevel_window, entry_date_from, entry_date_to, log_box, calendar))
+            elif type == 2:
+                toplevel_window.title("Date To")
+                confirm_button = customtkinter.CTkButton(toplevel_window, text="Confirm", command=lambda: self.get_date(2, toplevel_window, entry_date_from, entry_date_to, log_box, calendar))
+            else:
+                Exception("type option doesn't exists")
+            
+            confirm_button.grid(row=1, column=0, padx=(0, 0), pady=(10, 10), sticky="nsew") 
+            
+            toplevel_window.attributes("-topmost", True) # focus to this windows
+            toplevel_window.resizable(False, False)
+        else:
+            toplevel_window.focus()  # if window exists focus it
+        
+        return toplevel_window
+    
+    def get_date(self, type, toplevel_window, entry_date_from, entry_date_to, log_box, calendar):
+        date = calendar.get_date() # get the date from the calendar
+        #TODO:
+        #date = datetime.strptime(date, "%m-%d-%y") # convert the date string to datetime
+        #date = datetime.strftime(date, "%d-%m-%Y") # edit the date format
+        if type == 1:
+            self.write_log(log_box, "Date Selected From: " + date)
+            entry_date_from.delete("0", tkinter.END)
+            entry_date_from.insert("0", date)
+        elif type == 2:
+            self.write_log(log_box, "Date Selected To: " + date)
+            entry_date_to.delete("0", tkinter.END)
+            entry_date_to.insert("0", date)
+        else:
+            Exception("type option doesn't exists")
+        
+        toplevel_window.destroy() 
+
+    def write_log(self, log_box, message):
+        log_box.insert(tkinter.END, "\n" + str(datetime.now()) + ": " + message)
 #*###########################################################
 
 if __name__ == "__main__":
