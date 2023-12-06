@@ -222,7 +222,6 @@ class GetEventsByFrame(customtkinter.CTkFrame):
         self.title_label_main = customtkinter.CTkLabel(self, text="Get Events List", font=customtkinter.CTkFont(size=20, weight="bold"))
         self.title_label_main.grid(row=0, column=1, padx=20, pady=(20, 10), sticky="nsew")
         
-        
         # main entry
         self.main_frame = customtkinter.CTkFrame(self)
         self.main_frame.grid(row=1, column=1, padx=(30, 30), pady=10, sticky="ew")
@@ -243,9 +242,9 @@ class GetEventsByFrame(customtkinter.CTkFrame):
         self.label_color.grid(row=3, column=0, padx=10, pady=(10, 0), sticky="e")
         self.multi_selection = customtkinter.CTkComboBox(self.main_frame, values=list(self.event_color.keys()), command=self.combobox_callback)
         self.multi_selection.set("Lavender")
-        self.multi_selection.grid(row=3, column=1, pady=(10, 10), sticky="ew")
+        self.multi_selection.grid(row=3, column=1, padx=0, pady=(10, 10), sticky="w")
         self.color_preview = customtkinter.CTkCanvas(self.main_frame, width=15, height=15)
-        self.color_preview.grid(row=3, column=2, sticky="w")
+        self.color_preview.grid(row=3, column=1, sticky="w", padx=(150, 0), pady=(10, 10))
         self.color_preview.configure(bg=self.event_color.get('Lavender'))
         
         # date
@@ -279,8 +278,6 @@ class GetEventsByFrame(customtkinter.CTkFrame):
         self.button_file_path.grid(row=1, column=2, padx=0, pady=10, sticky="w")
         self.button_open_file = customtkinter.CTkButton(master=self.file_output_frame, image=self.file_image, text="open", command=self.open_file)
         self.button_open_file.grid(row=2, column=0, columnspan=3, padx=10, pady=10, sticky="s")
-
-
 
         # get list button
         self.get_button = customtkinter.CTkButton(self, command=None, image=self.list_image, text="Get")
@@ -400,7 +397,6 @@ class App():
     credentials_path = None
     token_path = None
     credentials = None
-    
     
     def __init__(self):
         root = customtkinter.CTk()
