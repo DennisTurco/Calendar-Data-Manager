@@ -523,6 +523,9 @@ class App():
     token_path = None
     credentials = None
     
+    app_width = 1100
+    app_height = 900
+    
     def __init__(self):
         root = customtkinter.CTk()
         self.root = root
@@ -559,7 +562,7 @@ class App():
         # configure window
         self.root.iconbitmap('./imgs/icon.ico')
         self.root.title("Google Calendar Events Manager")
-        self.root.geometry(f"{1100}x{900}")
+        self.centerWindow()
         self.root.minsize(300, 300)
     
     def init_menu(self):
@@ -592,6 +595,15 @@ class App():
 
         dropdown4 = CustomDropdownMenu(widget=button_4)
         dropdown4.add_option(option="Share")
+    
+    def centerWindow(self):
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight()
+        
+        x = (screen_width / 2) - (self.app_width / 2) 
+        y = (screen_height / 2) - (self.app_height / 2) 
+        
+        self.root.geometry(f'{self.app_width}x{self.app_height}+{int(x)}+{int(y)}')
     
     def page_controller(self):
         # creating a container
