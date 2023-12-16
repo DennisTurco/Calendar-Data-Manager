@@ -312,8 +312,6 @@ class GoogleCalendarEventsManager:
         except Exception as e:
             print(f"An error occurred: {str(e)}")
     
-    #! TODO: fixme
-    # TODO: test me 
     @staticmethod
     def editEventsTitleByTitle(creds: Credentials, old_title: str, new_title: str, start_date: datetime = None, end_date: datetime = None):
         if creds == None: Exception("Credentials can't be null")
@@ -327,15 +325,23 @@ class GoogleCalendarEventsManager:
                 q=old_title,
                 timeMin=start_date,
                 timeMax=end_date,
-                maxResults=1,
+                maxResults=2500,
                 singleEvents=True,
                 orderBy='startTime'
             ).execute()
             
-            for event in events:
-                event['summary'] = new_title 
-            
-            return events
+            updated_events = []
+            if 'items' in events:
+                for event in events['items']:
+                    event['summary'] = new_title
+                    updated_event = service.events().update(
+                        calendarId='primary',
+                        eventId=event['id'],
+                        body=event
+                    ).execute()
+                    updated_events.append(updated_event)
+
+            return updated_events
 
         except Exception as e:
             print(f"An error occurred: {str(e)}")

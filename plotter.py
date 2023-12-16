@@ -6,7 +6,7 @@ import numpy as np
 try:
     import pandas as pd
 except:
-    subprocess.call([sys.executable, "-m", "pip", "install", "pygame"])
+    subprocess.call([sys.executable, "-m", "pip", "install", "pandas"])
     import pandas as pd
 try:
     import matplotlib.pyplot as plt

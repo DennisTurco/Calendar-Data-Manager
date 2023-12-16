@@ -227,10 +227,11 @@ def connectionSetup():
     
     #res = gc.GoogleCalendarEventsManager.editEventsTitleByTitle(creds, "Lezioni Private Prenotabili (Feberico)", "Lezioni Private Prenotabili (Federico)")
     #res = gc.GoogleCalendarEventsManager.editEventsTitleByTitle(creds, "Lezioni Private Prenotabili (Lucrezia Piccione)", "Lezioni Private Prenotabili (Lucrezia Moschini)")
-    res = gc.GoogleCalendarEventsManager.editEventsTitleByTitle(creds, "Lezioni Private Prenotabili (Marco Moya)", "Lezioni Private Prenotabili (Marco Moya Gutierrez)")
-    print (res)
+    #res = gc.GoogleCalendarEventsManager.editEventsTitleByTitle(creds, "Lezioni Private Prenotabili (Marco Moya)", "Lezioni Private Prenotabili (Marco Moya Gutierrez)")
+    res = gc.GoogleCalendarEventsManager.editEventsTitleByTitle(creds, "Lezioni Private Prenotabili (Millene Gomes Araujo)", "Lezioni Private Prenotabili (Millene Rizzetto)")
+    print (len(res))
     
-    return 
+    #return 
     
     getAllLessons(creds, DATA_PATH)
     

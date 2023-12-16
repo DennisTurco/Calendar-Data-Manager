@@ -80,50 +80,66 @@ class NewEventsFrame(customtkinter.CTkFrame):
         
         # main entry
         self.main_frame = customtkinter.CTkFrame(self)
-        self.main_frame.grid(row=1, column=1, padx=(10, 10), pady=(10, 0), sticky="nsew")
-        self.label_summary = customtkinter.CTkLabel(self.main_frame, text="Summary:", anchor="w")
-        self.label_summary.grid(row=0, column=0, padx=10, pady=(10, 0))
+        self.main_frame.grid(row=1, column=1, padx=(50, 50), pady=10, sticky="ew")
+        self.main_frame.grid_columnconfigure((0, 1, 2), weight=1)
+        self.label_summary = customtkinter.CTkLabel(self.main_frame, text="Summary:")
+        self.label_summary.grid(row=0, column=0, padx=10, pady=(10, 0), sticky="e")
         self.entry_summary = customtkinter.CTkEntry(self.main_frame, placeholder_text="summary")
-        self.entry_summary.grid(row=0, column=1, columnspan=2, padx=(10, 10), pady=(10, 10), sticky="nsew")
-        self.label_description = customtkinter.CTkLabel(self.main_frame, text="Description:", anchor="w")
-        self.label_description.grid(row=1, column=0, padx=10, pady=(10, 0))
+        self.entry_summary.grid(row=0, column=1, columnspan=2, padx=(10, 10), pady=(10, 10), sticky="w")
+        self.label_description = customtkinter.CTkLabel(self.main_frame, text="Description:")
+        self.label_description.grid(row=1, column=0, padx=10, pady=(10, 0), sticky="e")
         self.entry_description = customtkinter.CTkTextbox(self.main_frame, width=250, height=100)
-        self.entry_description.grid(row=1, column=1, padx=(0, 0), pady=(10, 0), sticky="nsew")
-        self.label_color = customtkinter.CTkLabel(self.main_frame, text="Color:", anchor="w")
-        self.label_color.grid(row=2, column=0, pady=(10, 0))
-        self.multi_selection = customtkinter.CTkComboBox(self.main_frame, values=list(self.event_color.keys()))
+        self.entry_description.grid(row=1, column=1, padx=(0, 0), pady=(10, 0), sticky="ew")
+        self.label_color = customtkinter.CTkLabel(self.main_frame, text="Color:")
+        self.label_color.grid(row=2, column=0, padx=10, pady=(10, 0), sticky="e")
+        self.multi_selection = customtkinter.CTkComboBox(self.main_frame, values=list(self.event_color.keys()), command=self.combobox_callback)
         self.multi_selection.set("Lavender")
-        self.multi_selection.grid(row=2, column=1, pady=(10, 10))
+        self.multi_selection.grid(row=2, column=1, padx=0, pady=(10, 10), sticky="w")
         self.color_preview = customtkinter.CTkCanvas(self.main_frame, width=15, height=15)
-        self.color_preview.grid(row=2, column=3)
+        self.color_preview.grid(row=2, column=1, sticky="w", padx=(150, 0), pady=(10, 10))
         self.color_preview.configure(bg=self.event_color.get('Lavender'))
         
-        # date frame
+        # date
         self.date_frame = customtkinter.CTkFrame(self, width=400)
-        self.date_frame.grid(row=2, column=1, padx=(10, 10), pady=(10, 10), sticky="nsew")
+        self.date_frame.grid(row=2, column=1, padx=(50, 50), pady=10, sticky="nsew")
+        self.date_frame.grid_columnconfigure((0, 1, 2), weight=1)
         self.label_date_frame = customtkinter.CTkLabel(master=self.date_frame, text="Date Interval")
-        self.label_date_frame.grid(row=0, column=1, padx=10, pady=10, sticky="")
-        self.label_date_from = customtkinter.CTkLabel(self.date_frame, text="From:", anchor="w")
-        self.label_date_from.grid(row=1, column=0, padx=20, pady=(10, 0))
+        self.label_date_frame.grid(row=0, column=0, columnspan=3, padx=0, pady=10, sticky="ew")
+        self.label_date_from = customtkinter.CTkLabel(self.date_frame, text="From:")
+        self.label_date_from.grid(row=1, column=0, padx=10, pady=10, sticky="e")
         self.entry_date_from = customtkinter.CTkEntry(self.date_frame, placeholder_text="dd/mm/yyyy")
-        self.entry_date_from.grid(row=1, column=1, padx=(0, 0), pady=(10, 10), sticky="nsew")
+        self.entry_date_from.grid(row=1, column=1, padx=0, pady=10, sticky="ew")
         self.entry_date_button = customtkinter.CTkButton(self.date_frame, text="", width=10, image=self.calendar_image, command=lambda: self.date_picker(1))
-        self.entry_date_button.grid(row=1, column=2, padx=(0, 0), pady=(10, 10))
-        self.label_date_to = customtkinter.CTkLabel(self.date_frame, text="To:", anchor="w")
-        self.label_date_to.grid(row=2, column=0, padx=20, pady=(10, 0))
+        self.entry_date_button.grid(row=1, column=2, padx=0, pady=10, sticky="w")
+        self.label_date_to = customtkinter.CTkLabel(self.date_frame, text="To:")
+        self.label_date_to.grid(row=2, column=0, padx=10, pady=10, sticky="e")
         self.entry_date_to = customtkinter.CTkEntry(self.date_frame, placeholder_text="dd/mm/yyyy")
-        self.entry_date_to.grid(row=2, column=1, padx=(0, 0), pady=(10, 10), sticky="nsew")
+        self.entry_date_to.grid(row=2, column=1, padx=0, pady=10, sticky="ew")
         self.entry_date_button2 = customtkinter.CTkButton(self.date_frame, text="", width=10, image=self.calendar_image, command=lambda: self.date_picker(2))
-        self.entry_date_button2.grid(row=2, column=2, padx=(0, 0), pady=(0, 0))
+        self.entry_date_button2.grid(row=2, column=2, padx=0, pady=10, sticky="w")
         
         # create button
-        self.create_button = customtkinter.CTkButton(self, command=None, image=self.plus_image, text="Create")
+        self.create_button = customtkinter.CTkButton(self, image=self.plus_image, text="Create", command=self.create_event)
         self.create_button.grid(row=3, column=1, padx=20, pady=20)
         
         # create log textbox
         self.log_box = customtkinter.CTkTextbox(self, width=250, height=100)
         self.log_box.bind("<Key>", lambda e: "break")  # set the textbox readonly
         self.log_box.grid(row=4, column=1, columnspan=2, padx=(0, 0), pady=(20, 0), sticky="nsew")
+    
+    #TODO: check and fixhere
+    def create_event(self):
+        print(self.entry_summary.get())
+        print(self.entry_description.get())
+        print(self.multi_selection.get())
+        print(self.entry_date_from.get())
+        print(self.entry_date_to.get())
+        return
+        #gc.GoogleCalendarEventsManager.createEvent()
+    
+    def combobox_callback(self, color):
+        self.color_preview.configure(bg=self.event_color.get(color))
+        self.main_class.write_log(self.log_box, f"color '{color}' selected")
     
     def date_picker(self, type):
         self.toplevel_window = self.main_class.date_picker_window(type, self.toplevel_window, self.entry_date_from, self.entry_date_to, self.log_box)
@@ -317,7 +333,11 @@ class GetEventsByFrame(customtkinter.CTkFrame):
         self.file_path.delete("0", tkinter.END)
         self.file_path.insert("0", file_path)
         self.main_class.write_log(self.log_box, f"file '{file_path}' selected")
-        
+    
+    def set_logbox_text(self, text):
+        self.log_box.delete("0.0", tkinter.END)
+        self.log_box.insert("0.0", text)
+    
     def open_file(self):
         self.file_viewer_window = self.main_class.file_viewer_window(self.file_viewer_window, self.file_path.get(), self.log_box)
     
@@ -335,6 +355,7 @@ class GetEventsByFrame(customtkinter.CTkFrame):
         
     def go_to_graph_frame(self):
         self.main_class.show_frame(GraphFrame)
+        self.main_class.update_logtext(self.log_box, GraphFrame)
 #?###########################################################
 
 
@@ -414,7 +435,11 @@ class GraphFrame(customtkinter.CTkFrame):
         self.file_path.delete("0", tkinter.END)
         self.file_path.insert("0", file_path)
         self.main_class.write_log(self.log_box, f"file '{file_path}' selected")
-        
+    
+    def set_logbox_text(self, text):
+        self.log_box.delete("0.0", tkinter.END)
+        self.log_box.insert("0.0", text)
+    
     def open_file(self):
         self.file_viewer_window = self.main_class.file_viewer_window(self.file_viewer_window, self.file_path.get(), self.log_box)
     
@@ -523,6 +548,8 @@ class App():
     token_path = None
     credentials = None
     
+    log_text = None
+    
     app_width = 1100
     app_height = 900
     
@@ -557,6 +584,9 @@ class App():
     def show_frame(self, cont):
         frame = self.frames[cont]
         frame.tkraise()
+    
+    def update_logtext(self, logbox, next_frame):
+        next_frame.set_logbox_text(text=logbox.get("0.0", tkinter.END))
     
     def init_window(self):
         # configure window

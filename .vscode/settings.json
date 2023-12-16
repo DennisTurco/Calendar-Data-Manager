@@ -60,5 +60,13 @@
     "*.tex": "latex",
     "cmath": "cpp",
     "iostream": "cpp"
-  }
+  },
+  "cSpell.words": [
+    "columnspan",
+    "customtkinter",
+    "padx",
+    "pady",
+    "rowspan",
+    "tkcalendar"
+  ]
 }
