@@ -121,13 +121,14 @@ class GoogleCalendarEventsManager:
             return False
 
     @staticmethod
-    def createEvent(creds: Credentials, title_event: str, start_date: datetime, end_date: datetime, color_event_id: int = 1, timeZone: str = 'UTC'):
+    def createEvent(creds: Credentials, summary: str, description: str, start_date: datetime, end_date: datetime, color_event_id: int = 1, timeZone: str = 'UTC'):
         if creds == None: Exception("Credentials can't be null")
         service = build("calendar", "v3", credentials=creds)
         
         # set the event
         event = {
-            'summary': title_event,
+            'summary': summary,
+            'description': description,
             'start': {
                 'dateTime': start_date.isoformat(),
                 'timeZone': timeZone,
