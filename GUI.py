@@ -186,6 +186,8 @@ class NewEventsFrame(customtkinter.CTkFrame):
 class EditEventsFrame(customtkinter.CTkFrame):
     
     main_class = None
+    event_color = {"Tomato": "#d50000", "Flamingo": "#e67c73", "Tangerine": "#f4511e", "Banana": "#f6bf26", "Sage": "#33b679", "Basil": "#0b8043", "Peacock": "#039be5", "Blueberry": "#3f51b5", "Lavender": "#7986cb", "Wine": "#8e24aa", "Graphite": "#616161"}
+    timezone = ['Africa/Abidjan', 'Africa/Accra', 'Africa/Algiers', 'Africa/Bissau', 'Africa/Cairo', 'Africa/Casablanca', 'Africa/Ceuta', 'Africa/El_Aaiun', 'Africa/Juba', 'Africa/Khartoum', 'Africa/Lagos', 'Africa/Maputo', 'Africa/Monrovia', 'Africa/Nairobi', 'Africa/Ndjamena', 'Africa/Sao_Tome', 'Africa/Tripoli', 'Africa/Tunis', 'Africa/Windhoek', 'America/Adak', 'America/Anchorage', 'America/Araguaina', 'America/Argentina/Buenos_Aires', 'America/Argentina/Catamarca', 'America/Argentina/Cordoba', 'America/Argentina/Jujuy', 'America/Argentina/La_Rioja', 'America/Argentina/Mendoza', 'America/Argentina/Rio_Gallegos', 'America/Argentina/Salta', 'America/Argentina/San_Juan', 'America/Argentina/San_Luis', 'America/Argentina/Tucuman', 'America/Argentina/Ushuaia', 'America/Asuncion', 'America/Atikokan', 'America/Bahia', 'America/Bahia_Banderas', 'America/Barbados', 'America/Belem', 'America/Belize', 'America/Blanc-Sablon', 'America/Boa_Vista', 'America/Bogota', 'America/Boise', 'America/Cambridge_Bay', 'America/Campo_Grande', 'America/Cancun', 'America/Caracas', 'America/Cayenne', 'America/Chicago', 'America/Chihuahua', 'America/Costa_Rica', 'America/Creston', 'America/Cuiaba', 'America/Curacao', 'America/Danmarkshavn', 'America/Dawson', 'America/Dawson_Creek', 'America/Denver', 'America/Detroit', 'America/Edmonton', 'America/Eirunepe', 'America/El_Salvador', 'America/Fort_Nelson', 'America/Fortaleza', 'America/Glace_Bay', 'America/Godthab', 'America/Goose_Bay', 'America/Grand_Turk', 'America/Guatemala', 'America/Guayaquil', 'America/Guyana', 'America/Halifax', 'America/Havana', 'America/Hermosillo', 'America/Indiana/Indianapolis', 'America/Indiana/Knox', 'America/Indiana/Marengo', 'America/Indiana/Petersburg', 'America/Indiana/Tell_City', 'America/Indiana/Vevay', 'America/Indiana/Vincennes', 'America/Indiana/Winamac', 'America/Inuvik', 'America/Iqaluit', 'America/Jamaica', 'America/Juneau', 'America/Kentucky/Louisville', 'America/Kentucky/Monticello', 'America/Kralendijk', 'America/La_Paz', 'America/Lima', 'America/Los_Angeles', 'America/Louisville', 'America/Lower_Princes', 'America/Maceio', 'America/Managua', 'America/Manaus', 'America/Marigot', 'America/Martinique', 'America/Matamoros', 'America/Mazatlan', 'America/Menominee', 'America/Merida', 'America/Metlakatla', 'America/Mexico_City', 'America/Miquelon', 'America/Moncton', 'America/Monterrey', 'America/Montevideo', 'America/Montreal', 'America/Montserrat', 'America/Nassau', 'America/New_York', 'America/Nipigon', 'America/Nome', 'America/Noronha', 'America/North_Dakota/Beulah', 'America/North_Dakota/Center', 'America/North_Dakota/New_Salem', 'America/Nuuk', 'America/Ojinaga', 'America/Panama', 'America/Pangnirtung', 'America/Paramaribo', 'America/Phoenix', 'America/Port-au-Prince', 'America/Port_of_Spain', 'America/Porto_Acre', 'America/Porto_Velho', 'America/Puerto_Rico', 'America/Punta_Arenas', 'America/Rainy_River', 'America/Rankin_Inlet', 'America/Recife', 'America/Regina', 'America/Resolute', 'America/Rio_Branco', 'America/Santarem', 'America/Santiago', 'America/Santo_Domingo', 'America/Sao_Paulo', 'America/Scoresbysund', 'America/Sitka', 'America/St_Barthelemy', 'America/St_Johns', 'America/St_Kitts', 'America/St_Lucia', 'America/St_Thomas', 'America/St_Vincent', 'America/Swift_Current', 'America/Tegucigalpa', 'America/Thule', 'America/Thunder_Bay', 'America/Tijuana', 'America/Toronto', 'America/Tortola', 'America/Vancouver', 'America/Whitehorse', 'America/Winnipeg', 'America/Yakutat', 'America/Yellowknife', 'Antarctica/Casey', 'Antarctica/Davis', 'Antarctica/DumontDUrville', 'Antarctica/Macquarie', 'Antarctica/Mawson', 'Antarctica/McMurdo', 'Antarctica/Palmer', 'Antarctica/Rothera', 'Antarctica/Syowa', 'Antarctica/Troll', 'Antarctica/Vostok', 'Arctic/Longyearbyen', 'Asia/Aden', 'Asia/Almaty', 'Asia/Amman', 'Asia/Anadyr', 'Asia/Aqtau', 'Asia/Aqtobe', 'Asia/Ashgabat', 'Asia/Atyrau', 'Asia/Baghdad', 'Asia/Bahrain', 'Asia/Baku', 'Asia/Bangkok', 'Asia/Barnaul', 'Asia/Beirut', 'Asia/Bishkek', 'Asia/Brunei', 'Asia/Chita', 'Asia/Choibalsan', 'Asia/Colombo', 'Asia/Damascus', 'Asia/Dhaka', 'Asia/Dili', 'Asia/Dubai', 'Asia/Dushanbe', 'Asia/Famagusta', 'Asia/Gaza', 'Asia/Hebron', 'Asia/Ho_Chi_Minh', 'Asia/Hong_Kong', 'Asia/Hovd', 'Asia/Irkutsk', 'Asia/Istanbul', 'Asia/Jakarta', 'Asia/Jayapura', 'Asia/Jerusalem', 'Asia/Kabul', 'Asia/Kamchatka', 'Asia/Karachi', 'Asia/Kathmandu', 'Asia/Khandyga', 'Asia/Kolkata', 'Asia/Krasnoyarsk', 'Asia/Kuala_Lumpur', 'Asia/Kuching', 'Asia/Kuwait', 'Asia/Macau', 'Asia/Magadan', 'Asia/Makassar', 'Asia/Manila', 'Asia/Muscat', 'Asia/Nicosia', 'Asia/Novokuznetsk', 'Asia/Novosibirsk', 'Asia/Omsk', 'Asia/Oral', 'Asia/Phnom_Penh', 'Asia/Pontianak', 'Asia/Pyongyang', 'Asia/Qatar', 'Asia/Qostanay', 'Asia/Qyzylorda', 'Asia/Riyadh', 'Asia/Sakhalin', 'Asia/Samarkand', 'Asia/Seoul', 'Asia/Shanghai', 'Asia/Singapore', 'Asia/Srednekolymsk', 'Asia/Taipei', 'Asia/Tashkent', 'Asia/Tbilisi', 'Asia/Tehran', 'Asia/Thimphu', 'Asia/Tokyo', 'Asia/Tomsk', 'Asia/Ulaanbaatar', 'Asia/Urumqi', 'Asia/Ust-Nera', 'Asia/Vientiane', 'Asia/Vladivostok', 'Asia/Yakutsk', 'Asia/Yangon', 'Asia/Yekaterinburg', 'Asia/Yerevan', 'Atlantic/Azores', 'Atlantic/Bermuda', 'Atlantic/Canary', 'Atlantic/Cape_Verde', 'Atlantic/Faroe', 'Atlantic/Madeira', 'Atlantic/Reykjavik', 'Atlantic/South_Georgia', 'Atlantic/St_Helena', 'Atlantic/Stanley', 'Australia/Adelaide', 'Australia/Brisbane', 'Australia/Broken_Hill', 'Australia/Currie', 'Australia/Darwin', 'Australia/Eucla', 'Australia/Hobart', 'Australia/Lindeman', 'Australia/Lord_Howe', 'Australia/Melbourne', 'Australia/Perth', 'Australia/Sydney', 'Canada/Atlantic', 'Canada/Central', 'Canada/Eastern', 'Canada/Mountain', 'Canada/Newfoundland', 'Canada/Pacific', 'Europe/Amsterdam', 'Europe/Andorra', 'Europe/Astrakhan', 'Europe/Athens', 'Europe/Belgrade', 'Europe/Berlin', 'Europe/Bratislava', 'Europe/Brussels', 'Europe/Bucharest', 'Europe/Budapest', 'Europe/Busingen', 'Europe/Chisinau', 'Europe/Copenhagen', 'Europe/Dublin', 'Europe/Gibraltar', 'Europe/Guernsey', 'Europe/Helsinki', 'Europe/Isle_of_Man', 'Europe/Istanbul', 'Europe/Jersey', 'Europe/Kaliningrad', 'Europe/Kiev', 'Europe/Kirov', 'Europe/Lisbon', 'Europe/Ljubljana', 'Europe/London', 'Europe/Luxembourg', 'Europe/Madrid', 'Europe/Malta', 'Europe/Mariehamn', 'Europe/Minsk', 'Europe/Monaco', 'Europe/Moscow', 'Europe/Oslo', 'Europe/Paris', 'Europe/Podgorica', 'Europe/Prague', 'Europe/Riga', 'Europe/Rome', 'Europe/Samara', 'Europe/San_Marino', 'Europe/Sarajevo', 'Europe/Saratov', 'Europe/Simferopol', 'Europe/Skopje', 'Europe/Sofia', 'Europe/Stockholm', 'Europe/Tallinn', 'Europe/Tirane', 'Europe/Ulyanovsk', 'Europe/Uzhgorod', 'Europe/Vaduz', 'Europe/Vatican', 'Europe/Vienna', 'Europe/Vilnius', 'Europe/Volgograd', 'Europe/Warsaw', 'Europe/Zagreb', 'Europe/Zaporozhye', 'Europe/Zurich', 'GMT', 'Indian/Antananarivo', 'Indian/Chagos', 'Indian/Christmas', 'Indian/Cocos', 'Indian/Comoro', 'Indian/Kerguelen', 'Indian/Mahe', 'Indian/Maldives', 'Indian/Mauritius', 'Indian/Mayotte', 'Indian/Reunion', 'Pacific/Apia', 'Pacific/Auckland', 'Pacific/Bougainville', 'Pacific/Chatham', 'Pacific/Chuuk', 'Pacific/Easter', 'Pacific/Efate', 'Pacific/Enderbury', 'Pacific/Fakaofo', 'Pacific/Fiji', 'Pacific/Funafuti', 'Pacific/Galapagos', 'Pacific/Gambier', 'Pacific/Guadalcanal', 'Pacific/Guam', 'Pacific/Honolulu', 'Pacific/Kiritimati', 'Pacific/Kosrae', 'Pacific/Kwajalein', 'Pacific/Majuro', 'Pacific/Marquesas', 'Pacific/Midway', 'Pacific/Nauru', 'Pacific/Niue', 'Pacific/Norfolk', 'Pacific/Noumea', 'Pacific/Pago_Pago', 'Pacific/Palau', 'Pacific/Pitcairn', 'Pacific/Pohnpei', 'Pacific/Port_Moresby', 'Pacific/Rarotonga', 'Pacific/Saipan', 'Pacific/Tahiti', 'Pacific/Tarawa', 'Pacific/Tongatapu', 'Pacific/Wake', 'Pacific/Wallis', 'UTC']
     
     def __init__(self, parent, main_class):
         customtkinter.CTkFrame.__init__(self, parent)
@@ -203,7 +205,7 @@ class EditEventsFrame(customtkinter.CTkFrame):
         
         # configure grid layout (4x4)
         self.grid_columnconfigure(1, weight=1)
-        self.grid_columnconfigure((2, 3), weight=0)
+        self.grid_columnconfigure((2, 4), weight=0)
         self.grid_rowconfigure((0, 1, 2), weight=1)
 
         # create sidebar frame with widgets
@@ -222,6 +224,104 @@ class EditEventsFrame(customtkinter.CTkFrame):
         self.sidebar_button_4.grid(row=4, column=0, padx=20, pady=10)
         self.google_calendar_link = customtkinter.CTkButton(self.sidebar_frame, image=self.google_image, text="Google Calendar", command=lambda: webbrowser.open('https://calendar.google.com/'))
         self.google_calendar_link.grid(row=6, column=0, padx=20, pady=(10, 10))
+        
+        # create main panel
+        self.title_label_main = customtkinter.CTkLabel(self, text="Edit Events", font=customtkinter.CTkFont(size=20, weight="bold"))
+        self.title_label_main.grid(row=0, column=1, padx=20, pady=(20, 10), sticky="nsew")
+        
+        #TODO: fix colors position
+        
+        
+        # Create a frame with a 1x2 grid
+        main_frame = customtkinter.CTkFrame(self)
+        main_frame.grid(row=1, column=1, padx=(50, 50), pady=10, sticky="ew")
+        main_frame.grid_columnconfigure((0, 1, 2), weight=1)
+        
+        # old main values
+        self.old_values_frame = customtkinter.CTkFrame(main_frame)
+        self.old_values_frame.grid(row=1, column=1, padx=(50, 25), pady=10, sticky="ew")
+        self.old_values_frame.grid_columnconfigure((0, 1, 2), weight=1)
+        self.label_frame_old = customtkinter.CTkLabel(self.old_values_frame, text="OLD Values")
+        self.label_frame_old.grid(row=0, column=0, columnspan=3, padx=0, pady=10, sticky="ew")
+        self.label_summary_old = customtkinter.CTkLabel(self.old_values_frame, text="Summary:")
+        self.label_summary_old.grid(row=1, column=0, padx=10, pady=(10, 0), sticky="e")
+        self.entry_summary_old = customtkinter.CTkEntry(self.old_values_frame, placeholder_text="summary")
+        self.entry_summary_old.grid(row=1, column=1, columnspan=2, padx=(10, 10), pady=(10, 10), sticky="w")
+        self.label_description_old = customtkinter.CTkLabel(self.old_values_frame, text="Description:")
+        self.label_description_old.grid(row=2, column=0, padx=10, pady=(10, 0), sticky="e")
+        self.entry_description_old = customtkinter.CTkTextbox(self.old_values_frame, width=250, height=100)
+        self.entry_description_old.grid(row=2, column=1, padx=(0, 0), pady=(10, 0), sticky="ew")
+        self.label_color_old = customtkinter.CTkLabel(self.old_values_frame, text="Color:")
+        self.label_color_old.grid(row=3, column=0, padx=10, pady=(10, 0), sticky="e")
+        self.multi_selection_old = customtkinter.CTkComboBox(self.old_values_frame, state="readonly", values=list(self.event_color.keys()), command=self.combobox_callback)
+        self.multi_selection_old.set("Lavender")
+        self.multi_selection_old.grid(row=3, column=1, padx=0, pady=(10, 10), sticky="w")
+        self.color_preview_old = customtkinter.CTkCanvas(self.old_values_frame, width=15, height=15)
+        self.color_preview_old.grid(row=3, column=1, sticky="w", padx=(150, 0), pady=(10, 10))
+        self.color_preview_old.configure(bg=self.event_color.get('Lavender'))
+        
+        # new main values
+        self.new_values_frame = customtkinter.CTkFrame(main_frame)
+        self.new_values_frame.grid(row=1, column=2, padx=(25, 50), pady=10, sticky="ew")
+        self.new_values_frame.grid_columnconfigure((0, 1, 2), weight=1)
+        self.label_frame_new = customtkinter.CTkLabel(self.old_values_frame, text="NEW Values")
+        self.label_frame_new.grid(row=0, column=0, columnspan=3, padx=0, pady=10, sticky="ew")
+        self.label_summary_new = customtkinter.CTkLabel(self.new_values_frame, text="Summary:")
+        self.label_summary_new.grid(row=1, column=0, padx=10, pady=(10, 0), sticky="e")
+        self.entry_summary_new = customtkinter.CTkEntry(self.new_values_frame, placeholder_text="summary")
+        self.entry_summary_new.grid(row=1, column=1, columnspan=2, padx=(10, 10), pady=(10, 10), sticky="w")
+        self.label_description_new = customtkinter.CTkLabel(self.new_values_frame, text="Description:")
+        self.label_description_new.grid(row=2, column=0, padx=10, pady=(10, 0), sticky="e")
+        self.entry_description_new = customtkinter.CTkTextbox(self.new_values_frame, width=250, height=100)
+        self.entry_description_new.grid(row=2, column=1, padx=(0, 0), pady=(10, 0), sticky="ew")
+        self.label_color_new = customtkinter.CTkLabel(self.new_values_frame, text="Color:")
+        self.label_color_new.grid(row=3, column=0, padx=10, pady=(10, 0), sticky="e")
+        self.multi_selection_new = customtkinter.CTkComboBox(self.new_values_frame, state="readonly", values=list(self.event_color.keys()), command=self.combobox_callback)
+        self.multi_selection_new.set("Lavender")
+        self.multi_selection_new.grid(row=3, column=1, padx=0, pady=(10, 10), sticky="w")
+        self.color_preview_new = customtkinter.CTkCanvas(self.new_values_frame, width=15, height=15)
+        self.color_preview_new.grid(row=3, column=1, sticky="w", padx=(150, 0), pady=(10, 10))
+        self.color_preview_new.configure(bg=self.event_color.get('Lavender'))
+           
+        # date
+        self.date_frame = customtkinter.CTkFrame(self, width=400)
+        self.date_frame.grid(row=2, column=1, columnspan=2, padx=20, pady=10, sticky="nsew")
+        self.date_frame.grid_columnconfigure((0, 1, 2), weight=1)
+        self.label_date_frame = customtkinter.CTkLabel(master=self.date_frame, text="Date Interval")
+        self.label_date_frame.grid(row=0, column=0, columnspan=3, padx=0, pady=10, sticky="ew")
+        self.label_date_from = customtkinter.CTkLabel(self.date_frame, text="From:")
+        self.label_date_from.grid(row=1, column=0, padx=10, pady=10, sticky="e")
+        self.entry_date_from = customtkinter.CTkEntry(self.date_frame, placeholder_text="yyyy-mm-dd hh:mm")
+        self.entry_date_from.grid(row=1, column=1, padx=0, pady=10, sticky="ew")
+        self.entry_date_button = customtkinter.CTkButton(self.date_frame, text="", width=10, image=self.calendar_image, command=lambda: self.date_picker(1))
+        self.entry_date_button.grid(row=1, column=2, padx=0, pady=10, sticky="w")
+        self.label_date_to = customtkinter.CTkLabel(self.date_frame, text="To:")
+        self.label_date_to.grid(row=2, column=0, padx=10, pady=10, sticky="e")
+        self.entry_date_to = customtkinter.CTkEntry(self.date_frame, placeholder_text="yyyy-mm-dd hh:mm")
+        self.entry_date_to.grid(row=2, column=1, padx=0, pady=10, sticky="ew")
+        self.entry_date_button2 = customtkinter.CTkButton(self.date_frame, text="", width=10, image=self.calendar_image, command=lambda: self.date_picker(2))
+        self.entry_date_button2.grid(row=2, column=2, padx=0, pady=10, sticky="w")
+        self.label_timezone = customtkinter.CTkLabel(self.date_frame, text="Timezone:")
+        self.label_timezone.grid(row=3, column=0, padx=10, pady=10, sticky="e")
+        self.timezone_selection = customtkinter.CTkComboBox(self.date_frame, state="readonly", values=list(self.timezone), command=self.combobox_callback)
+        self.timezone_selection.set(self.timezone[len(self.timezone)-1])
+        self.timezone_selection.grid(row=3, column=1, padx=0, pady=(10, 10), sticky="nsew")
+        
+        # create button
+        self.create_button = customtkinter.CTkButton(self, image=self.edit_image, text="Edit", command=self.edit_event)
+        self.create_button.grid(row=3, column=1, columnspan=2, padx=20, pady=20)
+        
+        # create log textbox
+        self.log_box = customtkinter.CTkTextbox(self, width=250, height=100)
+        self.log_box.bind("<Key>", lambda e: "break")  # set the textbox readonly
+        self.log_box.grid(row=4, column=1, columnspan=2, padx=(0, 0), pady=(20, 0), sticky="nsew")
+    
+    def edit_event(self):
+        pass
+    
+    def combobox_callback(self, color):
+        self.color_preview.configure(bg=self.event_color.get(color))
+        self.main_class.write_log(self.log_box, f"color '{color}' selected")
     
     def go_to_new_events_frame(self):
         self.main_class.show_frame(NewEventsFrame)
