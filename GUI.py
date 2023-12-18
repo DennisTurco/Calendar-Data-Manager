@@ -108,13 +108,13 @@ class NewEventsFrame(customtkinter.CTkFrame):
         self.label_date_frame.grid(row=0, column=0, columnspan=3, padx=0, pady=10, sticky="ew")
         self.label_date_from = customtkinter.CTkLabel(self.date_frame, text="From:")
         self.label_date_from.grid(row=1, column=0, padx=10, pady=10, sticky="e")
-        self.entry_date_from = customtkinter.CTkEntry(self.date_frame, placeholder_text="dd/mm/yy")
+        self.entry_date_from = customtkinter.CTkEntry(self.date_frame, placeholder_text="yyyy-mm-dd hh:mm")
         self.entry_date_from.grid(row=1, column=1, padx=0, pady=10, sticky="ew")
         self.entry_date_button = customtkinter.CTkButton(self.date_frame, text="", width=10, image=self.calendar_image, command=lambda: self.date_picker(1))
         self.entry_date_button.grid(row=1, column=2, padx=0, pady=10, sticky="w")
         self.label_date_to = customtkinter.CTkLabel(self.date_frame, text="To:")
         self.label_date_to.grid(row=2, column=0, padx=10, pady=10, sticky="e")
-        self.entry_date_to = customtkinter.CTkEntry(self.date_frame, placeholder_text="dd/mm/yy")
+        self.entry_date_to = customtkinter.CTkEntry(self.date_frame, placeholder_text="yyyy-mm-dd hh:mm")
         self.entry_date_to.grid(row=2, column=1, padx=0, pady=10, sticky="ew")
         self.entry_date_button2 = customtkinter.CTkButton(self.date_frame, text="", width=10, image=self.calendar_image, command=lambda: self.date_picker(2))
         self.entry_date_button2.grid(row=2, column=2, padx=0, pady=10, sticky="w")
@@ -146,8 +146,8 @@ class NewEventsFrame(customtkinter.CTkFrame):
             self.main_class.write_log(self.log_box, f"Error on creating event: date is missing")
             return
         try:
-            date_from = datetime.strptime(date_from, '%d-%m-%y')
-            date_to = datetime.strptime(date_to, '%d-%m-%y')
+            date_from = datetime.strptime(date_from, '%Y-%m-%d %H:%M')
+            date_to = datetime.strptime(date_to, '%Y-%m-%d %H:%M')
         except ValueError:
             self.main_class.write_log(self.log_box, f"Error on creating event: date format is not correct")
         
@@ -157,9 +157,12 @@ class NewEventsFrame(customtkinter.CTkFrame):
             if color == color_selected:
                 color_index = idx
                 break
-            
-        gc.GoogleCalendarEventsManager.createEvent(self.main_class.get_credentials(), summary, self.entry_description.get("0.0", tkinter.END), date_from, date_to, color_index)
-    
+        try: 
+            gc.GoogleCalendarEventsManager.createEvent(self.main_class.get_credentials(), summary, self.entry_description.get("0.0", tkinter.END), date_from, date_to, color_index)
+        except Exception as e:
+            self.main_class.write_log(self.log_box, f"Exception occurred: {str(e)}")
+        
+        
     def combobox_callback(self, color):
         self.color_preview.configure(bg=self.event_color.get(color))
         self.main_class.write_log(self.log_box, f"color '{color}' selected")
@@ -316,13 +319,13 @@ class GetEventsByFrame(customtkinter.CTkFrame):
         self.label_date_frame.grid(row=0, column=0, columnspan=3, padx=0, pady=10, sticky="ew")
         self.label_date_from = customtkinter.CTkLabel(self.date_frame, text="From:")
         self.label_date_from.grid(row=1, column=0, padx=10, pady=10, sticky="e")
-        self.entry_date_from = customtkinter.CTkEntry(self.date_frame, placeholder_text="dd/mm/yyyy")
+        self.entry_date_from = customtkinter.CTkEntry(self.date_frame, placeholder_text="yyyy-mm-dd hh:mm")
         self.entry_date_from.grid(row=1, column=1, padx=0, pady=10, sticky="ew")
         self.entry_date_button = customtkinter.CTkButton(self.date_frame, text="", width=10, image=self.calendar_image, command=lambda: self.date_picker(1))
         self.entry_date_button.grid(row=1, column=2, padx=0, pady=10, sticky="w")
         self.label_date_to = customtkinter.CTkLabel(self.date_frame, text="To:")
         self.label_date_to.grid(row=2, column=0, padx=10, pady=10, sticky="e")
-        self.entry_date_to = customtkinter.CTkEntry(self.date_frame, placeholder_text="dd/mm/yyyy")
+        self.entry_date_to = customtkinter.CTkEntry(self.date_frame, placeholder_text="yyyy-mm-dd hh:mm")
         self.entry_date_to.grid(row=2, column=1, padx=0, pady=10, sticky="ew")
         self.entry_date_button2 = customtkinter.CTkButton(self.date_frame, text="", width=10, image=self.calendar_image, command=lambda: self.date_picker(2))
         self.entry_date_button2.grid(row=2, column=2, padx=0, pady=10, sticky="w")
@@ -588,13 +591,13 @@ class App():
         self.root = root
         
         
-        self.init_window()
-        self.init_menu()
-        self.page_controller()
+        # self.init_window()
+        # self.init_menu()
+        # self.page_controller()
         
-        self.root.mainloop()
+        # self.root.mainloop()
         
-        return 
+        # return 
         #TODO: solo per test, questo sotto va abilitato
         
         # read data from json to get path from last session
@@ -705,18 +708,26 @@ class App():
         if toplevel_window is None or not toplevel_window.winfo_exists():
             toplevel_window = customtkinter.CTkToplevel() # create window if its None or destroyed
             calendar = Calendar(toplevel_window)
-            calendar.grid(row=0, column=0, padx=(0, 0), pady=(10, 10), sticky="nsew")
-            
+            calendar.grid(row=0, column=0, padx=10, pady=10, sticky="nsew") 
+            hours = customtkinter.CTkLabel(toplevel_window, text="hours:")
+            hours.grid(row=1, column=0, padx=10, pady=10, sticky="w")
+            hours = customtkinter.CTkEntry(toplevel_window, placeholder_text="hh")
+            hours.grid(row=1, column=0, padx=(70, 0), pady=10, sticky="w")
+            minutes = customtkinter.CTkLabel(toplevel_window, text="minutes: ")
+            minutes.grid(row=2, column=0, padx=10, pady=10, sticky="w")
+            minutes = customtkinter.CTkEntry(toplevel_window, placeholder_text="mm")
+            minutes.grid(row=2, column=0, padx=(70, 0), pady=10, sticky="w")
+                
             if type == 1:
                 toplevel_window.title("Date From")
-                confirm_button = customtkinter.CTkButton(toplevel_window, text="Confirm", command=lambda: self.get_date(1, toplevel_window, entry_date_from, entry_date_to, log_box, calendar))
+                confirm_button = customtkinter.CTkButton(toplevel_window, text="Confirm", command=lambda: self.get_date(1, toplevel_window, entry_date_from, entry_date_to, log_box, calendar, hours, minutes))
             elif type == 2:
                 toplevel_window.title("Date To")
-                confirm_button = customtkinter.CTkButton(toplevel_window, text="Confirm", command=lambda: self.get_date(2, toplevel_window, entry_date_from, entry_date_to, log_box, calendar))
+                confirm_button = customtkinter.CTkButton(toplevel_window, text="Confirm", command=lambda: self.get_date(2, toplevel_window, entry_date_from, entry_date_to, log_box, calendar, hours, minutes))
             else:
                 Exception("type option doesn't exists")
             
-            confirm_button.grid(row=1, column=0, padx=(0, 0), pady=(10, 10), sticky="nsew") 
+            confirm_button.grid(row=3, column=0, padx=10, pady=10, sticky="nsew") 
             
             toplevel_window.attributes("-topmost", True) # focus to this windows
             toplevel_window.resizable(False, False)
@@ -725,19 +736,32 @@ class App():
         
         return toplevel_window
     
-    def get_date(self, type, toplevel_window, entry_date_from, entry_date_to, log_box, calendar):
+    def get_date(self, type, toplevel_window, entry_date_from, entry_date_to, log_box, calendar, hours, minutes):
         date = calendar.get_date() # get the date from the calendar
-        #TODO:
-        #date = datetime.strptime(date, "%m-%d-%y") # convert the date string to datetime
-        #date = datetime.strftime(date, "%d-%m-%Y") # edit the date format
+        
+        try:
+            if len(hours.get()) == 0: hour = 0
+            else: hour = int(hours.get())
+            if len(minutes.get()) == 0: minute = 0
+            else: minute =  int(minutes.get())
+    
+            if hour > 23 or hour < 0 or minute > 59 or minute < 0: return
+        except ValueError:
+            return
+        
+        # Format the datetime object as a string in "%Y-%m-%d %H:%M" format
+        date = datetime.strptime(date, "%m/%d/%y")  
+        full_date = datetime(date.year, date.month, date.day, hour, minute)
+        full_date_str = full_date.strftime("%Y-%m-%d %H:%M")  
+        
         if type == 1:
-            self.write_log(log_box, "Date Selected From: " + date)
+            self.write_log(log_box, "Date Selected From: " + full_date_str)
             entry_date_from.delete("0", tkinter.END)
-            entry_date_from.insert("0", date)
+            entry_date_from.insert("0", full_date_str)
         elif type == 2:
-            self.write_log(log_box, "Date Selected To: " + date)
+            self.write_log(log_box, "Date Selected To: " + full_date_str)
             entry_date_to.delete("0", tkinter.END)
-            entry_date_to.insert("0", date)
+            entry_date_to.insert("0", full_date_str)
         else:
             Exception("type option doesn't exists")
         
