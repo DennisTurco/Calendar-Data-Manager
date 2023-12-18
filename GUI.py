@@ -31,7 +31,6 @@ except:
     from tkcalendar import *
 
 #?###########################################################
-#TODO: todo
 class NewEventsFrame(customtkinter.CTkFrame):
     
     main_class = None
@@ -79,6 +78,7 @@ class NewEventsFrame(customtkinter.CTkFrame):
         self.title_label_main = customtkinter.CTkLabel(self, text="Create New Event", font=customtkinter.CTkFont(size=20, weight="bold"))
         self.title_label_main.grid(row=0, column=1, padx=20, pady=(20, 10), sticky="nsew")
         
+        #TODO: fix colors position
         # main entry
         self.main_frame = customtkinter.CTkFrame(self)
         self.main_frame.grid(row=1, column=1, padx=(50, 50), pady=10, sticky="ew")
@@ -133,7 +133,6 @@ class NewEventsFrame(customtkinter.CTkFrame):
         self.log_box.bind("<Key>", lambda e: "break")  # set the textbox readonly
         self.log_box.grid(row=4, column=1, columnspan=2, padx=(0, 0), pady=(20, 0), sticky="nsew")
     
-    #TODO: check and fixhere
     def create_event(self):
         summary = self.entry_summary.get()
         date_from = self.entry_date_from.get()
@@ -159,9 +158,9 @@ class NewEventsFrame(customtkinter.CTkFrame):
                 break
         try: 
             gc.GoogleCalendarEventsManager.createEvent(self.main_class.get_credentials(), summary, self.entry_description.get("0.0", tkinter.END), date_from, date_to, color_index)
+            self.main_class.write_log(self.log_box, f"Event '{summary}' created succesfully!")
         except Exception as e:
-            self.main_class.write_log(self.log_box, f"Exception occurred: {str(e)}")
-        
+            self.main_class.write_log(self.log_box, f"Exception occurred: {str(e)}")   
         
     def combobox_callback(self, color):
         self.color_preview.configure(bg=self.event_color.get(color))
@@ -177,7 +176,7 @@ class NewEventsFrame(customtkinter.CTkFrame):
         self.main_class.show_frame(EditEventsFrame)
     
     def go_to_get_events_by_title_frame(self):
-        self.main_class.show_frame(GetEventsByFrame)
+        self.main_class.show_frame(GetEventsByTitleFrame)
     
     def go_to_graph_frame(self):
         self.main_class.show_frame(GraphFrame)
@@ -231,20 +230,20 @@ class EditEventsFrame(customtkinter.CTkFrame):
         self.main_class.show_frame(EditEventsFrame)
     
     def go_to_get_events_by_title_frame(self):
-        self.main_class.show_frame(GetEventsByFrame)
+        self.main_class.show_frame(GetEventsByTitleFrame)
     
     def go_to_graph_frame(self):
         self.main_class.show_frame(GraphFrame)
 #?###########################################################
 
 #?###########################################################
-class GetEventsByFrame(customtkinter.CTkFrame):
+class GetEventsByTitleFrame(customtkinter.CTkFrame):
     main_class = None
+    toplevel_window = None
     date_picker_window = None
     file_viewer_window = None
     event_color = {"Tomato": "#d50000", "Flamingo": "#e67c73", "Tangerine": "#f4511e", "Banana": "#f6bf26", "Sage": "#33b679", "Basil": "#0b8043", "Peacock": "#039be5", "Blueberry": "#3f51b5", "Lavender": "#7986cb", "Wine": "#8e24aa", "Graphite": "#616161"}
     timezone = ['Africa/Abidjan', 'Africa/Accra', 'Africa/Algiers', 'Africa/Bissau', 'Africa/Cairo', 'Africa/Casablanca', 'Africa/Ceuta', 'Africa/El_Aaiun', 'Africa/Juba', 'Africa/Khartoum', 'Africa/Lagos', 'Africa/Maputo', 'Africa/Monrovia', 'Africa/Nairobi', 'Africa/Ndjamena', 'Africa/Sao_Tome', 'Africa/Tripoli', 'Africa/Tunis', 'Africa/Windhoek', 'America/Adak', 'America/Anchorage', 'America/Araguaina', 'America/Argentina/Buenos_Aires', 'America/Argentina/Catamarca', 'America/Argentina/Cordoba', 'America/Argentina/Jujuy', 'America/Argentina/La_Rioja', 'America/Argentina/Mendoza', 'America/Argentina/Rio_Gallegos', 'America/Argentina/Salta', 'America/Argentina/San_Juan', 'America/Argentina/San_Luis', 'America/Argentina/Tucuman', 'America/Argentina/Ushuaia', 'America/Asuncion', 'America/Atikokan', 'America/Bahia', 'America/Bahia_Banderas', 'America/Barbados', 'America/Belem', 'America/Belize', 'America/Blanc-Sablon', 'America/Boa_Vista', 'America/Bogota', 'America/Boise', 'America/Cambridge_Bay', 'America/Campo_Grande', 'America/Cancun', 'America/Caracas', 'America/Cayenne', 'America/Chicago', 'America/Chihuahua', 'America/Costa_Rica', 'America/Creston', 'America/Cuiaba', 'America/Curacao', 'America/Danmarkshavn', 'America/Dawson', 'America/Dawson_Creek', 'America/Denver', 'America/Detroit', 'America/Edmonton', 'America/Eirunepe', 'America/El_Salvador', 'America/Fort_Nelson', 'America/Fortaleza', 'America/Glace_Bay', 'America/Godthab', 'America/Goose_Bay', 'America/Grand_Turk', 'America/Guatemala', 'America/Guayaquil', 'America/Guyana', 'America/Halifax', 'America/Havana', 'America/Hermosillo', 'America/Indiana/Indianapolis', 'America/Indiana/Knox', 'America/Indiana/Marengo', 'America/Indiana/Petersburg', 'America/Indiana/Tell_City', 'America/Indiana/Vevay', 'America/Indiana/Vincennes', 'America/Indiana/Winamac', 'America/Inuvik', 'America/Iqaluit', 'America/Jamaica', 'America/Juneau', 'America/Kentucky/Louisville', 'America/Kentucky/Monticello', 'America/Kralendijk', 'America/La_Paz', 'America/Lima', 'America/Los_Angeles', 'America/Louisville', 'America/Lower_Princes', 'America/Maceio', 'America/Managua', 'America/Manaus', 'America/Marigot', 'America/Martinique', 'America/Matamoros', 'America/Mazatlan', 'America/Menominee', 'America/Merida', 'America/Metlakatla', 'America/Mexico_City', 'America/Miquelon', 'America/Moncton', 'America/Monterrey', 'America/Montevideo', 'America/Montreal', 'America/Montserrat', 'America/Nassau', 'America/New_York', 'America/Nipigon', 'America/Nome', 'America/Noronha', 'America/North_Dakota/Beulah', 'America/North_Dakota/Center', 'America/North_Dakota/New_Salem', 'America/Nuuk', 'America/Ojinaga', 'America/Panama', 'America/Pangnirtung', 'America/Paramaribo', 'America/Phoenix', 'America/Port-au-Prince', 'America/Port_of_Spain', 'America/Porto_Acre', 'America/Porto_Velho', 'America/Puerto_Rico', 'America/Punta_Arenas', 'America/Rainy_River', 'America/Rankin_Inlet', 'America/Recife', 'America/Regina', 'America/Resolute', 'America/Rio_Branco', 'America/Santarem', 'America/Santiago', 'America/Santo_Domingo', 'America/Sao_Paulo', 'America/Scoresbysund', 'America/Sitka', 'America/St_Barthelemy', 'America/St_Johns', 'America/St_Kitts', 'America/St_Lucia', 'America/St_Thomas', 'America/St_Vincent', 'America/Swift_Current', 'America/Tegucigalpa', 'America/Thule', 'America/Thunder_Bay', 'America/Tijuana', 'America/Toronto', 'America/Tortola', 'America/Vancouver', 'America/Whitehorse', 'America/Winnipeg', 'America/Yakutat', 'America/Yellowknife', 'Antarctica/Casey', 'Antarctica/Davis', 'Antarctica/DumontDUrville', 'Antarctica/Macquarie', 'Antarctica/Mawson', 'Antarctica/McMurdo', 'Antarctica/Palmer', 'Antarctica/Rothera', 'Antarctica/Syowa', 'Antarctica/Troll', 'Antarctica/Vostok', 'Arctic/Longyearbyen', 'Asia/Aden', 'Asia/Almaty', 'Asia/Amman', 'Asia/Anadyr', 'Asia/Aqtau', 'Asia/Aqtobe', 'Asia/Ashgabat', 'Asia/Atyrau', 'Asia/Baghdad', 'Asia/Bahrain', 'Asia/Baku', 'Asia/Bangkok', 'Asia/Barnaul', 'Asia/Beirut', 'Asia/Bishkek', 'Asia/Brunei', 'Asia/Chita', 'Asia/Choibalsan', 'Asia/Colombo', 'Asia/Damascus', 'Asia/Dhaka', 'Asia/Dili', 'Asia/Dubai', 'Asia/Dushanbe', 'Asia/Famagusta', 'Asia/Gaza', 'Asia/Hebron', 'Asia/Ho_Chi_Minh', 'Asia/Hong_Kong', 'Asia/Hovd', 'Asia/Irkutsk', 'Asia/Istanbul', 'Asia/Jakarta', 'Asia/Jayapura', 'Asia/Jerusalem', 'Asia/Kabul', 'Asia/Kamchatka', 'Asia/Karachi', 'Asia/Kathmandu', 'Asia/Khandyga', 'Asia/Kolkata', 'Asia/Krasnoyarsk', 'Asia/Kuala_Lumpur', 'Asia/Kuching', 'Asia/Kuwait', 'Asia/Macau', 'Asia/Magadan', 'Asia/Makassar', 'Asia/Manila', 'Asia/Muscat', 'Asia/Nicosia', 'Asia/Novokuznetsk', 'Asia/Novosibirsk', 'Asia/Omsk', 'Asia/Oral', 'Asia/Phnom_Penh', 'Asia/Pontianak', 'Asia/Pyongyang', 'Asia/Qatar', 'Asia/Qostanay', 'Asia/Qyzylorda', 'Asia/Riyadh', 'Asia/Sakhalin', 'Asia/Samarkand', 'Asia/Seoul', 'Asia/Shanghai', 'Asia/Singapore', 'Asia/Srednekolymsk', 'Asia/Taipei', 'Asia/Tashkent', 'Asia/Tbilisi', 'Asia/Tehran', 'Asia/Thimphu', 'Asia/Tokyo', 'Asia/Tomsk', 'Asia/Ulaanbaatar', 'Asia/Urumqi', 'Asia/Ust-Nera', 'Asia/Vientiane', 'Asia/Vladivostok', 'Asia/Yakutsk', 'Asia/Yangon', 'Asia/Yekaterinburg', 'Asia/Yerevan', 'Atlantic/Azores', 'Atlantic/Bermuda', 'Atlantic/Canary', 'Atlantic/Cape_Verde', 'Atlantic/Faroe', 'Atlantic/Madeira', 'Atlantic/Reykjavik', 'Atlantic/South_Georgia', 'Atlantic/St_Helena', 'Atlantic/Stanley', 'Australia/Adelaide', 'Australia/Brisbane', 'Australia/Broken_Hill', 'Australia/Currie', 'Australia/Darwin', 'Australia/Eucla', 'Australia/Hobart', 'Australia/Lindeman', 'Australia/Lord_Howe', 'Australia/Melbourne', 'Australia/Perth', 'Australia/Sydney', 'Canada/Atlantic', 'Canada/Central', 'Canada/Eastern', 'Canada/Mountain', 'Canada/Newfoundland', 'Canada/Pacific', 'Europe/Amsterdam', 'Europe/Andorra', 'Europe/Astrakhan', 'Europe/Athens', 'Europe/Belgrade', 'Europe/Berlin', 'Europe/Bratislava', 'Europe/Brussels', 'Europe/Bucharest', 'Europe/Budapest', 'Europe/Busingen', 'Europe/Chisinau', 'Europe/Copenhagen', 'Europe/Dublin', 'Europe/Gibraltar', 'Europe/Guernsey', 'Europe/Helsinki', 'Europe/Isle_of_Man', 'Europe/Istanbul', 'Europe/Jersey', 'Europe/Kaliningrad', 'Europe/Kiev', 'Europe/Kirov', 'Europe/Lisbon', 'Europe/Ljubljana', 'Europe/London', 'Europe/Luxembourg', 'Europe/Madrid', 'Europe/Malta', 'Europe/Mariehamn', 'Europe/Minsk', 'Europe/Monaco', 'Europe/Moscow', 'Europe/Oslo', 'Europe/Paris', 'Europe/Podgorica', 'Europe/Prague', 'Europe/Riga', 'Europe/Rome', 'Europe/Samara', 'Europe/San_Marino', 'Europe/Sarajevo', 'Europe/Saratov', 'Europe/Simferopol', 'Europe/Skopje', 'Europe/Sofia', 'Europe/Stockholm', 'Europe/Tallinn', 'Europe/Tirane', 'Europe/Ulyanovsk', 'Europe/Uzhgorod', 'Europe/Vaduz', 'Europe/Vatican', 'Europe/Vienna', 'Europe/Vilnius', 'Europe/Volgograd', 'Europe/Warsaw', 'Europe/Zagreb', 'Europe/Zaporozhye', 'Europe/Zurich', 'GMT', 'Indian/Antananarivo', 'Indian/Chagos', 'Indian/Christmas', 'Indian/Cocos', 'Indian/Comoro', 'Indian/Kerguelen', 'Indian/Mahe', 'Indian/Maldives', 'Indian/Mauritius', 'Indian/Mayotte', 'Indian/Reunion', 'Pacific/Apia', 'Pacific/Auckland', 'Pacific/Bougainville', 'Pacific/Chatham', 'Pacific/Chuuk', 'Pacific/Easter', 'Pacific/Efate', 'Pacific/Enderbury', 'Pacific/Fakaofo', 'Pacific/Fiji', 'Pacific/Funafuti', 'Pacific/Galapagos', 'Pacific/Gambier', 'Pacific/Guadalcanal', 'Pacific/Guam', 'Pacific/Honolulu', 'Pacific/Kiritimati', 'Pacific/Kosrae', 'Pacific/Kwajalein', 'Pacific/Majuro', 'Pacific/Marquesas', 'Pacific/Midway', 'Pacific/Nauru', 'Pacific/Niue', 'Pacific/Norfolk', 'Pacific/Noumea', 'Pacific/Pago_Pago', 'Pacific/Palau', 'Pacific/Pitcairn', 'Pacific/Pohnpei', 'Pacific/Port_Moresby', 'Pacific/Rarotonga', 'Pacific/Saipan', 'Pacific/Tahiti', 'Pacific/Tarawa', 'Pacific/Tongatapu', 'Pacific/Wake', 'Pacific/Wallis', 'UTC']
-    
     
     def __init__(self, parent, main_class):
         customtkinter.CTkFrame.__init__(self, parent)
@@ -286,6 +285,8 @@ class GetEventsByFrame(customtkinter.CTkFrame):
         self.title_label_main = customtkinter.CTkLabel(self, text="Get Events List", font=customtkinter.CTkFont(size=20, weight="bold"))
         self.title_label_main.grid(row=0, column=1, padx=20, pady=(20, 10), sticky="nsew")
         
+        #TODO: add like mode check box
+        #TODO: add option to update the previus get list with the new list
         # main entry
         self.main_frame = customtkinter.CTkFrame(self)
         self.main_frame.grid(row=1, column=1, padx=(50, 50), pady=10, sticky="ew")
@@ -349,13 +350,54 @@ class GetEventsByFrame(customtkinter.CTkFrame):
         self.button_open_file.grid(row=2, column=0, columnspan=3, padx=10, pady=10, sticky="s")
 
         # get list button
-        self.get_button = customtkinter.CTkButton(self, command=None, image=self.list_image, text="Get")
+        self.get_button = customtkinter.CTkButton(self, image=self.list_image, text="Get", command=self.get_events)
         self.get_button.grid(row=4, column=1, padx=20, pady=20)
         
         # create log textbox
         self.log_box = customtkinter.CTkTextbox(self, width=250, height=100)
         self.log_box.bind("<Key>", lambda e: "break")  # set the textbox readonly
         self.log_box.grid(row=5, column=1, columnspan=2, padx=(0, 0), pady=(20, 0), sticky="nsew")
+    
+    def get_events(self):
+        id = self.entry_id.get()
+        if len(id) != 0:
+            try: 
+                event = gc.GoogleCalendarEventsManager.getEventByID(self.main_class.get_credentials(), id)
+                self.main_class.events_list_viewer_window(self.toplevel_window, event)
+                self.main_class.write_log(self.log_box, f"Event obtained succesfully!")
+                return
+            except Exception as e:
+                self.main_class.write_log(self.log_box, f"Exception occurred: {str(e)}")
+                return
+        
+        summary = self.entry_summary.get()
+        date_from = self.entry_date_from.get()
+        date_to = self.entry_date_to.get()
+         
+        try:
+            if len(date_from) != 0:
+                date_from = datetime.strptime(date_from, '%Y-%m-%d %H:%M')
+            if len(date_to) != 0:
+                date_to = datetime.strptime(date_to, '%Y-%m-%d %H:%M')
+        except ValueError:
+            self.main_class.write_log(self.log_box, f"Error on creating event: date format is not correct")
+        
+        color_selected = self.multi_selection.get()
+        color_index = 0
+        for idx, color in enumerate(self.event_color.keys()):
+            if color == color_selected:
+                color_index = idx
+                break
+        try: 
+            #TODO: add description and color parameter
+            events = gc.GoogleCalendarEventsManager.getEvents(creds=self.main_class.get_credentials(), title=summary, start_date=date_from, end_date=date_to)
+            if events == None or len(events) == 0:
+                self.main_class.write_log(self.log_box, f"No events obtained")
+                return
+            self.main_class.events_list_viewer_window(self.toplevel_window, events)
+            self.main_class.write_log(self.log_box, f"{len(events)} Event(s) obtained succesfully!")
+        except Exception as e:
+            self.main_class.write_log(self.log_box, f"Exception occurred: {str(e)}")
     
     def combobox_callback(self, color):
         self.color_preview.configure(bg=self.event_color.get(color))
@@ -384,7 +426,7 @@ class GetEventsByFrame(customtkinter.CTkFrame):
         self.main_class.show_frame(EditEventsFrame)
     
     def go_to_get_events_by_title_frame(self):
-        self.main_class.show_frame(GetEventsByFrame)
+        self.main_class.show_frame(GetEventsByTitleFrame)
         
     def go_to_graph_frame(self):
         self.main_class.show_frame(GraphFrame)
@@ -491,7 +533,7 @@ class GraphFrame(customtkinter.CTkFrame):
         self.main_class.show_frame(EditEventsFrame)
     
     def go_to_get_events_by_title_frame(self):
-        self.main_class.show_frame(GetEventsByFrame)
+        self.main_class.show_frame(GetEventsByTitleFrame)
         
     def go_to_graph_frame(self):
         self.main_class.show_frame(GraphFrame)
@@ -506,17 +548,21 @@ class MainFrame(customtkinter.CTkFrame):
         customtkinter.CTkFrame.__init__(self, parent)
         self.main_class = main_class
         
-        # text title
-        label = customtkinter.CTkLabel(self, text="Choose the action", fg_color="transparent", font=("Arial", 32))
-        label.pack(padx=20, pady=20)
+        # load images
+        calendar_image = tkinter.PhotoImage(file='./imgs/calendar.png')
+        google_image = tkinter.PhotoImage(file='./imgs/google.png')
+        plus_image = tkinter.PhotoImage(file='./imgs/plus.png')
+        list_image = tkinter.PhotoImage(file='./imgs/list.png')
+        edit_image = tkinter.PhotoImage(file='./imgs/edit.png')
+        folder_image = tkinter.PhotoImage(file='./imgs/folder.png')
+        file_image = tkinter.PhotoImage(file='./imgs/file.png')
+        chart_image = tkinter.PhotoImage(file='./imgs/chart.png')
         
-        # buttons action
-        button = customtkinter.CTkButton(master=self, text="New Events", command=self.go_to_new_events_frame)
-        button.pack(padx=20, pady=10)
-        button1 = customtkinter.CTkButton(master=self, text="Edit Events", command=self.go_to_edit_events_frame)
-        button1.pack(padx=20, pady=10)
-        button2 = customtkinter.CTkButton(master=self, text="Get Events", command=self.go_to_get_events_by_title_frame)
-        button2.pack(padx=20, pady=10)
+        # main
+        customtkinter.CTkLabel(self, text="Choose the action", fg_color="transparent", font=("Arial", 32)).pack(padx=20, pady=20)
+        customtkinter.CTkButton(master=self, image=plus_image, text="New Events", command=self.go_to_new_events_frame).pack(padx=20, pady=10, anchor='center')
+        customtkinter.CTkButton(master=self, image=edit_image, text="Edit Events", command=self.go_to_edit_events_frame).pack(padx=20, pady=10, anchor='center')
+        customtkinter.CTkButton(master=self, image=list_image, text="Get Events", command=self.go_to_get_events_by_title_frame).pack(padx=20, pady=10, anchor='center')
     
     def go_to_new_events_frame(self):
         self.main_class.show_frame(NewEventsFrame)
@@ -525,7 +571,7 @@ class MainFrame(customtkinter.CTkFrame):
         self.main_class.show_frame(EditEventsFrame)
     
     def go_to_get_events_by_title_frame(self):
-        self.main_class.show_frame(GetEventsByFrame)
+        self.main_class.show_frame(GetEventsByTitleFrame)
 #?###########################################################
 
 #?###########################################################   
@@ -680,7 +726,7 @@ class App():
         self.frames = {} 
 
         # iterating through a tuple consisting of the different page layouts
-        for F in (SetupFrame, MainFrame, NewEventsFrame, EditEventsFrame, GetEventsByFrame, GraphFrame):
+        for F in (SetupFrame, MainFrame, NewEventsFrame, EditEventsFrame, GetEventsByTitleFrame, GraphFrame):
 
             frame = F(container, self)
 
@@ -689,9 +735,9 @@ class App():
 
             frame.grid(row = 0, column = 0, sticky ="nsew")
         
-        self.show_frame(GetEventsByFrame)
+        self.show_frame(MainFrame)
         
-        return
+        #return
         #TODO: solo per test, questo sotto va abilitato
         if self.credentials is None or self.credentials_path is None:
             self.show_frame(SetupFrame)
@@ -767,6 +813,23 @@ class App():
         
         toplevel_window.destroy() 
     
+    def events_list_viewer_window(self, toplevel_window, events):  
+        if toplevel_window is None or not toplevel_window.winfo_exists():
+            toplevel_window = customtkinter.CTkToplevel() # create window if its None or destroyed
+            toplevel_window.title(f'{len(events)} Event(s) obtained')
+            event_list_file_viewer = customtkinter.CTkTextbox(toplevel_window)
+            event_list_file_viewer.bind("<Key>", lambda e: "break")  # set the textbox readonly
+            event_list_file_viewer.pack(fill=tkinter.BOTH, expand=True)   
+             
+            event_list_file_viewer.delete(1.0, tkinter.END)
+            event_list_file_viewer.insert(tkinter.END, events)
+    
+            toplevel_window.attributes("-topmost", True) # focus to this windows
+        else:
+            toplevel_window.focus()  # if window exists focus it
+        
+        return toplevel_window
+    
     def file_viewer_window(self, toplevel_window, filepath, log_box):
         if filepath is None or len(filepath) == 0:
             self.write_log(log_box, f"ERROR: file path is missing")
@@ -801,6 +864,8 @@ class App():
 
     def get_credentials(self):
         return self.credentials
+
+    
 #*###########################################################
 
 if __name__ == "__main__":

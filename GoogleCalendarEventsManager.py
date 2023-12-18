@@ -299,6 +299,61 @@ class GoogleCalendarEventsManager:
             print(f"An error occurred: {str(e)}")
             return None
     
+    def getEventByID(creds: Credentials, ID: str):
+        if creds == None: Exception("Credentials can't be null")
+        if ID == None: Exception("ID can't be null")
+        
+        try:
+            # Call the Google Calendar API to get the event by ID
+            service = build("calendar", "v3", credentials=creds)
+            event = service.events().get(calendarId='primary', eventId=ID).execute()
+            
+            return event
+        except Exception as e:
+            print(f"An error occurred: {str(e)}")
+            return None
+    
+    # TODO: add like mode
+    # TODO: add color mode
+    @staticmethod
+    def getEvents(creds: Credentials, title: str, like_mode: bool = False, start_date: str = None, end_date: str = None):
+        if creds == None: Exception("Credentials can't be null")
+        
+        try:
+            service = build("calendar", "v3", credentials=creds)
+            events = []
+            
+            now = datetime.datetime.now().isoformat() + "Z"
+            start_date_search = None 
+            end_date_search = None
+            while (True):
+                # set the events list
+                events_result = service.events().list(
+                    calendarId="primary", 
+                    q=title,
+                    maxResults=2500, 
+                    timeMin=start_date_search, 
+                    timeMax=now, 
+                    singleEvents=True, 
+                    orderBy="startTime").execute()
+                
+                events = events + events_result.get('items', [])
+                
+                # i quit if i found all the events -> it happens when the date of the last element inside the list is the same for two times
+                if events[len(events)-1]['end'].get('dateTime') == end_date_search:
+                    break
+
+                end_date_search = events[len(events)-1]['end'].get('dateTime')
+                start_date_search = end_date_search
+            
+            if events:
+                return events
+            else:
+                return None  
+        except Exception as e:
+            print(f"An error occurred: {str(e)}")
+            return None
+
     # TODO: test me 
     @staticmethod
     def editEventTitleByID(creds: Credentials, ID: str, title: str):
