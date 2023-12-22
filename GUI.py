@@ -176,7 +176,7 @@ class NewEventsFrame(customtkinter.CTkFrame):
         self.main_class.show_frame(EditEventsFrame)
     
     def go_to_get_events_by_title_frame(self):
-        self.main_class.show_frame(GetEventsByTitleFrame)
+        self.main_class.show_frame(GetEventsFrame)
     
     def go_to_graph_frame(self):
         self.main_class.show_frame(GraphFrame)
@@ -264,7 +264,7 @@ class EditEventsFrame(customtkinter.CTkFrame):
         self.new_values_frame = customtkinter.CTkFrame(main_frame)
         self.new_values_frame.grid(row=1, column=2, padx=(25, 50), pady=10, sticky="ew")
         self.new_values_frame.grid_columnconfigure((0, 1, 2), weight=1)
-        self.label_frame_new = customtkinter.CTkLabel(self.old_values_frame, text="NEW Values")
+        self.label_frame_new = customtkinter.CTkLabel(self.new_values_frame, text="NEW Values")
         self.label_frame_new.grid(row=0, column=0, columnspan=3, padx=0, pady=10, sticky="ew")
         self.label_summary_new = customtkinter.CTkLabel(self.new_values_frame, text="Summary:")
         self.label_summary_new.grid(row=1, column=0, padx=10, pady=(10, 0), sticky="e")
@@ -330,14 +330,14 @@ class EditEventsFrame(customtkinter.CTkFrame):
         self.main_class.show_frame(EditEventsFrame)
     
     def go_to_get_events_by_title_frame(self):
-        self.main_class.show_frame(GetEventsByTitleFrame)
+        self.main_class.show_frame(GetEventsFrame)
     
     def go_to_graph_frame(self):
         self.main_class.show_frame(GraphFrame)
 #?###########################################################
 
 #?###########################################################
-class GetEventsByTitleFrame(customtkinter.CTkFrame):
+class GetEventsFrame(customtkinter.CTkFrame):
     main_class = None
     toplevel_window = None
     date_picker_window = None
@@ -494,8 +494,11 @@ class GetEventsByTitleFrame(customtkinter.CTkFrame):
             if events == None or len(events) == 0:
                 self.main_class.write_log(self.log_box, f"No events obtained")
                 return
-            self.main_class.events_list_viewer_window(self.toplevel_window, events)
+            
+            self.main_class.events_list_viewer_window(self.toplevel_window, events[:1000]) # i have to truncate the list for performances reason
             self.main_class.write_log(self.log_box, f"{len(events)} Event(s) obtained succesfully!")
+            if len(events) > 100:
+                self.main_class.write_log(self.log_box, f"Warning: preview is possible only for max 100 events")
         except Exception as e:
             self.main_class.write_log(self.log_box, f"Exception occurred: {str(e)}")
     
@@ -526,7 +529,7 @@ class GetEventsByTitleFrame(customtkinter.CTkFrame):
         self.main_class.show_frame(EditEventsFrame)
     
     def go_to_get_events_by_title_frame(self):
-        self.main_class.show_frame(GetEventsByTitleFrame)
+        self.main_class.show_frame(GetEventsFrame)
         
     def go_to_graph_frame(self):
         self.main_class.show_frame(GraphFrame)
@@ -633,7 +636,7 @@ class GraphFrame(customtkinter.CTkFrame):
         self.main_class.show_frame(EditEventsFrame)
     
     def go_to_get_events_by_title_frame(self):
-        self.main_class.show_frame(GetEventsByTitleFrame)
+        self.main_class.show_frame(GetEventsFrame)
         
     def go_to_graph_frame(self):
         self.main_class.show_frame(GraphFrame)
@@ -671,7 +674,7 @@ class MainFrame(customtkinter.CTkFrame):
         self.main_class.show_frame(EditEventsFrame)
     
     def go_to_get_events_by_title_frame(self):
-        self.main_class.show_frame(GetEventsByTitleFrame)
+        self.main_class.show_frame(GetEventsFrame)
 #?###########################################################
 
 #?###########################################################   
@@ -826,7 +829,7 @@ class App():
         self.frames = {} 
 
         # iterating through a tuple consisting of the different page layouts
-        for F in (SetupFrame, MainFrame, NewEventsFrame, EditEventsFrame, GetEventsByTitleFrame, GraphFrame):
+        for F in (SetupFrame, MainFrame, NewEventsFrame, EditEventsFrame, GetEventsFrame, GraphFrame):
 
             frame = F(container, self)
 
@@ -922,7 +925,22 @@ class App():
             event_list_file_viewer.pack(fill=tkinter.BOTH, expand=True)   
              
             event_list_file_viewer.delete(1.0, tkinter.END)
-            event_list_file_viewer.insert(tkinter.END, events)
+            
+            # obtain only important informations about the event
+            event_dict = {}
+            events_info = []
+            for event in events:
+                event_dict = {
+                    'summary': event['summary'],
+                    'start': event['start']['dateTime'],
+                    'end': event['end']['dateTime']
+                }
+                events_info.append(event_dict)
+            
+            # print event after event
+            for event in events_info:
+                event_info_str = f"Summary: {event['summary']} | Start: {event['start']} | End: {event['end']}\n\n"
+                event_list_file_viewer.insert(tkinter.END, event_info_str)
     
             toplevel_window.attributes("-topmost", True) # focus to this windows
         else:

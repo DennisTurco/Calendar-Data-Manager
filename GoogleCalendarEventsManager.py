@@ -1,5 +1,5 @@
 from typing import List, Set, Tuple, Dict
-import datetime
+from datetime import datetime, timedelta
 import requests
 import os.path
 import io, subprocess, sys
@@ -18,6 +18,8 @@ except:
     from google.oauth2.credentials import Credentials
     from google_auth_oauthlib.flow import InstalledAppFlow
 
+
+#TODO add raise Exception 
 class GoogleCalendarEventsManager:
     
     SCOPE = ["https://www.googleapis.com/auth/calendar"]
@@ -300,8 +302,8 @@ class GoogleCalendarEventsManager:
             return None
     
     def getEventByID(creds: Credentials, ID: str):
-        if creds == None: Exception("Credentials can't be null")
-        if ID == None: Exception("ID can't be null")
+        if creds == None: raise Exception("Credentials can't be null")
+        if ID == None: raise Exception("ID can't be null")
         
         try:
             # Call the Google Calendar API to get the event by ID
@@ -317,42 +319,58 @@ class GoogleCalendarEventsManager:
     # TODO: add color mode
     @staticmethod
     def getEvents(creds: Credentials, title: str, like_mode: bool = False, start_date: str = None, end_date: str = None):
-        if creds == None: Exception("Credentials can't be null")
-        
+        if creds is None: raise Exception("Credentials can't be null")
+
         try:
             service = build("calendar", "v3", credentials=creds)
             events = []
             
-            now = datetime.datetime.now().isoformat() + "Z"
-            start_date_search = None 
-            end_date_search = None
-            while (True):
-                # set the events list
+            start_date_time = None
+            end_date_time = datetime.datetime.now().isoformat() + "Z"
+            
+            if start_date:
+                # Check if start_date is already a datetime object
+                if isinstance(start_date, datetime):
+                    start_date_time = start_date.isoformat() + 'Z'
+                else:
+                    # Parsing and formatting start_date
+                    start_date_time = datetime.strptime(start_date, '%Y-%m-%d %H:%M').isoformat() + 'Z'
+
+            if end_date:
+                # Check if end_date is already a datetime object
+                if isinstance(end_date, datetime):
+                    end_date_time = end_date.isoformat() + 'Z'
+                else:
+                    # Parsing and formatting end_date
+                    end_date_time = datetime.strptime(end_date, '%Y-%m-%d %H:%M').isoformat() + 'Z'
+
+            while True:
                 events_result = service.events().list(
-                    calendarId="primary", 
+                    calendarId="primary",
                     q=title,
-                    maxResults=2500, 
-                    timeMin=start_date_search, 
-                    timeMax=now, 
-                    singleEvents=True, 
-                    orderBy="startTime").execute()
-                
-                events = events + events_result.get('items', [])
-                
-                # i quit if i found all the events -> it happens when the date of the last element inside the list is the same for two times
-                if events[len(events)-1]['end'].get('dateTime') == end_date_search:
+                    maxResults=2500,
+                    timeMin=start_date_time,
+                    timeMax=end_date_time,
+                    singleEvents=True,
+                    orderBy="startTime"
+                ).execute()
+
+                events += events_result.get('items', [])
+
+                if not events_result.get('nextPageToken'):
                     break
 
-                end_date_search = events[len(events)-1]['end'].get('dateTime')
-                start_date_search = end_date_search
-            
+                page_token = events_result['nextPageToken']
+                events_result = service.events().list(calendarId='primary', pageToken=page_token).execute()
+
             if events:
                 return events
             else:
-                return None  
+                return None
         except Exception as e:
             print(f"An error occurred: {str(e)}")
             return None
+
 
     # TODO: test me 
     @staticmethod
