@@ -336,6 +336,7 @@ class EditEventsFrame(customtkinter.CTkFrame):
 class GetEventsFrame(customtkinter.CTkFrame):
     main_class = None
     toplevel_window = None
+    toplevel_entry_window = None
     date_picker_window = None
     file_viewer_window = None
     event_color = {"Lavender": "#7986cb", "Sage": "#33b679", "Grape": "#8e24aa", "Flamingo": "#e67c73", "Banana": "#f6bf26", "Tangerine": "#f4511e", "Peacock": "#039be5", "Graphite": "#616161", "Blueberry": "#3f51b5", "Basil": "#0b8043", "Tomato": "#d50000"}
@@ -440,7 +441,7 @@ class GetEventsFrame(customtkinter.CTkFrame):
         self.checkbox.grid(row=0, column=0, columnspan=3, padx=10, pady=10, sticky="s")
         self.file_path = customtkinter.CTkEntry(master=self.file_output_frame, placeholder_text="file path")
         self.file_path.grid(row=1, column=1, padx=0, pady=10, sticky="ew")
-        self.button_file_path = customtkinter.CTkButton(self.file_output_frame, text="", width=10, image=self.folder_image, command=self.get_file_path)
+        self.button_file_path = customtkinter.CTkButton(self.file_output_frame, text="", width=10, image=self.folder_image, command=lambda: self.get_file_path(self.file_path))
         self.button_file_path.grid(row=1, column=2, padx=0, pady=10, sticky="w")
         self.button_open_file = customtkinter.CTkButton(master=self.file_output_frame, image=self.file_image, text="open", command=self.open_file)
         self.button_open_file.grid(row=2, column=0, columnspan=3, padx=10, pady=10, sticky="s")
@@ -459,7 +460,7 @@ class GetEventsFrame(customtkinter.CTkFrame):
         if len(id) != 0:
             try: 
                 event = gc.GoogleCalendarEventsManager.getEventByID(self.main_class.get_credentials(), id)
-                self.main_class.events_list_viewer_window(self.toplevel_window, event)
+                self.events_list_viewer_window(event)
                 self.main_class.write_log(self.log_box, f"Event obtained succesfully!")
                 return
             except Exception as e:
@@ -491,22 +492,107 @@ class GetEventsFrame(customtkinter.CTkFrame):
                 self.main_class.write_log(self.log_box, f"No events obtained")
                 return
             
-            self.main_class.events_list_viewer_window(self.toplevel_window, events) # i have to truncate the list for performances reason
+            self.events_list_viewer_window(events) # i have to truncate the list for performances reason
             self.main_class.write_log(self.log_box, f"{len(events)} Event(s) obtained succesfully!")
             # if len(events) > 100:
             #     self.main_class.write_log(self.log_box, f"Warning: preview is possible only for max 100 events")
         except Exception as e:
             self.main_class.write_log(self.log_box, f"Exception occurred: {str(e)}")
     
+    def events_list_viewer_window(self, events):  
+        if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
+            self.toplevel_window = customtkinter.CTkToplevel()
+            self.toplevel_window.title(f'{len(events)} Event(s) obtained')
+
+            # Create a grid inside the toplevel window
+            self.toplevel_window.grid_rowconfigure(0, weight=1)  # Allow row 0 to expand vertically
+            self.toplevel_window.grid_columnconfigure(0, weight=1)  # Allow column 0 to expand horizontally
+            self.toplevel_window.grid_columnconfigure(1, weight=1)  # Allow column 1 to expand horizontally
+            
+            event_list_file_viewer = customtkinter.CTkTextbox(self.toplevel_window)
+            event_list_file_viewer.bind("<Key>", lambda e: "break")  # set the textbox readonly
+            event_list_file_viewer.grid(row=0, column=0, columnspan=2, padx=0, pady=(0, 10), sticky="nsew")
+            
+            button_save = customtkinter.CTkButton(self.toplevel_window, text="Save results", command=lambda: self.get_filepath_to_save_results())
+            button_save.grid(row=1, column=0, padx=5, pady=(0, 10), sticky="nsew")
+            
+            button_cancel = customtkinter.CTkButton(self.toplevel_window, text="Cancel", command=lambda: self.close_top_frame())
+            button_cancel.grid(row=1, column=1, padx=5, pady=(0, 10), sticky="nsew")
+             
+            event_list_file_viewer.delete(1.0, tkinter.END)
+
+            # obtain only important informations about the event
+            event_dict = {}
+            events_info = []
+            index = 1
+            for event in events:
+                event_dict = {
+                    'index': index,
+                    'ID': event['id'],
+                    'summary': event['summary'],
+                    'start': event['start'],
+                    'end': event['end']
+                }
+                events_info.append(event_dict)
+                index += 1     
+            
+            # print event after event
+            for event in events_info:
+                event_info_str = f"INDEX: {event['index']} | ID: {event['ID']} | SUMMARY: {event['summary']} | START: {event['start']} | END: {event['end']}\n"
+                event_list_file_viewer.insert(tkinter.END, event_info_str)
+    
+            self.toplevel_window.attributes("-topmost", True) # focus to this windows
+        else:
+            self.toplevel_window.focus()  # if window exists focus it
+        
+        return self.toplevel_window
+    
+    def get_filepath_to_save_results(self):
+        
+        if self.file_path != None and len(self.file_path.get()) != 0:
+            self.save_results_to_file() 
+            return
+        
+        if self.toplevel_entry_window is None or not self.toplevel_entry_window.winfo_exists():
+            
+            self.toplevel_entry_window = customtkinter.CTkToplevel()
+            self.toplevel_entry_window.title('Select a file to save the results')
+            self.toplevel_entry_window.geometry("350x50")
+            entry = customtkinter.CTkEntry(self.toplevel_entry_window)
+            entry.grid(row=0, column=0, padx=5, pady=(10, 10), sticky="nsew")
+            button_add_filepath = customtkinter.CTkButton(self.toplevel_entry_window, width=10, text="", image=self.folder_image, command=lambda: self.get_file_path(entry))
+            button_add_filepath.grid(row=0, column=1, padx=5, pady=(10, 10), sticky="nsew")
+            button_ok = customtkinter.CTkButton(self.toplevel_entry_window, width=10, text="Ok", command= lambda: self.save_results_to_file2(entry))
+            button_ok.grid(row=0, column=2, padx=5, pady=(10, 10), sticky="nsew") 
+                
+            self.toplevel_entry_window.resizable(False, False)
+            self.toplevel_entry_window.attributes("-topmost", True) # focus to this windows
+        else:
+            self.toplevel_entry_window.focus()  # if window exists focus it
+        
+        return self.toplevel_entry_window
+    
+    #TODO: add function
+    def save_results_to_file(self):
+        pass
+    
+    def save_results_to_file2(self, entry):
+        #TODO: non funziona
+        self.file_path = entry.get()
+        
+        self.close_top_frame()
+        self.save_results_to_file()
+    
+    def close_top_frame(self):
+        self.toplevel_window.destroy()
+        self.toplevel_entry_window.destroy()
+        
     def combobox_callback(self, color):
         self.color_preview.configure(bg=self.event_color.get(color))
         self.main_class.write_log(self.log_box, f"color '{color}' selected")
     
-    def get_file_path(self):
-        file_path = filedialog.askopenfilename(title="Select file where do you want to save data", filetypes=(("CSV files", "*.csv"), ("All files", "*.*")))
-        self.file_path.delete("0", tkinter.END)
-        self.file_path.insert("0", file_path)
-        self.main_class.write_log(self.log_box, f"file '{file_path}' selected")
+    def get_file_path(self, entry):
+        self.main_class.get_file_path(self.log_box, entry)
     
     def set_logbox_text(self, text):
         self.log_box.delete("0.0", tkinter.END)
@@ -916,41 +1002,12 @@ class App():
         
         toplevel_window.destroy() 
     
-    def events_list_viewer_window(self, toplevel_window, events):  
-        if toplevel_window is None or not toplevel_window.winfo_exists():
-            toplevel_window = customtkinter.CTkToplevel() # create window if its None or destroyed
-            toplevel_window.title(f'{len(events)} Event(s) obtained')
-            event_list_file_viewer = customtkinter.CTkTextbox(toplevel_window)
-            event_list_file_viewer.bind("<Key>", lambda e: "break")  # set the textbox readonly
-            event_list_file_viewer.pack(fill=tkinter.BOTH, expand=True)   
-             
-            event_list_file_viewer.delete(1.0, tkinter.END)
-
-            # obtain only important informations about the event
-            event_dict = {}
-            events_info = []
-            index = 1
-            for event in events:
-                event_dict = {
-                    'index': index,
-                    'ID': event['id'],
-                    'summary': event['summary'],
-                    'start': event['start'],
-                    'end': event['end']
-                }
-                events_info.append(event_dict)
-                index += 1     
-            
-            # print event after event
-            for event in events_info:
-                event_info_str = f"INDEX: {event['index']} | ID: {event['ID']} | SUMMARY: {event['summary']} | START: {event['start']} | END: {event['end']}\n"
-                event_list_file_viewer.insert(tkinter.END, event_info_str)
-    
-            toplevel_window.attributes("-topmost", True) # focus to this windows
-        else:
-            toplevel_window.focus()  # if window exists focus it
-        
-        return toplevel_window
+    def get_file_path(self, logbox, entry):
+        file_path = filedialog.askopenfilename(title="Select file where do you want to save data", filetypes=(("CSV files", "*.csv"), ("All files", "*.*")))
+        entry.delete("0", tkinter.END)
+        entry.insert("0", file_path)
+        self.write_log(logbox, f"file '{file_path}' selected")
+        return file_path
     
     def file_viewer_window(self, toplevel_window, filepath, log_box):
         
