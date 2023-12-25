@@ -17,7 +17,7 @@ except:
 
 def loadData():
     # Load data from the CSV file
-    df = pd.read_csv('./data/data.csv', sep='|', header=None, encoding='ISO-8859-1')
+    df = pd.read_csv('./data/data.csv', sep='|', header=None, encoding='utf-8')
     df.columns = ['id', 'FirstName', 'LastName', 'Col3', 'Col4', 'Col5', 'DateTime', 'Col7', 'Duration', 'Col9']
     return df
 
@@ -46,6 +46,7 @@ plt.xticks(yearly_hours.index)  # Ensure x-axis labels match available years
 
 #################### Total Hours per Month 2021 - 2022 - 2023
 df = loadData()
+
 # Convert 'DateTime' and 'Duration' columns
 df['DateTime'] = pd.to_datetime(df['DateTime'], utc=True)
 df['Duration'] = pd.to_timedelta(df['Duration']).dt.total_seconds() / 3600  # Convert to hours

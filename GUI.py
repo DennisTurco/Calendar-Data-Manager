@@ -78,7 +78,6 @@ class NewEventsFrame(customtkinter.CTkFrame):
         self.title_label_main = customtkinter.CTkLabel(self, text="Create New Event", font=customtkinter.CTkFont(size=20, weight="bold"))
         self.title_label_main.grid(row=0, column=1, padx=20, pady=(20, 10), sticky="nsew")
         
-        #TODO: fix colors position
         # main entry
         self.main_frame = customtkinter.CTkFrame(self)
         self.main_frame.grid(row=1, column=1, padx=(50, 50), pady=10, sticky="ew")
@@ -228,10 +227,7 @@ class EditEventsFrame(customtkinter.CTkFrame):
         # create main panel
         self.title_label_main = customtkinter.CTkLabel(self, text="Edit Events", font=customtkinter.CTkFont(size=20, weight="bold"))
         self.title_label_main.grid(row=0, column=1, padx=20, pady=(20, 10), sticky="nsew")
-        
-        #TODO: fix colors position
-        
-        
+                
         # Create a frame with a 1x2 grid
         main_frame = customtkinter.CTkFrame(self)
         main_frame.grid(row=1, column=1, padx=(50, 50), pady=10, sticky="ew")
@@ -495,10 +491,10 @@ class GetEventsFrame(customtkinter.CTkFrame):
                 self.main_class.write_log(self.log_box, f"No events obtained")
                 return
             
-            self.main_class.events_list_viewer_window(self.toplevel_window, events[:1000]) # i have to truncate the list for performances reason
+            self.main_class.events_list_viewer_window(self.toplevel_window, events) # i have to truncate the list for performances reason
             self.main_class.write_log(self.log_box, f"{len(events)} Event(s) obtained succesfully!")
-            if len(events) > 100:
-                self.main_class.write_log(self.log_box, f"Warning: preview is possible only for max 100 events")
+            # if len(events) > 100:
+            #     self.main_class.write_log(self.log_box, f"Warning: preview is possible only for max 100 events")
         except Exception as e:
             self.main_class.write_log(self.log_box, f"Exception occurred: {str(e)}")
     
@@ -625,9 +621,13 @@ class GraphFrame(customtkinter.CTkFrame):
         self.date_picker_window = self.main_class.date_picker_window(type, self.date_picker_window, self.entry_date_from, self.entry_date_to, self.log_box)
     
     def generate_graph(self):
-        self.main_class.write_log(self.log_box, "Generating chart")
-        #TODO: mettere un try catch e a seconda di dove mi trovo scrivo un output specifico
-        Plotter.Plotter.graph()
+        if self.check_file_path_errors(self.log_box, self.filepath): return  
+        
+        try:
+            self.main_class.write_log(self.log_box, "Generating chart")
+            Plotter.Plotter.graph()
+        except Exception:
+            self.main_class.write_log(self.log_box, f"Error generating chart")
     
     def go_to_new_events_frame(self):
         self.main_class.show_frame(NewEventsFrame)
@@ -925,21 +925,25 @@ class App():
             event_list_file_viewer.pack(fill=tkinter.BOTH, expand=True)   
              
             event_list_file_viewer.delete(1.0, tkinter.END)
-            
+
             # obtain only important informations about the event
             event_dict = {}
             events_info = []
+            index = 1
             for event in events:
                 event_dict = {
+                    'index': index,
+                    'ID': event['id'],
                     'summary': event['summary'],
-                    'start': event['start']['dateTime'],
-                    'end': event['end']['dateTime']
+                    'start': event['start'],
+                    'end': event['end']
                 }
                 events_info.append(event_dict)
+                index += 1     
             
             # print event after event
             for event in events_info:
-                event_info_str = f"Summary: {event['summary']} | Start: {event['start']} | End: {event['end']}\n\n"
+                event_info_str = f"INDEX: {event['index']} | ID: {event['ID']} | SUMMARY: {event['summary']} | START: {event['start']} | END: {event['end']}\n"
                 event_list_file_viewer.insert(tkinter.END, event_info_str)
     
             toplevel_window.attributes("-topmost", True) # focus to this windows
@@ -949,13 +953,8 @@ class App():
         return toplevel_window
     
     def file_viewer_window(self, toplevel_window, filepath, log_box):
-        if filepath is None or len(filepath) == 0:
-            self.write_log(log_box, f"ERROR: file path is missing")
-            return 
         
-        if not os.path.exists(filepath): 
-            self.write_log(log_box, f"ERROR: file '{filepath}' doesn't found")
-            return
+        if self.check_file_path_errors(log_box, filepath): return
         
         if toplevel_window is None or not toplevel_window.winfo_exists():
             toplevel_window = customtkinter.CTkToplevel() # create window if its None or destroyed
@@ -977,12 +976,20 @@ class App():
         
         return toplevel_window
     
+    def check_file_path_errors(self, log_box, filepath):
+        if filepath is None or len(filepath) == 0:
+            self.write_log(log_box, f"ERROR: file path is missing")
+            return True
+        
+        if not os.path.exists(filepath): 
+            self.write_log(log_box, f"ERROR: file '{filepath}' doesn't found")
+            return True
+    
     def write_log(self, log_box, message):
-        log_box.insert(tkinter.END, "\n" + str(datetime.now()) + ": " + message)
+        log_box.insert("0.0", "\n" + str(datetime.now()) + ": " + message)
 
     def get_credentials(self):
         return self.credentials
-
     
 #*###########################################################
 

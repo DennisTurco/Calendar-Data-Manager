@@ -1,5 +1,5 @@
 from typing import List, Set, Tuple, Dict
-from datetime import datetime, timedelta
+import datetime
 import requests
 import os.path
 import io, subprocess, sys
@@ -19,14 +19,10 @@ except:
     from google_auth_oauthlib.flow import InstalledAppFlow
 
 
-#TODO add raise Exception 
 class GoogleCalendarEventsManager:
     
     SCOPE = ["https://www.googleapis.com/auth/calendar"]
-        
-    def __init__():
-        pass
-    
+
     @staticmethod
     def saveDataToFile(data: Dict[str, List[str]], filepath: str, delimeter: str = "|", encodingType: str = None):
         if filepath == None or len(filepath) == 0: Exception("File path can't be null")
@@ -158,8 +154,7 @@ class GoogleCalendarEventsManager:
             title = event['summary'] # Extract and return the event title
             return title
         except Exception as e:
-            print(f"An error occurred: {str(e)}")
-            return None
+            raise Exception(f"An error occurred: {str(e)}")
     
     @staticmethod
     def getTitleByDate(creds: Credentials, start_date: str, end_date: str) -> str:
@@ -186,8 +181,7 @@ class GoogleCalendarEventsManager:
             else:
                 return None
         except Exception as e:
-            print(f"An error occurred: {str(e)}")
-            return None
+            raise Exception(f"An error occurred: {str(e)}")
     
     @staticmethod
     def getIDByTitle(creds: Credentials, title: str) -> str:
@@ -212,8 +206,7 @@ class GoogleCalendarEventsManager:
             else:
                 return None  
         except Exception as e:
-            print(f"An error occurred: {str(e)}")
-            return None
+            raise Exception(f"An error occurred: {str(e)}")
     
     @staticmethod
     def getIDByDate(creds: Credentials, start_date: str, end_date: str) -> List:
@@ -240,8 +233,7 @@ class GoogleCalendarEventsManager:
             else:
                 return None
         except Exception as e:
-            print(f"An error occurred: {str(e)}")
-            return None
+            raise Exception(f"An error occurred: {str(e)}")
     
     @staticmethod
     def getDescriptionByID(creds: Credentials, ID: str) -> str:
@@ -256,8 +248,7 @@ class GoogleCalendarEventsManager:
             description = event.get('description') # Extract and return the event description
             return description
         except Exception as e:
-            print(f"An error occurred: {str(e)}")
-            return None
+            raise Exception(f"An error occurred: {str(e)}")
     
     # TODO: test 
     # TODO: add like mode
@@ -312,8 +303,7 @@ class GoogleCalendarEventsManager:
             
             return event
         except Exception as e:
-            print(f"An error occurred: {str(e)}")
-            return None
+            raise Exception(f"An error occurred: {str(e)}")
     
     # TODO: add like mode
     # TODO: add color mode
@@ -326,23 +316,23 @@ class GoogleCalendarEventsManager:
             events = []
             
             start_date_time = None
-            end_date_time = datetime.datetime.now().isoformat() + "Z"
+            end_date_time = None
+            end_date_time_search = None
             
             if start_date:
                 # Check if start_date is already a datetime object
-                if isinstance(start_date, datetime):
+                if isinstance(start_date, datetime.datetime):
                     start_date_time = start_date.isoformat() + 'Z'
-                else:
-                    # Parsing and formatting start_date
-                    start_date_time = datetime.strptime(start_date, '%Y-%m-%d %H:%M').isoformat() + 'Z'
 
             if end_date:
                 # Check if end_date is already a datetime object
-                if isinstance(end_date, datetime):
+                if isinstance(end_date, datetime.datetime):
                     end_date_time = end_date.isoformat() + 'Z'
-                else:
-                    # Parsing and formatting end_date
-                    end_date_time = datetime.strptime(end_date, '%Y-%m-%d %H:%M').isoformat() + 'Z'
+            elif end_date is None or len(end_date) == 0:
+                # Parsing and formatting end_date
+                end_date_time = datetime.datetime.now().isoformat() + "Z"
+            
+            end_date_time_search = end_date_time
 
             while True:
                 events_result = service.events().list(
@@ -354,23 +344,24 @@ class GoogleCalendarEventsManager:
                     singleEvents=True,
                     orderBy="startTime"
                 ).execute()
-
-                events += events_result.get('items', [])
-
-                if not events_result.get('nextPageToken'):
+                
+                events = events + events_result.get('items', [])
+                
+                # i quit if i found all the events -> it happens when the date of the last element inside the list is the same for two times
+                if events[len(events)-1]['end'].get('dateTime') == end_date_time_search:
                     break
 
-                page_token = events_result['nextPageToken']
-                events_result = service.events().list(calendarId='primary', pageToken=page_token).execute()
+                end_date_time_search = events[len(events)-1]['end'].get('dateTime')
+                
+                start_date_time = end_date_time_search
 
             if events:
                 return events
             else:
                 return None
         except Exception as e:
-            print(f"An error occurred: {str(e)}")
-            return None
-
+            print(e)
+            raise Exception(f"An error occurred: {str(e)}")
 
     # TODO: test me 
     @staticmethod
@@ -384,7 +375,7 @@ class GoogleCalendarEventsManager:
             event = service.events().get(calendarId='primary', eventId=ID).execute()
             event['summary'] = title 
         except Exception as e:
-            print(f"An error occurred: {str(e)}")
+            raise Exception(f"An error occurred: {str(e)}")
     
     @staticmethod
     def editEventsTitleByTitle(creds: Credentials, old_title: str, new_title: str, start_date: datetime = None, end_date: datetime = None):
@@ -418,7 +409,7 @@ class GoogleCalendarEventsManager:
             return updated_events
 
         except Exception as e:
-            print(f"An error occurred: {str(e)}")
+            raise Exception(f"An error occurred: {str(e)}")
     
     # TODO: test me
     @staticmethod
@@ -443,7 +434,7 @@ class GoogleCalendarEventsManager:
             ).execute()
         
         except Exception as e:
-            print(f"An error occurred: {str(e)}")
+            raise Exception(f"An error occurred: {str(e)}")
     
     # TODO: test me 
     @staticmethod
@@ -467,7 +458,7 @@ class GoogleCalendarEventsManager:
             ).execute()
         
         except Exception as e:
-            print(f"An error occurred: {str(e)}")
+            raise Exception(f"An error occurred: {str(e)}")
     
     # TODO: test me 
     # TODO: add like mode
@@ -493,7 +484,7 @@ class GoogleCalendarEventsManager:
                 ).execute()
         
         except Exception as e:
-            print(f"An error occurred: {str(e)}")
+            raise Exception(f"An error occurred: {str(e)}")
 
     @staticmethod
     def deleteEventByID(creds: Credentials, ID: str):
@@ -505,4 +496,4 @@ class GoogleCalendarEventsManager:
         try:
             service.events().delete(calendarId='primary', eventId=ID).execute()
         except Exception as e:
-            print(f"An error occurred: {str(e)}")
+            raise Exception(f"An error occurred: {str(e)}")
