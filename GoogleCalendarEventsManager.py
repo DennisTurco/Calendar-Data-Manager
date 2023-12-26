@@ -1,4 +1,3 @@
-from typing import List, Set, Tuple, Dict
 import datetime
 import requests
 import os.path
@@ -22,36 +21,6 @@ except:
 class GoogleCalendarEventsManager:
     
     SCOPE = ["https://www.googleapis.com/auth/calendar"]
-
-    @staticmethod
-    def saveDataToFile(data: Dict[str, List[str]], filepath: str, delimeter: str = "|", encodingType: str = None):
-        if filepath == None or len(filepath) == 0: Exception("File path can't be null")
-        
-        file = open(filepath, "w", encoding=encodingType)
-        counter = 0
-        for ID in data.keys():
-            elem = data[ID]
-            elem = [str(element) for element in elem]
-            line = delimeter.join(elem)
-            if (counter + 1) < len(data):
-                line = line + "\n"
-            file.write(line)
-            counter += 1
-        file.close()
-    
-    @staticmethod
-    def loadDataFromFile(filepath: str, delimeter: str = "|") -> Dict[str, List[str]]:
-        if filepath == None or len(filepath) == 0: Exception("File path can't be null")
-        
-        file = open(filepath, "r")
-        data = dict()
-        lines = file.readlines()
-        for line in lines:
-            elem = line.replace("\n", "").split(delimeter)
-            ID = elem[0]
-            data[ID] = elem
-        file.close()
-        return data
     
     @staticmethod
     def connectionSetup(credentials_path: str, scopes: str, token_path: str) -> Credentials:
@@ -106,18 +75,7 @@ class GoogleCalendarEventsManager:
             print(new_refresh_token)
         else:
             print("Error refreshing access token:", response.text)
-    
-    #TODO: ha senso??
-    @staticmethod
-    def addData(data: Dict[str, List[str]], ID: str, data_list: List[str]) -> bool:
-        if ID == None: Exception("ID can't be null")
-        
-        if ID not in data:
-            data[ID] = data_list
-            return True
-        else:
-            return False
-
+ 
     @staticmethod
     def createEvent(creds: Credentials, summary: str, description: str, start_date: datetime, end_date: datetime, color_event_id: int = 1, timeZone: str = 'UTC'):
         if creds == None: Exception("Credentials can't be null")
@@ -209,7 +167,7 @@ class GoogleCalendarEventsManager:
             raise Exception(f"An error occurred: {str(e)}")
     
     @staticmethod
-    def getIDByDate(creds: Credentials, start_date: str, end_date: str) -> List:
+    def getIDByDate(creds: Credentials, start_date: str, end_date: str):
         if creds == None: Exception("Credentials can't be null")
         if start_date == None or end_date == None: Exception("Date can't be empty")
         
@@ -253,7 +211,7 @@ class GoogleCalendarEventsManager:
     # TODO: test 
     # TODO: add like mode
     @staticmethod
-    def getAllDescriptionsByTitle(creds: Credentials, title: str, like_mode: bool = False) -> Dict[str, List[str]]:
+    def getAllDescriptionsByTitle(creds: Credentials, title: str, like_mode: bool = False):
         if creds == None: Exception("Credentials can't be null")
         if title == None: Exception("Title can't be null")
         
