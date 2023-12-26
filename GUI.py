@@ -540,19 +540,24 @@ class GetEventsFrame(customtkinter.CTkFrame):
                     start_date = event['start']['date']
                     end_date = event['end']['date']
                 
+                start_datetime = datetime.fromisoformat(start_date)
+                end_datetime = datetime.fromisoformat(end_date)
+                duration = end_datetime - start_datetime
+                
                 event_dict = {
                     'index': index,
                     'ID': event['id'],
                     'summary': event['summary'],
                     'start': start_date,
-                    'end': end_date
+                    'end': end_date,
+                    'duration': duration
                 }
                 events_info.append(event_dict)
                 index += 1 
             
             # print event after event
             for event in events_info:
-                event_info_str = f"INDEX: {event['index']} | ID: {event['ID']} | SUMMARY: {event['summary']} | START: {event['start']} | END: {event['end']}\n"
+                event_info_str = f"INDEX: {event['index']} | ID: {event['ID']} | SUMMARY: {event['summary']} | START: {event['start']} | END: {event['end']} | DURATION: {event['duration']}\n"
                 event_list_file_viewer.insert(tkinter.END, event_info_str)
     
             self.toplevel_window.attributes("-topmost", True) # focus to this windows
@@ -606,8 +611,12 @@ class GetEventsFrame(customtkinter.CTkFrame):
                 except:
                     start_date = event['start']['date']
                     end_date = event['end']['date']
+                    
+                start_datetime = datetime.fromisoformat(start_date)
+                end_datetime = datetime.fromisoformat(end_date)
+                duration = end_datetime - start_datetime
                 
-                added = DataCSV.addData(self.data, event['id'], data_list=(event['id'], event['summary'], start_date, end_date))
+                added = DataCSV.addData(self.data, event['id'], data_list=(event['id'], event['summary'], start_date, end_date, duration))
                 if added:
                     counter += 1
                 
@@ -1096,8 +1105,7 @@ class App():
         log_box.insert("0.0", "\n" + str(datetime.now()) + ": " + message)
 
     def get_credentials(self):
-        return self.credentials
-    
+        return self.credentials 
 #*###########################################################
 
 if __name__ == "__main__":
