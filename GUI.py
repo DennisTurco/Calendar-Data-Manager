@@ -752,13 +752,14 @@ class GraphFrame(customtkinter.CTkFrame):
         self.date_picker_window = self.main_class.date_picker_window(type, self.date_picker_window, self.entry_date_from, self.entry_date_to, self.log_box)
     
     def generate_graph(self):
-        if self.check_file_path_errors(self.log_box, self.filepath): return  
+        if self.main_class.check_file_path_errors(self.log_box, self.file_path.get()): return  
         
         try:
             self.main_class.write_log(self.log_box, "Generating chart")
-            Plotter.Plotter.graph()
-        except Exception:
-            self.main_class.write_log(self.log_box, f"Error generating chart")
+            data = Plotter.Plotter.loadData(self.file_path.get())
+            Plotter.Plotter.graph(data)
+        except Exception as e:
+            self.main_class.write_log(self.log_box, f"Exception occurred: {str(e)}")
     
     def go_to_new_events_frame(self):
         self.main_class.show_frame(NewEventsFrame)
@@ -797,6 +798,7 @@ class MainFrame(customtkinter.CTkFrame):
         customtkinter.CTkButton(master=self, image=plus_image, text="New Events", command=self.go_to_new_events_frame).pack(padx=20, pady=10, anchor='center')
         customtkinter.CTkButton(master=self, image=edit_image, text="Edit Events", command=self.go_to_edit_events_frame).pack(padx=20, pady=10, anchor='center')
         customtkinter.CTkButton(master=self, image=list_image, text="Get Events", command=self.go_to_get_events_by_title_frame).pack(padx=20, pady=10, anchor='center')
+        customtkinter.CTkButton(master=self, image=chart_image, text="Graph", command=self.go_to_graph_frame).pack(padx=20, pady=10, anchor='center')
     
     def go_to_new_events_frame(self):
         self.main_class.show_frame(NewEventsFrame)
@@ -806,6 +808,9 @@ class MainFrame(customtkinter.CTkFrame):
     
     def go_to_get_events_by_title_frame(self):
         self.main_class.show_frame(GetEventsFrame)
+        
+    def go_to_graph_frame(self):
+        self.main_class.show_frame(GraphFrame)
 #?###########################################################
 
 #?###########################################################   
