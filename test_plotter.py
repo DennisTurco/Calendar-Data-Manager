@@ -100,7 +100,7 @@ hours_by_student = hours_by_student.sort_values(ascending=False)
 
 # Create a bar chart
 plt.figure(figsize=(10, 6))  # Adjust the figure size if needed
-bars = hours_by_student.plot(kind='bar')
+hours_by_student.plot(kind='bar')
 plt.xlabel('Student')
 plt.ylabel('Total Hours')
 plt.title('Total Hours by Student')

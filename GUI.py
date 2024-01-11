@@ -32,6 +32,8 @@ except:
     from tkcalendar import *
 
 #?###########################################################
+# TODO: set default start date time to local time (hour)
+# TODO: set default end date time to local time + 1 (hour)
 class NewEventsFrame(customtkinter.CTkFrame):
     
     main_class = None
@@ -998,6 +1000,7 @@ class App():
         self.token_path = token_path
         js.SJONSettings.WriteToJSON(self.credentials_path, self.token_path)
     
+    # TODO: add button up and down hours, minutes by one
     def date_picker_window(self, type, toplevel_window, entry_date_from, entry_date_to, log_box):
         if toplevel_window is None or not toplevel_window.winfo_exists():
             toplevel_window = customtkinter.CTkToplevel() # create window if its None or destroyed
