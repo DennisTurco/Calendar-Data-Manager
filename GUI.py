@@ -50,14 +50,12 @@ class NewEventsFrame(customtkinter.CTkFrame):
         self.main_class = main_class
                 
         # load images
-        self.calendar_image = tkinter.PhotoImage(file='./imgs/calendar.png')
-        self.google_image = tkinter.PhotoImage(file='./imgs/google.png')
-        self.plus_image = tkinter.PhotoImage(file='./imgs/plus.png')
-        self.list_image = tkinter.PhotoImage(file='./imgs/list.png')
-        self.edit_image = tkinter.PhotoImage(file='./imgs/edit.png')
-        self.folder_image = tkinter.PhotoImage(file='./imgs/folder.png')
-        self.file_image = tkinter.PhotoImage(file='./imgs/file.png')
-        self.chart_image = tkinter.PhotoImage(file='./imgs/chart.png')
+        calendar_image = tkinter.PhotoImage(file='./imgs/calendar.png')
+        google_image = tkinter.PhotoImage(file='./imgs/google.png')
+        plus_image = tkinter.PhotoImage(file='./imgs/plus.png')
+        list_image = tkinter.PhotoImage(file='./imgs/list.png')
+        edit_image = tkinter.PhotoImage(file='./imgs/edit.png')
+        chart_image = tkinter.PhotoImage(file='./imgs/chart.png')
         
         # configure grid layout (4x4)
         self.grid_columnconfigure(1, weight=1)
@@ -70,15 +68,15 @@ class NewEventsFrame(customtkinter.CTkFrame):
         self.sidebar_frame.grid_rowconfigure(5, weight=1)
         self.title_label = customtkinter.CTkLabel(self.sidebar_frame, text="Other Options", font=customtkinter.CTkFont(size=20, weight="bold"))
         self.title_label.grid(row=0, column=0, padx=20, pady=(20, 10))
-        self.sidebar_button_1 = customtkinter.CTkButton(self.sidebar_frame, image=self.plus_image, text="New Events", command=self.go_to_new_events_frame)
+        self.sidebar_button_1 = customtkinter.CTkButton(self.sidebar_frame, image=plus_image, text="New Events", command=self.go_to_new_events_frame)
         self.sidebar_button_1.grid(row=1, column=0, padx=20, pady=10)
-        self.sidebar_button_2 = customtkinter.CTkButton(self.sidebar_frame, image=self.edit_image, text="Edit Events", command=self.go_to_edit_events_frame)
+        self.sidebar_button_2 = customtkinter.CTkButton(self.sidebar_frame, image=edit_image, text="Edit Events", command=self.go_to_edit_events_frame)
         self.sidebar_button_2.grid(row=2, column=0, padx=20, pady=10)
-        self.sidebar_button_3 = customtkinter.CTkButton(self.sidebar_frame, image=self.list_image, text="Get Events List", command=self.go_to_get_events_by_title_frame)
+        self.sidebar_button_3 = customtkinter.CTkButton(self.sidebar_frame, image=list_image, text="Get Events List", command=self.go_to_get_events_by_title_frame)
         self.sidebar_button_3.grid(row=3, column=0, padx=20, pady=10)
-        self.sidebar_button_4 = customtkinter.CTkButton(self.sidebar_frame, image=self.chart_image, text="Graph", command=self.go_to_graph_frame)
+        self.sidebar_button_4 = customtkinter.CTkButton(self.sidebar_frame, image=chart_image, text="Graph", command=self.go_to_graph_frame)
         self.sidebar_button_4.grid(row=4, column=0, padx=20, pady=10)
-        self.google_calendar_link = customtkinter.CTkButton(self.sidebar_frame, image=self.google_image, text="Google Calendar", command=lambda: webbrowser.open('https://calendar.google.com/'))
+        self.google_calendar_link = customtkinter.CTkButton(self.sidebar_frame, image=google_image, text="Google Calendar", command=lambda: webbrowser.open('https://calendar.google.com/'))
         self.google_calendar_link.grid(row=6, column=0, padx=20, pady=(10, 10))
         
         # create main panel
@@ -116,13 +114,13 @@ class NewEventsFrame(customtkinter.CTkFrame):
         self.label_date_from.grid(row=1, column=0, padx=10, pady=10, sticky="e")
         self.entry_date_from = customtkinter.CTkEntry(self.date_frame, placeholder_text="yyyy-mm-dd hh:mm")
         self.entry_date_from.grid(row=1, column=1, padx=0, pady=10, sticky="ew")
-        self.entry_date_button = customtkinter.CTkButton(self.date_frame, text="", width=10, image=self.calendar_image, command=lambda: self.date_picker(1))
+        self.entry_date_button = customtkinter.CTkButton(self.date_frame, text="", width=10, image=calendar_image, command=lambda: self.date_picker(1))
         self.entry_date_button.grid(row=1, column=2, padx=0, pady=10, sticky="w")
         self.label_date_to = customtkinter.CTkLabel(self.date_frame, text="To:")
         self.label_date_to.grid(row=2, column=0, padx=10, pady=10, sticky="e")
         self.entry_date_to = customtkinter.CTkEntry(self.date_frame, placeholder_text="yyyy-mm-dd hh:mm")
         self.entry_date_to.grid(row=2, column=1, padx=0, pady=10, sticky="ew")
-        self.entry_date_button2 = customtkinter.CTkButton(self.date_frame, text="", width=10, image=self.calendar_image, command=lambda: self.date_picker(2))
+        self.entry_date_button2 = customtkinter.CTkButton(self.date_frame, text="", width=10, image=calendar_image, command=lambda: self.date_picker(2))
         self.entry_date_button2.grid(row=2, column=2, padx=0, pady=10, sticky="w")
         self.label_timezone = customtkinter.CTkLabel(self.date_frame, text="Timezone:")
         self.label_timezone.grid(row=3, column=0, padx=10, pady=10, sticky="e")
@@ -131,7 +129,7 @@ class NewEventsFrame(customtkinter.CTkFrame):
         self.timezone_selection.grid(row=3, column=1, padx=0, pady=(10, 10), sticky="nsew")
         
         # create button
-        self.create_button = customtkinter.CTkButton(self, image=self.plus_image, text="Create", command=self.create_event)
+        self.create_button = customtkinter.CTkButton(self, image=plus_image, text="Create", command=self.create_event)
         self.create_button.grid(row=3, column=1, padx=20, pady=20)
         
         # create log textbox
@@ -201,14 +199,12 @@ class EditEventsFrame(customtkinter.CTkFrame):
         self.main_class = main_class
         
         # load images
-        self.calendar_image = tkinter.PhotoImage(file='./imgs/calendar.png')
-        self.google_image = tkinter.PhotoImage(file='./imgs/google.png')
-        self.plus_image = tkinter.PhotoImage(file='./imgs/plus.png')
-        self.list_image = tkinter.PhotoImage(file='./imgs/list.png')
-        self.edit_image = tkinter.PhotoImage(file='./imgs/edit.png')
-        self.folder_image = tkinter.PhotoImage(file='./imgs/folder.png')
-        self.file_image = tkinter.PhotoImage(file='./imgs/file.png')
-        self.chart_image = tkinter.PhotoImage(file='./imgs/chart.png')
+        calendar_image = tkinter.PhotoImage(file='./imgs/calendar.png')
+        google_image = tkinter.PhotoImage(file='./imgs/google.png')
+        plus_image = tkinter.PhotoImage(file='./imgs/plus.png')
+        list_image = tkinter.PhotoImage(file='./imgs/list.png')
+        edit_image = tkinter.PhotoImage(file='./imgs/edit.png')
+        chart_image = tkinter.PhotoImage(file='./imgs/chart.png')
         
         # configure grid layout (4x4)
         self.grid_columnconfigure(1, weight=1)
@@ -221,15 +217,15 @@ class EditEventsFrame(customtkinter.CTkFrame):
         self.sidebar_frame.grid_rowconfigure(5, weight=1)
         self.title_label = customtkinter.CTkLabel(self.sidebar_frame, text="Other Options", font=customtkinter.CTkFont(size=20, weight="bold"))
         self.title_label.grid(row=0, column=0, padx=20, pady=(20, 10))
-        self.sidebar_button_1 = customtkinter.CTkButton(self.sidebar_frame, image=self.plus_image, text="New Events", command=self.go_to_new_events_frame)
+        self.sidebar_button_1 = customtkinter.CTkButton(self.sidebar_frame, image=plus_image, text="New Events", command=self.go_to_new_events_frame)
         self.sidebar_button_1.grid(row=1, column=0, padx=20, pady=10)
-        self.sidebar_button_2 = customtkinter.CTkButton(self.sidebar_frame, image=self.edit_image, text="Edit Events", command=self.go_to_edit_events_frame)
+        self.sidebar_button_2 = customtkinter.CTkButton(self.sidebar_frame, image=edit_image, text="Edit Events", command=self.go_to_edit_events_frame)
         self.sidebar_button_2.grid(row=2, column=0, padx=20, pady=10)
-        self.sidebar_button_3 = customtkinter.CTkButton(self.sidebar_frame, image=self.list_image, text="Get Events List", command=self.go_to_get_events_by_title_frame)
+        self.sidebar_button_3 = customtkinter.CTkButton(self.sidebar_frame, image=list_image, text="Get Events List", command=self.go_to_get_events_by_title_frame)
         self.sidebar_button_3.grid(row=3, column=0, padx=20, pady=10)
-        self.sidebar_button_4 = customtkinter.CTkButton(self.sidebar_frame, image=self.chart_image, text="Graph", command=self.go_to_graph_frame)
+        self.sidebar_button_4 = customtkinter.CTkButton(self.sidebar_frame, image=chart_image, text="Graph", command=self.go_to_graph_frame)
         self.sidebar_button_4.grid(row=4, column=0, padx=20, pady=10)
-        self.google_calendar_link = customtkinter.CTkButton(self.sidebar_frame, image=self.google_image, text="Google Calendar", command=lambda: webbrowser.open('https://calendar.google.com/'))
+        self.google_calendar_link = customtkinter.CTkButton(self.sidebar_frame, image=google_image, text="Google Calendar", command=lambda: webbrowser.open('https://calendar.google.com/'))
         self.google_calendar_link.grid(row=6, column=0, padx=20, pady=(10, 10))
         
         # create main panel
@@ -297,13 +293,13 @@ class EditEventsFrame(customtkinter.CTkFrame):
         self.label_date_from.grid(row=1, column=0, padx=10, pady=10, sticky="e")
         self.entry_date_from = customtkinter.CTkEntry(self.date_frame, placeholder_text="yyyy-mm-dd hh:mm")
         self.entry_date_from.grid(row=1, column=1, padx=0, pady=10, sticky="ew")
-        self.entry_date_button = customtkinter.CTkButton(self.date_frame, text="", width=10, image=self.calendar_image, command=lambda: self.date_picker(1))
+        self.entry_date_button = customtkinter.CTkButton(self.date_frame, text="", width=10, image=calendar_image, command=lambda: self.date_picker(1))
         self.entry_date_button.grid(row=1, column=2, padx=0, pady=10, sticky="w")
         self.label_date_to = customtkinter.CTkLabel(self.date_frame, text="To:")
         self.label_date_to.grid(row=2, column=0, padx=10, pady=10, sticky="e")
         self.entry_date_to = customtkinter.CTkEntry(self.date_frame, placeholder_text="yyyy-mm-dd hh:mm")
         self.entry_date_to.grid(row=2, column=1, padx=0, pady=10, sticky="ew")
-        self.entry_date_button2 = customtkinter.CTkButton(self.date_frame, text="", width=10, image=self.calendar_image, command=lambda: self.date_picker(2))
+        self.entry_date_button2 = customtkinter.CTkButton(self.date_frame, text="", width=10, image=calendar_image, command=lambda: self.date_picker(2))
         self.entry_date_button2.grid(row=2, column=2, padx=0, pady=10, sticky="w")
         self.label_timezone = customtkinter.CTkLabel(self.date_frame, text="Timezone:")
         self.label_timezone.grid(row=3, column=0, padx=10, pady=10, sticky="e")
@@ -312,7 +308,7 @@ class EditEventsFrame(customtkinter.CTkFrame):
         self.timezone_selection.grid(row=3, column=1, padx=0, pady=(10, 10), sticky="nsew")
         
         # create button
-        self.create_button = customtkinter.CTkButton(self, image=self.edit_image, text="Edit", command=self.edit_event)
+        self.create_button = customtkinter.CTkButton(self, image=edit_image, text="Edit", command=self.edit_event)
         self.create_button.grid(row=3, column=1, columnspan=2, padx=20, pady=20)
         
         # create log textbox
@@ -357,14 +353,14 @@ class GetEventsFrame(customtkinter.CTkFrame):
         self.main_class = main_class
         
         # load images
-        self.calendar_image = tkinter.PhotoImage(file='./imgs/calendar.png')
-        self.google_image = tkinter.PhotoImage(file='./imgs/google.png')
-        self.plus_image = tkinter.PhotoImage(file='./imgs/plus.png')
-        self.list_image = tkinter.PhotoImage(file='./imgs/list.png')
-        self.edit_image = tkinter.PhotoImage(file='./imgs/edit.png')
-        self.folder_image = tkinter.PhotoImage(file='./imgs/folder.png')
-        self.file_image = tkinter.PhotoImage(file='./imgs/file.png')
-        self.chart_image = tkinter.PhotoImage(file='./imgs/chart.png')
+        calendar_image = tkinter.PhotoImage(file='./imgs/calendar.png')
+        google_image = tkinter.PhotoImage(file='./imgs/google.png')
+        plus_image = tkinter.PhotoImage(file='./imgs/plus.png')
+        list_image = tkinter.PhotoImage(file='./imgs/list.png')
+        edit_image = tkinter.PhotoImage(file='./imgs/edit.png')
+        folder_image = tkinter.PhotoImage(file='./imgs/folder.png')
+        file_image = tkinter.PhotoImage(file='./imgs/file.png')
+        chart_image = tkinter.PhotoImage(file='./imgs/chart.png')
         
         # configure grid layout (4x4)
         self.grid_columnconfigure(1, weight=1)
@@ -377,15 +373,15 @@ class GetEventsFrame(customtkinter.CTkFrame):
         self.sidebar_frame.grid_rowconfigure(5, weight=1)
         self.title_label = customtkinter.CTkLabel(self.sidebar_frame, text="Other Options", font=customtkinter.CTkFont(size=20, weight="bold"))
         self.title_label.grid(row=0, column=0, padx=20, pady=(20, 10))
-        self.sidebar_button_1 = customtkinter.CTkButton(self.sidebar_frame, image=self.plus_image, text="New Events", command=self.go_to_new_events_frame)
+        self.sidebar_button_1 = customtkinter.CTkButton(self.sidebar_frame, image=plus_image, text="New Events", command=self.go_to_new_events_frame)
         self.sidebar_button_1.grid(row=1, column=0, padx=20, pady=10)
-        self.sidebar_button_2 = customtkinter.CTkButton(self.sidebar_frame, image=self.edit_image, text="Edit Events", command=self.go_to_edit_events_frame)
+        self.sidebar_button_2 = customtkinter.CTkButton(self.sidebar_frame, image=edit_image, text="Edit Events", command=self.go_to_edit_events_frame)
         self.sidebar_button_2.grid(row=2, column=0, padx=20, pady=10)
-        self.sidebar_button_3 = customtkinter.CTkButton(self.sidebar_frame, image=self.list_image, text="Get Events List", command=self.go_to_get_events_by_title_frame)
+        self.sidebar_button_3 = customtkinter.CTkButton(self.sidebar_frame, image=list_image, text="Get Events List", command=self.go_to_get_events_by_title_frame)
         self.sidebar_button_3.grid(row=3, column=0, padx=20, pady=10)
-        self.sidebar_button_4 = customtkinter.CTkButton(self.sidebar_frame, image=self.chart_image, text="Graph", command=self.go_to_graph_frame)
+        self.sidebar_button_4 = customtkinter.CTkButton(self.sidebar_frame, image=chart_image, text="Graph", command=self.go_to_graph_frame)
         self.sidebar_button_4.grid(row=4, column=0, padx=20, pady=10)
-        self.google_calendar_link = customtkinter.CTkButton(self.sidebar_frame, image=self.google_image, text="Google Calendar", command=lambda: webbrowser.open('https://calendar.google.com/'))
+        self.google_calendar_link = customtkinter.CTkButton(self.sidebar_frame, image=google_image, text="Google Calendar", command=lambda: webbrowser.open('https://calendar.google.com/'))
         self.google_calendar_link.grid(row=6, column=0, padx=20, pady=(10, 10))
         
         # create main panel
@@ -429,13 +425,13 @@ class GetEventsFrame(customtkinter.CTkFrame):
         self.label_date_from.grid(row=1, column=0, padx=10, pady=10, sticky="e")
         self.entry_date_from = customtkinter.CTkEntry(self.date_frame, placeholder_text="yyyy-mm-dd hh:mm")
         self.entry_date_from.grid(row=1, column=1, padx=0, pady=10, sticky="ew")
-        self.entry_date_button = customtkinter.CTkButton(self.date_frame, text="", width=10, image=self.calendar_image, command=lambda: self.date_picker(1))
+        self.entry_date_button = customtkinter.CTkButton(self.date_frame, text="", width=10, image=calendar_image, command=lambda: self.date_picker(1))
         self.entry_date_button.grid(row=1, column=2, padx=0, pady=10, sticky="w")
         self.label_date_to = customtkinter.CTkLabel(self.date_frame, text="To:")
         self.label_date_to.grid(row=2, column=0, padx=10, pady=10, sticky="e")
         self.entry_date_to = customtkinter.CTkEntry(self.date_frame, placeholder_text="yyyy-mm-dd hh:mm")
         self.entry_date_to.grid(row=2, column=1, padx=0, pady=10, sticky="ew")
-        self.entry_date_button2 = customtkinter.CTkButton(self.date_frame, text="", width=10, image=self.calendar_image, command=lambda: self.date_picker(2))
+        self.entry_date_button2 = customtkinter.CTkButton(self.date_frame, text="", width=10, image=calendar_image, command=lambda: self.date_picker(2))
         self.entry_date_button2.grid(row=2, column=2, padx=0, pady=10, sticky="w")
         self.label_timezone = customtkinter.CTkLabel(self.date_frame, text="Timezone:")
         self.label_timezone.grid(row=3, column=0, padx=10, pady=10, sticky="e")
@@ -451,13 +447,13 @@ class GetEventsFrame(customtkinter.CTkFrame):
         self.title_label_file.grid(row=0, column=0, columnspan=3, padx=10, pady=10, sticky="s")
         self.file_path = customtkinter.CTkEntry(master=self.file_output_frame, placeholder_text="file path")
         self.file_path.grid(row=1, column=1, padx=0, pady=10, sticky="ew")
-        self.button_file_path = customtkinter.CTkButton(self.file_output_frame, text="", width=10, image=self.folder_image, command=lambda: self.get_file_path(self.file_path))
+        self.button_file_path = customtkinter.CTkButton(self.file_output_frame, text="", width=10, image=folder_image, command=lambda: self.get_file_path(self.file_path))
         self.button_file_path.grid(row=1, column=2, padx=0, pady=10, sticky="w")
-        self.button_open_file = customtkinter.CTkButton(master=self.file_output_frame, image=self.file_image, text="open", command=self.open_file)
+        self.button_open_file = customtkinter.CTkButton(master=self.file_output_frame, image=file_image, text="open", command=self.open_file)
         self.button_open_file.grid(row=2, column=0, columnspan=3, padx=10, pady=10, sticky="s")
 
         # get list button
-        self.get_button = customtkinter.CTkButton(self, image=self.list_image, text="Get", command=self.get_events)
+        self.get_button = customtkinter.CTkButton(self, image=list_image, text="Get", command=self.get_events)
         self.get_button.grid(row=4, column=1, padx=20, pady=20)
         
         # create log textbox
@@ -499,7 +495,7 @@ class GetEventsFrame(customtkinter.CTkFrame):
                 break
         
         # check if the color is valid (it is not setted 'No Color Filtering')
-        if color_index == len(self.event_color)-1:
+        if color_index == len(self.event_color):
             color_index = -1
         
         try: 
@@ -533,7 +529,7 @@ class GetEventsFrame(customtkinter.CTkFrame):
             button_save = customtkinter.CTkButton(self.toplevel_window, text="Save results", command=lambda: self.get_filepath_to_save_results())
             button_save.grid(row=1, column=0, padx=5, pady=(0, 10), sticky="nsew")
             
-            button_cancel = customtkinter.CTkButton(self.toplevel_window, text="Cancel", command=lambda: self.close_top_frame())
+            button_cancel = customtkinter.CTkButton(self.toplevel_window, text="Cancel", command=lambda: self.close_top_frame_window())
             button_cancel.grid(row=1, column=1, padx=5, pady=(0, 10), sticky="nsew")
              
             event_list_file_viewer.delete(1.0, tkinter.END)
@@ -696,14 +692,13 @@ class GraphFrame(customtkinter.CTkFrame):
         self.main_class = main_class
         
         # load images
-        self.calendar_image = tkinter.PhotoImage(file='./imgs/calendar.png')
-        self.google_image = tkinter.PhotoImage(file='./imgs/google.png')
-        self.plus_image = tkinter.PhotoImage(file='./imgs/plus.png')
-        self.list_image = tkinter.PhotoImage(file='./imgs/list.png')
-        self.edit_image = tkinter.PhotoImage(file='./imgs/edit.png')
-        self.folder_image = tkinter.PhotoImage(file='./imgs/folder.png')
-        self.file_image = tkinter.PhotoImage(file='./imgs/file.png')
-        self.chart_image = tkinter.PhotoImage(file='./imgs/chart.png')
+        google_image = tkinter.PhotoImage(file='./imgs/google.png')
+        plus_image = tkinter.PhotoImage(file='./imgs/plus.png')
+        list_image = tkinter.PhotoImage(file='./imgs/list.png')
+        edit_image = tkinter.PhotoImage(file='./imgs/edit.png')
+        folder_image = tkinter.PhotoImage(file='./imgs/folder.png')
+        file_image = tkinter.PhotoImage(file='./imgs/file.png')
+        chart_image = tkinter.PhotoImage(file='./imgs/chart.png')
         
         # configure grid layout (4x4)
         self.grid_columnconfigure(1, weight=1)
@@ -716,15 +711,15 @@ class GraphFrame(customtkinter.CTkFrame):
         self.sidebar_frame.grid_rowconfigure(5, weight=1)
         self.title_label = customtkinter.CTkLabel(self.sidebar_frame, text="Other Options", font=customtkinter.CTkFont(size=20, weight="bold"))
         self.title_label.grid(row=0, column=0, padx=20, pady=(20, 10))
-        self.sidebar_button_1 = customtkinter.CTkButton(self.sidebar_frame, image=self.plus_image, text="New Events", command=self.go_to_new_events_frame)
+        self.sidebar_button_1 = customtkinter.CTkButton(self.sidebar_frame, image=plus_image, text="New Events", command=self.go_to_new_events_frame)
         self.sidebar_button_1.grid(row=1, column=0, padx=20, pady=10)
-        self.sidebar_button_2 = customtkinter.CTkButton(self.sidebar_frame, image=self.edit_image, text="Edit Events", command=self.go_to_edit_events_frame)
+        self.sidebar_button_2 = customtkinter.CTkButton(self.sidebar_frame, image=edit_image, text="Edit Events", command=self.go_to_edit_events_frame)
         self.sidebar_button_2.grid(row=2, column=0, padx=20, pady=10)
-        self.sidebar_button_3 = customtkinter.CTkButton(self.sidebar_frame, image=self.list_image, text="Get Events List", command=self.go_to_get_events_by_title_frame)
+        self.sidebar_button_3 = customtkinter.CTkButton(self.sidebar_frame, image=list_image, text="Get Events List", command=self.go_to_get_events_by_title_frame)
         self.sidebar_button_3.grid(row=3, column=0, padx=20, pady=10)
-        self.sidebar_button_4 = customtkinter.CTkButton(self.sidebar_frame, image=self.chart_image, text="Graph", command=self.go_to_graph_frame)
+        self.sidebar_button_4 = customtkinter.CTkButton(self.sidebar_frame, image=chart_image, text="Graph", command=self.go_to_graph_frame)
         self.sidebar_button_4.grid(row=4, column=0, padx=20, pady=10)
-        self.google_calendar_link = customtkinter.CTkButton(self.sidebar_frame, image=self.google_image, text="Google Calendar", command=lambda: webbrowser.open('https://calendar.google.com/'))
+        self.google_calendar_link = customtkinter.CTkButton(self.sidebar_frame, image=google_image, text="Google Calendar", command=lambda: webbrowser.open('https://calendar.google.com/'))
         self.google_calendar_link.grid(row=6, column=0, padx=20, pady=(10, 10))
         
         # create main panel
@@ -740,13 +735,13 @@ class GraphFrame(customtkinter.CTkFrame):
         self.file_label.grid(row=0, column=0, columnspan=3, padx=10, pady=(10, 10), sticky="nsew")
         self.file_path = customtkinter.CTkEntry(master=self.file_output_frame, placeholder_text="file path")
         self.file_path.grid(row=1, column=1, padx=0, pady=10, sticky="ew")
-        self.button_file_path = customtkinter.CTkButton(self.file_output_frame, text="", width=10, image=self.folder_image, command=self.get_file_path)
+        self.button_file_path = customtkinter.CTkButton(self.file_output_frame, text="", width=10, image=folder_image, command=self.get_file_path)
         self.button_file_path.grid(row=1, column=2, padx=0, pady=10, sticky="w")
-        self.button_open_file = customtkinter.CTkButton(master=self.file_output_frame, image=self.file_image, text="open", command=self.open_file)
+        self.button_open_file = customtkinter.CTkButton(master=self.file_output_frame, image=file_image, text="open", command=self.open_file)
         self.button_open_file.grid(row=2, column=0, columnspan=3, padx=10, pady=10, sticky="n")
 
         # Generate Graph Button
-        self.get_button = customtkinter.CTkButton(self, command=self.generate_graph, image=self.chart_image, text="Generate")
+        self.get_button = customtkinter.CTkButton(self, command=self.generate_graph, image=chart_image, text="Generate")
         self.get_button.grid(row=4, column=1, padx=20, pady=20)
         
         # create log textbox
@@ -833,7 +828,6 @@ class MainFrame(customtkinter.CTkFrame):
 #?###########################################################
 
 #?###########################################################   
-# TODO: fixhere
 class SetupFrame(customtkinter.CTkFrame):
     width = 900
     height = 600
