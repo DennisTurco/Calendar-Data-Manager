@@ -264,9 +264,10 @@ class GoogleCalendarEventsManager:
             raise Exception(f"An error occurred: {str(e)}")
     
     # TODO: add like mode
-    # TODO: add color mode
+    # TODO: add research by color
+    # TODO: add research by description
     @staticmethod
-    def getEvents(creds: Credentials, title: str, like_mode: bool = False, start_date: str = None, end_date: str = None):
+    def getEvents(creds: Credentials, title: str = None, like_mode: bool = False, start_date: str = None, end_date: str = None, color_id: int = -1):
         if creds is None: raise Exception("Credentials can't be null")
 
         try:
@@ -312,9 +313,15 @@ class GoogleCalendarEventsManager:
                 end_date_time_search = events[len(events)-1]['end'].get('dateTime')
                 
                 start_date_time = end_date_time_search
-
-            if events:
-                return events
+            
+            # we have to filter by color_id passed
+            if color_id != -1:
+                events_getted = [event for event in events if event.get('colorId') == str(color_id)]
+            else:
+                events_getted = events
+                
+            if events_getted:
+                return events_getted
             else:
                 return None
         except Exception as e:
