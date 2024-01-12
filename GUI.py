@@ -161,7 +161,7 @@ class NewEventsFrame(customtkinter.CTkFrame):
         color_index = 0
         for idx, color in enumerate(self.event_color.keys()):
             if color == color_selected:
-                color_index = idx
+                color_index = idx+1
                 break
         try: 
             gc.GoogleCalendarEventsManager.createEvent(self.main_class.get_credentials(), summary, self.entry_description.get("0.0", tkinter.END), date_from, date_to, color_index, timeZone=time_zone)
@@ -495,7 +495,7 @@ class GetEventsFrame(customtkinter.CTkFrame):
         color_index = 0
         for idx, color in enumerate(self.event_color.keys()):
             if color == color_selected:
-                color_index = idx
+                color_index = idx+1
                 break
         
         # check if the color is valid (it is not setted 'No Color Filtering')
