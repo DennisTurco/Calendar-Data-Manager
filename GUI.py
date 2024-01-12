@@ -461,6 +461,7 @@ class GetEventsFrame(customtkinter.CTkFrame):
         self.log_box.bind("<Key>", lambda e: "break")  # set the textbox readonly
         self.log_box.grid(row=5, column=1, columnspan=2, padx=(0, 0), pady=(20, 0), sticky="nsew")
     
+    # TODO: error, try passing id = 9e3enj5d2cgcicook4mf14jmm8
     def get_events(self):
         self.events = None
         
@@ -478,6 +479,7 @@ class GetEventsFrame(customtkinter.CTkFrame):
         summary = self.entry_summary.get()
         date_from = self.entry_date_from.get()
         date_to = self.entry_date_to.get()
+        description = self.entry_description.get("0.0", tkinter.END).replace('\n', '')
          
         try:
             if len(date_from) != 0:
@@ -499,8 +501,7 @@ class GetEventsFrame(customtkinter.CTkFrame):
             color_index = -1
         
         try: 
-            #TODO: add description and color parameter
-            self.events = gc.GoogleCalendarEventsManager.getEvents(creds=self.main_class.get_credentials(), title=summary, start_date=date_from, end_date=date_to, color_id=color_index)
+            self.events = gc.GoogleCalendarEventsManager.getEvents(creds=self.main_class.get_credentials(), title=summary, start_date=date_from, end_date=date_to, color_id=color_index, description=description)
             if self.events == None or len(self.events) == 0:
                 self.main_class.write_log(self.log_box, f"No events obtained")
                 return
