@@ -930,33 +930,24 @@ class App():
     def init_menu(self):
         menu = CTkMenuBar(self.root)
         button_1 = menu.add_cascade("File")
-        button_2 = menu.add_cascade("Edit")
         button_3 = menu.add_cascade("Settings")
         button_4 = menu.add_cascade("About")
 
         dropdown1 = CustomDropdownMenu(widget=button_1)
-        dropdown1.add_option(option="New Credentials", command=lambda: self.setCredentialsPath())
-        dropdown1.add_option(option="Open")
-        dropdown1.add_option(option="Save")
+        dropdown1.add_option(option="New Credentials", command=lambda: self.show_frame(SetupFrame))
         dropdown1.add_option(option="Exit", command=lambda: exit())
 
         dropdown1.add_separator()
 
-        dropdown2 = CustomDropdownMenu(widget=button_2)
-        dropdown2.add_option(option="Cut")
-        dropdown2.add_option(option="Copy")
-        dropdown2.add_option(option="Paste")
-
         dropdown3 = CustomDropdownMenu(widget=button_3)
-        dropdown3.add_option(option="Update")
-        
         sub_menu2 = dropdown3.add_submenu("Appearance")
         sub_menu2.add_option(option="System", command=lambda: customtkinter.set_appearance_mode("System"))
         sub_menu2.add_option(option="Dark", command=lambda: customtkinter.set_appearance_mode("dark"))
         sub_menu2.add_option(option="Light", command=lambda: customtkinter.set_appearance_mode("light"))
 
         dropdown4 = CustomDropdownMenu(widget=button_4)
-        dropdown4.add_option(option="Share")
+        dropdown4.add_option(option="Share", command=lambda: webbrowser.open('https://github.com/DennisTurco/Google-Calendar-Data-Manager'))
+        dropdown4.add_option(option="Report a bug", command=lambda: webbrowser.open('https://github.com/DennisTurco/Google-Calendar-Data-Manager/issues'))
     
     def centerWindow(self):
         screen_width = self.root.winfo_screenwidth()
