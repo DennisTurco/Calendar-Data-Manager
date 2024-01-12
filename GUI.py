@@ -807,13 +807,9 @@ class MainFrame(customtkinter.CTkFrame):
         self.main_class = main_class
         
         # load images
-        calendar_image = tkinter.PhotoImage(file='./imgs/calendar.png')
-        google_image = tkinter.PhotoImage(file='./imgs/google.png')
         plus_image = tkinter.PhotoImage(file='./imgs/plus.png')
         list_image = tkinter.PhotoImage(file='./imgs/list.png')
         edit_image = tkinter.PhotoImage(file='./imgs/edit.png')
-        folder_image = tkinter.PhotoImage(file='./imgs/folder.png')
-        file_image = tkinter.PhotoImage(file='./imgs/file.png')
         chart_image = tkinter.PhotoImage(file='./imgs/chart.png')
         
         # main
@@ -847,17 +843,16 @@ class SetupFrame(customtkinter.CTkFrame):
         customtkinter.CTkFrame.__init__(self, parent)
         self.main_class = main_class
         
-        # text title
-        label = customtkinter.CTkLabel(self, text="Set Credentials", fg_color="transparent", font=("Arial", 32))
-        label.pack(padx=20, pady=20)
+        # load images
+        google_image = tkinter.PhotoImage(file='./imgs/google.png')
+        question_image = tkinter.PhotoImage(file='./imgs/question.png')
+        arrow_image = tkinter.PhotoImage(file='./imgs/arrow-right.png')
         
-        # buttons action
-        button = customtkinter.CTkButton(master=self, text="Google Calendar", width=140, height=50, command=lambda: webbrowser.open('https://calendar.google.com/'))
-        button.pack(padx=20, pady=10)
-        button1 = customtkinter.CTkButton(master=self, text="Tutorial Setup", width=140, height=50, command=lambda: webbrowser.open('https://developers.google.com/workspace/guides/get-started'))
-        button1.pack(padx=20, pady=10)
-        button2 = customtkinter.CTkButton(master=self, text="First Setup", width=140, height=50, command=lambda: self.setCredentialsPath())
-        button2.pack(padx=20, pady=10)
+        # main content
+        customtkinter.CTkLabel(self, text="Set Credentials", fg_color="transparent", font=("Arial", 32)).pack(padx=20, pady=20)
+        customtkinter.CTkButton(master=self, image=google_image, text="Google Calendar", command=lambda: webbrowser.open('https://calendar.google.com/')).pack(padx=20, pady=10, anchor='center')
+        customtkinter.CTkButton(master=self, image=question_image, text="Tutorial Setup", command=lambda: webbrowser.open('https://developers.google.com/workspace/guides/get-started')).pack(padx=20, pady=10, anchor='center')
+        customtkinter.CTkButton(master=self, image=arrow_image, text="First Setup", command=lambda: self.setCredentialsPath()).pack(padx=20, pady=10, anchor='center')
     
     def setCredentialsPath(self):
         # get response from dialog
