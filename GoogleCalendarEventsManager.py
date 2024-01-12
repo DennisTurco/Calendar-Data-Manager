@@ -48,7 +48,7 @@ class GoogleCalendarEventsManager:
         
         return credentials
     
-    # TODO: Test
+    # TODO: Test me
     @staticmethod
     def refreshToken():
         client_secret = "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"
@@ -317,7 +317,7 @@ class GoogleCalendarEventsManager:
                 events = [event for event in events if event.get('colorId') == str(color_id)]
             
             # Filter events by description
-            if description and len(description) > 2: # as default it contains '\n' string                    
+            if description and len(description) > 2: # as default it contains '\n' string
                 events = [event for event in events if description.lower() in event.get('description', '').lower()]
                 
             if events:
@@ -451,6 +451,41 @@ class GoogleCalendarEventsManager:
         except Exception as e:
             raise Exception(f"An error occurred: {str(e)}")
 
+    # TODO: test me
+    @staticmethod
+    def editEvent(creds: Credentials, summary_old: str, description_old, color_id_old: int, summary_new: str, description_new: str, color_id_new, start_date: str = None, end_date: str = None):
+        if creds == None: Exception("Credentials can't be null")
+        
+        try:
+            service = build("calendar", "v3", credentials=creds)
+            
+            # get events list
+            events = GoogleCalendarEventsManager.getEvents(creds=creds, title=summary_old, description=description_old, color_id=color_id_old, start_date=start_date, end_date=end_date)
+            
+            if len(events) == 0: 
+                return
+            
+            # update events
+            updated_events = []
+            for event in events:
+                event['summary'] = summary_new
+                event['color_id'] = color_id_new
+                if description_new != None and len(description_new) > 2:   # as default it contains '\n' string
+                    event['description'] = description_new
+                                
+                updated_event = service.events().update(
+                    calendarId='primary',
+                    eventId=event['id'],
+                    body=event
+                ).execute()
+                updated_events.append(updated_event)
+
+            return updated_events
+
+        except Exception as e:
+            raise Exception(f"An error occurred: {str(e)}")
+            
+    
     @staticmethod
     def deleteEventByID(creds: Credentials, ID: str):
         if creds == None: Exception("Credentials can't be null")
@@ -462,3 +497,5 @@ class GoogleCalendarEventsManager:
             service.events().delete(calendarId='primary', eventId=ID).execute()
         except Exception as e:
             raise Exception(f"An error occurred: {str(e)}")
+        
+    
