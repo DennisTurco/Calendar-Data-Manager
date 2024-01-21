@@ -31,12 +31,15 @@ except:
     subprocess.call([sys.executable, "-m", "pip", "install", "tkcalendar"])
     from tkcalendar import *
 
-
-# TODO: save used timezone to settings.json
-# TODO: merge all the logbox to one
+#* TODO: use more function and set private variables and functions where it is possible
+#! TODO: save used timezone to settings.json
+#? TODO: merge all the logbox to one
+#* TODO: add new frame "delete events"
+#* TODO: add log frame: https://developers.google.com/calendar/api/guides/errors?hl=it
+#* TODO: resolve problems: https://developers.google.com/calendar/api/troubleshoot-authentication-authorization?hl=it
 #?###########################################################
-# TODO: set default start date time to local time (hour)
-# TODO: set default end date time to local time + 1 (hour)
+#* TODO: set default start date time to local time (hour)
+#* TODO: set default end date time to local time + 1 (hour)
 class NewEventsFrame(customtkinter.CTkFrame):
     main_class = None
     toplevel_window = None
@@ -183,6 +186,7 @@ class NewEventsFrame(customtkinter.CTkFrame):
 #?###########################################################
 
 #?###########################################################
+#* TODO: add preview and confirm button before edit
 class EditEventsFrame(customtkinter.CTkFrame):
     main_class = None
     date_picker_window = None
@@ -314,14 +318,15 @@ class EditEventsFrame(customtkinter.CTkFrame):
     def date_picker(self, type):
         self.date_picker_window = self.main_class.date_picker_window(type, self.date_picker_window, self.entry_date_from, self.entry_date_to, self.log_box)
     
-    # TODO: set color new 
-    # TODO: error to fix -> per qualche ragione la ricerca per summary_old esegue la ricerca anche sulla description 
+    #! TODO: set color new 
+    #! TODO: error to fix -> per qualche ragione la ricerca per summary_old esegue la ricerca anche sulla description 
     def edit_event(self):
         events = None
         
         # get values OLD
         summary_old = self.entry_summary_old.get()
-        description_old = self.entry_description_old.get('0.0', tkinter.END)  
+        #! TODO: is it correct put replace function? 
+        description_old = self.entry_description_old.get('0.0', tkinter.END).replace('\n', '') 
         color_index_old = self.main_class.get_color_id(self.event_color_from, self.multi_selection_old.get())  # get color index
         
         # get values NEW
@@ -385,6 +390,7 @@ class EditEventsFrame(customtkinter.CTkFrame):
 #?###########################################################
 
 #?###########################################################
+#? TODO: add list of flag to choose what you want to obtain from the event (ex: location, participants, ecc...)
 class GetEventsFrame(customtkinter.CTkFrame):
     main_class = None
     toplevel_window = None
@@ -436,8 +442,8 @@ class GetEventsFrame(customtkinter.CTkFrame):
         self.title_label_main = customtkinter.CTkLabel(self, text="Get Events List", font=customtkinter.CTkFont(size=20, weight="bold"))
         self.title_label_main.grid(row=0, column=1, padx=20, pady=(20, 10), sticky="nsew")
         
-        #TODO: add like mode check box
-        #TODO: add option to update the previus get list with the new list
+        #? TODO: add like mode check box
+        #? TODO: add option to update the previus get list with the new list
         # main entry
         self.main_frame = customtkinter.CTkFrame(self)
         self.main_frame.grid(row=1, column=1, padx=(50, 50), pady=10, sticky="ew")
@@ -508,7 +514,7 @@ class GetEventsFrame(customtkinter.CTkFrame):
         self.log_box.bind("<Key>", lambda e: "break")  # set the textbox readonly
         self.log_box.grid(row=5, column=1, columnspan=2, padx=(0, 0), pady=(20, 0), sticky="nsew")
     
-    # TODO: error, try passing id = 9e3enj5d2cgcicook4mf14jmm8
+    #! TODO: error, try passing id = 9e3enj5d2cgcicook4mf14jmm8
     def get_events(self):
         self.events = None
         
@@ -894,8 +900,11 @@ class SetupFrame(customtkinter.CTkFrame):
         credentials_path = dialog.get_input()
         token_path = credentials_path.rsplit("\\", 1)[0] + "\\" + "token.json"
         
-        # get credentials
-        credentials = gc.GoogleCalendarEventsManager.connectionSetup(credentials_path, gc.GoogleCalendarEventsManager.SCOPE, token_path)
+        try:
+            # get credentials
+            credentials = gc.GoogleCalendarEventsManager.connectionSetup(credentials_path, gc.GoogleCalendarEventsManager.SCOPE, token_path)
+        except Exception as error:
+            CTkMessagebox(title="Error", message=str(error), icon="cancel")
         
         # response message box
         if credentials is not None:
@@ -919,8 +928,6 @@ class App():
     token_path = None
     credentials = None
     
-    log_text = None
-    
     app_width = 1100
     app_height = 900
     
@@ -933,7 +940,10 @@ class App():
         if listRes != None:
             self.credentials_path = listRes["CredentialsPath"]
             self.token_path = listRes["TokenPath"]
-            self.credentials = gc.GoogleCalendarEventsManager.connectionSetup(self.credentials_path, gc.GoogleCalendarEventsManager.SCOPE, self.token_path)
+            try:
+                self.credentials = gc.GoogleCalendarEventsManager.connectionSetup(self.credentials_path, gc.GoogleCalendarEventsManager.SCOPE, self.token_path)
+            except:
+                pass
             
         self.init_window()
         self.init_menu()
@@ -1008,10 +1018,6 @@ class App():
 
             frame.grid(row = 0, column = 0, sticky ="nsew")
         
-        self.show_frame(MainFrame)
-        
-        #return
-        #TODO: solo per test, questo sotto va abilitato
         if self.credentials is None or self.credentials_path is None:
             self.show_frame(SetupFrame)
         else:
@@ -1037,7 +1043,7 @@ class App():
             
         return color_index
     
-    # TODO: add button up and down hours, minutes by one
+    #* TODO: add button up and down hours, minutes by one
     def date_picker_window(self, type, toplevel_window, entry_date_from, entry_date_to, log_box):
         if toplevel_window is None or not toplevel_window.winfo_exists():
             toplevel_window = customtkinter.CTkToplevel() # create window if its None or destroyed
