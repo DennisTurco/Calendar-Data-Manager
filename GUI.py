@@ -904,7 +904,9 @@ class SetupFrame(customtkinter.CTkFrame):
             credentials = gc.GoogleCalendarEventsManager.connectionSetup(credentials_path, gc.GoogleCalendarEventsManager.SCOPE, token_path)
         except Exception as error:
             CTkMessagebox(title="Error", message=str(error), icon="cancel")
-            #! TODO: delete token.json 
+            try: os.remove(token_path) # delete token.json 
+            except: pass
+            
         
         # response message box
         if credentials is not None:
@@ -1152,6 +1154,7 @@ class App():
 
     def get_credentials(self):
         return self.credentials 
+
 #*###########################################################
 
 if __name__ == "__main__":
