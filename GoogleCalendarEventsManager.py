@@ -472,7 +472,7 @@ class GoogleCalendarEventsManager:
             updated_events = []
             for event in events:
                 event['summary'] = summary_new
-                event['color_id'] = color_id_new
+                event['colorId'] = color_id_new
                 if description_new != None and len(description_new) > 2:   # as default it contains '\n' string
                     event['description'] = description_new
                                 

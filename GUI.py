@@ -31,6 +31,7 @@ except:
     subprocess.call([sys.executable, "-m", "pip", "install", "tkcalendar"])
     from tkcalendar import *
 
+#* TODO: use correct exception type
 #* TODO: use more function and set private variables and functions where it is possible
 #! TODO: save used timezone to settings.json
 #? TODO: merge all the logbox to one
@@ -318,7 +319,6 @@ class EditEventsFrame(customtkinter.CTkFrame):
     def date_picker(self, type):
         self.date_picker_window = self.main_class.date_picker_window(type, self.date_picker_window, self.entry_date_from, self.entry_date_to, self.log_box)
     
-    #! TODO: set color new 
     def edit_event(self):
         events = None
         
