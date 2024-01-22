@@ -266,16 +266,17 @@ class GoogleCalendarEventsManager:
     # TODO: add like mode for title and description
     @staticmethod
     def getEvents(creds: Credentials, title: str = None, like_mode: bool = False, description: str = None, start_date: str = None, end_date: str = None, color_id: int = -1):
-        if creds is None: raise Exception("Credentials can't be null")
+        if creds is None:
+            raise Exception("Credentials can't be null")
 
         try:
             service = build("calendar", "v3", credentials=creds)
             events = []
-            
+
             start_date_time = None
             end_date_time = None
             end_date_time_search = None
-            
+
             if start_date:
                 # Check if start_date is already a datetime object
                 if isinstance(start_date, datetime.datetime):
@@ -288,38 +289,41 @@ class GoogleCalendarEventsManager:
             elif end_date is None or len(end_date) == 0:
                 # Parsing and formatting end_date
                 end_date_time = datetime.datetime.now().isoformat() + "Z"
-            
+
             end_date_time_search = end_date_time
 
             while True:
                 events_result = service.events().list(
                     calendarId="primary",
-                    q=title,
                     maxResults=2500,
                     timeMin=start_date_time,
                     timeMax=end_date_time,
                     singleEvents=True,
-                    orderBy="startTime"
+                    orderBy="startTime",
+                    fields="items(id,summary,description,start,end,colorId)"
                 ).execute()
-                
-                events = events + events_result.get('items', [])
-                
-                # i quit if i found all the events -> it happens when the date of the last element inside the list is the same for two times
-                if events[len(events)-1]['end'].get('dateTime') == end_date_time_search:
+
+                events += [event for event in events_result.get('items', []) if title.lower() in event.get('summary', '').lower()]
+
+                if len(events) == 0:
+                    return None
+
+                # Exit if all events are found (when the date of the last element inside the list is the same for two times)
+                if events[-1]['end'].get('dateTime') == end_date_time_search:
                     break
 
-                end_date_time_search = events[len(events)-1]['end'].get('dateTime')
-                
+                end_date_time_search = events[-1]['end'].get('dateTime')
+
                 start_date_time = end_date_time_search
-            
+
             # Filter events by color_id
             if color_id != -1:
                 events = [event for event in events if event.get('colorId') == str(color_id)]
-            
+
             # Filter events by description
-            if description and len(description) > 2: # as default it contains '\n' string
+            if description and len(description) > 2:  # as default it contains '\n' string
                 events = [event for event in events if description.lower() in event.get('description', '').lower()]
-                
+
             if events:
                 return events
             else:
@@ -451,7 +455,6 @@ class GoogleCalendarEventsManager:
         except Exception as e:
             raise Exception(f"An error occurred: {str(e)}")
 
-    # TODO: test me
     @staticmethod
     def editEvent(creds: Credentials, summary_old: str, description_old, color_id_old: int, summary_new: str, description_new: str, color_id_new, start_date: str = None, end_date: str = None):
         if creds == None: Exception("Credentials can't be null")
@@ -461,8 +464,8 @@ class GoogleCalendarEventsManager:
             
             # get events list
             events = GoogleCalendarEventsManager.getEvents(creds=creds, title=summary_old, description=description_old, color_id=color_id_old, start_date=start_date, end_date=end_date)
-            
-            if len(events) == 0: 
+
+            if events == None or len(events) == 0: 
                 return
             
             # update events

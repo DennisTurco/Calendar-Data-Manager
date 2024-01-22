@@ -319,14 +319,12 @@ class EditEventsFrame(customtkinter.CTkFrame):
         self.date_picker_window = self.main_class.date_picker_window(type, self.date_picker_window, self.entry_date_from, self.entry_date_to, self.log_box)
     
     #! TODO: set color new 
-    #! TODO: error to fix -> per qualche ragione la ricerca per summary_old esegue la ricerca anche sulla description 
     def edit_event(self):
         events = None
         
         # get values OLD
         summary_old = self.entry_summary_old.get()
-        #! TODO: is it correct put replace function? 
-        description_old = self.entry_description_old.get('0.0', tkinter.END).replace('\n', '') 
+        description_old = self.entry_description_old.get('0.0', tkinter.END)
         color_index_old = self.main_class.get_color_id(self.event_color_from, self.multi_selection_old.get())  # get color index
         
         # get values NEW
@@ -356,7 +354,7 @@ class EditEventsFrame(customtkinter.CTkFrame):
         try:
             events = gc.GoogleCalendarEventsManager.editEvent(self.main_class.get_credentials(), summary_old, description_old, color_index_old, summary_new, description_new, color_index_new, date_from, date_to)
             
-            if len(events) == 0:
+            if events == None or len(events) == 0:
                 self.main_class.write_log(self.log_box, f"No events obtained")
             else:
                 self.main_class.write_log(self.log_box, f"{len(events)} Event(s) edited succesfully!")
@@ -894,6 +892,7 @@ class SetupFrame(customtkinter.CTkFrame):
         customtkinter.CTkButton(master=self, image=question_image, text="Tutorial Setup", command=lambda: webbrowser.open('https://developers.google.com/workspace/guides/get-started')).pack(padx=20, pady=10, anchor='center')
         customtkinter.CTkButton(master=self, image=arrow_image, text="First Setup", command=lambda: self.setCredentialsPath()).pack(padx=20, pady=10, anchor='center')
     
+    #* TODO: add folder reaserch to obtain credentials.json path
     def setCredentialsPath(self):
         # get response from dialog
         dialog = customtkinter.CTkInputDialog(title="New Credentials", text="Insert credentials path")
@@ -905,6 +904,7 @@ class SetupFrame(customtkinter.CTkFrame):
             credentials = gc.GoogleCalendarEventsManager.connectionSetup(credentials_path, gc.GoogleCalendarEventsManager.SCOPE, token_path)
         except Exception as error:
             CTkMessagebox(title="Error", message=str(error), icon="cancel")
+            #! TODO: delete token.json 
         
         # response message box
         if credentials is not None:
