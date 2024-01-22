@@ -264,10 +264,10 @@ class GoogleCalendarEventsManager:
             raise Exception(f"An error occurred: {str(e)}")
     
     # TODO: add like mode for title and description
+    
     @staticmethod
-    def getEvents(creds: Credentials, title: str = None, like_mode: bool = False, description: str = None, start_date: str = None, end_date: str = None, color_id: int = -1):
-        if creds is None:
-            raise Exception("Credentials can't be null")
+    def getEvents(creds: Credentials, title: str = None, like_mode: bool = False, description: str = None, start_date: str = None, end_date: str = None, time_zone: str = 'UTC', color_id: int = -1):
+        if creds is None: raise Exception("Credentials can't be null")
 
         try:
             service = build("calendar", "v3", credentials=creds)
@@ -300,6 +300,7 @@ class GoogleCalendarEventsManager:
                     timeMax=end_date_time,
                     singleEvents=True,
                     orderBy="startTime",
+                    timeZone=time_zone,
                     fields="items(id,summary,description,start,end,colorId)"
                 ).execute()
 
@@ -456,14 +457,14 @@ class GoogleCalendarEventsManager:
             raise Exception(f"An error occurred: {str(e)}")
 
     @staticmethod
-    def editEvent(creds: Credentials, summary_old: str, description_old, color_id_old: int, summary_new: str, description_new: str, color_id_new, start_date: str = None, end_date: str = None):
+    def editEvent(creds: Credentials, summary_old: str, description_old, color_id_old: int, summary_new: str, description_new: str, color_id_new, start_date: str = None, end_date: str = None, time_zone: str = 'UTC'):
         if creds == None: Exception("Credentials can't be null")
         
         try:
             service = build("calendar", "v3", credentials=creds)
             
             # get events list
-            events = GoogleCalendarEventsManager.getEvents(creds=creds, title=summary_old, description=description_old, color_id=color_id_old, start_date=start_date, end_date=end_date)
+            events = GoogleCalendarEventsManager.getEvents(creds=creds, title=summary_old, description=description_old, color_id=color_id_old, start_date=start_date, end_date=end_date, time_zone=time_zone)
 
             if events == None or len(events) == 0: 
                 return
@@ -479,6 +480,7 @@ class GoogleCalendarEventsManager:
                 updated_event = service.events().update(
                     calendarId='primary',
                     eventId=event['id'],
+                    timeZone=time_zone,
                     body=event
                 ).execute()
                 updated_events.append(updated_event)
@@ -486,8 +488,7 @@ class GoogleCalendarEventsManager:
             return updated_events
 
         except Exception as e:
-            raise Exception(f"An error occurred: {str(e)}")
-            
+            raise Exception(f"An error occurred: {str(e)}")  
     
     @staticmethod
     def deleteEventByID(creds: Credentials, ID: str):

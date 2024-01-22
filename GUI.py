@@ -33,7 +33,6 @@ except:
 
 #* TODO: use correct exception type
 #* TODO: use more function and set private variables and functions where it is possible
-#! TODO: save used timezone to settings.json
 #? TODO: merge all the logbox to one
 #* TODO: add new frame "delete events"
 #* TODO: add log frame: https://developers.google.com/calendar/api/guides/errors?hl=it
@@ -322,7 +321,6 @@ class EditEventsFrame(customtkinter.CTkFrame):
     def date_picker(self, type):
         self.date_picker_window = self.main_class.date_picker_window(type, self.date_picker_window, self.entry_date_from, self.entry_date_to, self.log_box)
     
-    #! TODO: this function doesn't use timezone attribute
     def edit_event(self):
         events = None
         
@@ -361,7 +359,7 @@ class EditEventsFrame(customtkinter.CTkFrame):
         self.main_class.set_timezone(time_zone)
             
         try:
-            events = gc.GoogleCalendarEventsManager.editEvent(self.main_class.get_credentials(), summary_old, description_old, color_index_old, summary_new, description_new, color_index_new, date_from, date_to)
+            events = gc.GoogleCalendarEventsManager.editEvent(self.main_class.get_credentials(), summary_old, description_old, color_index_old, summary_new, description_new, color_index_new, date_from, date_to, time_zone)
             
             if events == None or len(events) == 0:
                 self.main_class.write_log(self.log_box, f"No events obtained")
@@ -522,7 +520,6 @@ class GetEventsFrame(customtkinter.CTkFrame):
         self.log_box.grid(row=5, column=1, columnspan=2, padx=(0, 0), pady=(20, 0), sticky="nsew")
     
     #! TODO: error, try passing id = 9e3enj5d2cgcicook4mf14jmm8
-    #! TODO: this function doesn't use timezone attribute
     def get_events(self):
         self.events = None
         
@@ -558,7 +555,7 @@ class GetEventsFrame(customtkinter.CTkFrame):
         color_index = self.main_class.get_color_id(self.event_color, self.multi_selection.get())
         
         try: 
-            self.events = gc.GoogleCalendarEventsManager.getEvents(creds=self.main_class.get_credentials(), title=summary, start_date=date_from, end_date=date_to, color_id=color_index, description=description)
+            self.events = gc.GoogleCalendarEventsManager.getEvents(creds=self.main_class.get_credentials(), title=summary, start_date=date_from, end_date=date_to, color_id=color_index, description=description, time_zone=time_zone)
             if self.events == None or len(self.events) == 0:
                 self.main_class.write_log(self.log_box, f"No events obtained")
                 return
