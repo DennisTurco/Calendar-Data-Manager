@@ -127,7 +127,7 @@ class NewEventsFrame(customtkinter.CTkFrame):
         self.label_timezone = customtkinter.CTkLabel(self.date_frame, text="Timezone:")
         self.label_timezone.grid(row=3, column=0, padx=10, pady=10, sticky="e")
         self.timezone_selection = customtkinter.CTkComboBox(self.date_frame, state="readonly", values=list(self.timezone), command=self.combobox_callback)
-        self.timezone_selection.set(self.timezone[len(self.timezone)-1])
+        self.timezone_selection.set(self.main_class.get_timezone())
         self.timezone_selection.grid(row=3, column=1, padx=0, pady=(10, 10), sticky="nsew")
         
         # create button
@@ -144,6 +144,9 @@ class NewEventsFrame(customtkinter.CTkFrame):
         date_from = self.entry_date_from.get()
         date_to = self.entry_date_to.get()
         time_zone = self.timezone_selection.get()
+        
+        # update preferred TimeZone
+        self.main_class.set_timezone(time_zone)
         
         if len(summary.replace(" ", "")) == 0:
             self.main_class.write_log(self.log_box, f"Error on creating event: summary is missing")
@@ -304,7 +307,7 @@ class EditEventsFrame(customtkinter.CTkFrame):
         self.label_timezone = customtkinter.CTkLabel(self.date_frame, text="Timezone:")
         self.label_timezone.grid(row=3, column=0, padx=10, pady=10, sticky="e")
         self.timezone_selection = customtkinter.CTkComboBox(self.date_frame, state="readonly", values=list(self.timezone), command=self.combobox_callback)
-        self.timezone_selection.set(self.timezone[len(self.timezone)-1])
+        self.timezone_selection.set(self.main_class.get_timezone())
         self.timezone_selection.grid(row=3, column=1, padx=0, pady=(10, 10), sticky="nsew")
         
         # create button
@@ -319,6 +322,7 @@ class EditEventsFrame(customtkinter.CTkFrame):
     def date_picker(self, type):
         self.date_picker_window = self.main_class.date_picker_window(type, self.date_picker_window, self.entry_date_from, self.entry_date_to, self.log_box)
     
+    #! TODO: this function doesn't use timezone attribute
     def edit_event(self):
         events = None
         
@@ -350,6 +354,11 @@ class EditEventsFrame(customtkinter.CTkFrame):
                 date_to = datetime.strptime(date_to, '%Y-%m-%d %H:%M')
         except ValueError:
             self.main_class.write_log(self.log_box, f"Error on creating event: date format is not correct")
+            
+        time_zone = self.timezone_selection.get()
+        
+        # update preferred TimeZone
+        self.main_class.set_timezone(time_zone)
             
         try:
             events = gc.GoogleCalendarEventsManager.editEvent(self.main_class.get_credentials(), summary_old, description_old, color_index_old, summary_new, description_new, color_index_new, date_from, date_to)
@@ -487,7 +496,7 @@ class GetEventsFrame(customtkinter.CTkFrame):
         self.label_timezone = customtkinter.CTkLabel(self.date_frame, text="Timezone:")
         self.label_timezone.grid(row=3, column=0, padx=10, pady=10, sticky="e")
         self.timezone_selection = customtkinter.CTkComboBox(self.date_frame, state="readonly", values=list(self.timezone), command=self.combobox_callback)
-        self.timezone_selection.set(self.timezone[len(self.timezone)-1])
+        self.timezone_selection.set(self.main_class.get_timezone())
         self.timezone_selection.grid(row=3, column=1, padx=0, pady=(10, 10), sticky="nsew")
 
         # file output
@@ -513,6 +522,7 @@ class GetEventsFrame(customtkinter.CTkFrame):
         self.log_box.grid(row=5, column=1, columnspan=2, padx=(0, 0), pady=(20, 0), sticky="nsew")
     
     #! TODO: error, try passing id = 9e3enj5d2cgcicook4mf14jmm8
+    #! TODO: this function doesn't use timezone attribute
     def get_events(self):
         self.events = None
         
@@ -531,6 +541,10 @@ class GetEventsFrame(customtkinter.CTkFrame):
         date_from = self.entry_date_from.get()
         date_to = self.entry_date_to.get()
         description = self.entry_description.get("0.0", tkinter.END).replace('\n', '')
+        time_zone = self.timezone_selection.get()
+        
+        # update preferred TimeZone
+        self.main_class.set_timezone(time_zone)
          
         try:
             if len(date_from) != 0:
@@ -551,8 +565,6 @@ class GetEventsFrame(customtkinter.CTkFrame):
             
             self.events_list_viewer_window() # i have to truncate the list for performances reason
             self.main_class.write_log(self.log_box, f"{len(self.events)} Event(s) obtained succesfully!")
-            # if len(self.events) > 100:
-            #     self.main_class.write_log(self.log_box, f"Warning: preview is possible only for max 100 events")
         except Exception as e:
             self.main_class.write_log(self.log_box, f"Exception occurred: {str(e)}")
     
@@ -618,6 +630,7 @@ class GetEventsFrame(customtkinter.CTkFrame):
         
         return self.toplevel_window
     
+    #! TODO: fixhere -> add ok submit, add button file_path
     def get_filepath_to_save_results(self):
         
         if self.file_path != None and len(self.file_path.get()) != 0:
@@ -723,7 +736,6 @@ class GetEventsFrame(customtkinter.CTkFrame):
         self.main_class.show_frame(GraphFrame)
         self.main_class.update_logtext(self.log_box, GraphFrame)
 #?###########################################################
-
 
 #?###########################################################
 class GraphFrame(customtkinter.CTkFrame):
@@ -906,7 +918,6 @@ class SetupFrame(customtkinter.CTkFrame):
             CTkMessagebox(title="Error", message=str(error), icon="cancel")
             try: os.remove(token_path) # delete token.json 
             except: pass
-            
         
         # response message box
         if credentials is not None:
@@ -938,7 +949,7 @@ class App():
         self.root = root
         
         # read data from json to get path from last session
-        listRes = js.SJONSettings.ReadFromJSON()
+        listRes = js.JSONSettings.ReadFromJSON()
         if listRes != None:
             self.credentials_path = listRes["CredentialsPath"]
             self.token_path = listRes["TokenPath"]
@@ -1029,7 +1040,19 @@ class App():
         self.credentials = credentials
         self.credentials_path = credentials_path
         self.token_path = token_path
-        js.SJONSettings.WriteToJSON(self.credentials_path, self.token_path)
+        js.JSONSettings.WriteCredentialsToJSON(self.credentials_path, self.token_path)
+        
+    def set_timezone(self, timezone):
+        js.JSONSettings.WriteTimeZoneToJSON(timezone)
+    
+    def get_timezone(self):
+        # read data from json to get path from last session
+        timezone = 'UTC' # set default timezone
+        listRes = js.JSONSettings.ReadFromJSON()
+        if listRes != None:
+            try: timezone = listRes["TimeZone"]
+            except: pass
+        return timezone
     
     def get_color_id(self, colors, color_selected):
         color_index = 0

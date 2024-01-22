@@ -2,12 +2,12 @@ import json
 
 JSON_PATH = "settings/session.json"
 
-class SJONSettings:
+class JSONSettings:
     def __init__():
         pass
     
     @staticmethod
-    def ReadFromJSON():
+    def ReadFromJSON() -> list:
         try:
             fileObject = open(JSON_PATH, "r")
             jsonContent = fileObject.read()
@@ -17,16 +17,43 @@ class SJONSettings:
             return None
             
     @staticmethod
-    def WriteToJSON(credentials_path: str, token_path: str):
-        if credentials_path == None or len(credentials_path) == 0: Exception("Credentials path can't be empty")
-        if token_path == None or len(token_path) == 0: Exception("Token path can't be empty")
+    def WriteCredentialsToJSON(credentials_path: str, token_path: str) -> None:
+        if credentials_path is None or len(credentials_path) == 0: raise Exception("Credentials path can't be empty")
+        if token_path is None or len(token_path) == 0: raise Exception("Token path can't be empty")
+
+        # Read existing data from the file
+        existing_data = {}
+        try:
+            with open(JSON_PATH, "r") as jsonFile:
+                existing_data = json.load(jsonFile)
+        except FileNotFoundError:
+            # If the file doesn't exist, ignore the error and create a new file later
+            pass
+
+        # Update or add the new credentials paths
+        existing_data["CredentialsPath"] = credentials_path
+        existing_data["TokenPath"] = token_path
+
+        # Write the updated data back to the file
+        with open(JSON_PATH, "w") as jsonFile:
+            json.dump(existing_data, jsonFile)
         
-        # check for '\\' on string path
-        credentials_path = credentials_path.replace('\\\\', '\\')
-        token_path = token_path.replace('\\\\', '\\')
-        
-        res = {"CredentialsPath":credentials_path, "TokenPath":token_path}
-        jsonString = json.dumps(res)
-        jsonFile = open(JSON_PATH, "w")
-        jsonFile.write(jsonString)
-        jsonFile.close()
+    @staticmethod
+    def WriteTimeZoneToJSON(timezone: str) -> None:
+        if timezone is None or len(timezone) == 0: raise Exception("TimeZone can't be empty")
+
+        # Read existing data from the file
+        existing_data = {}
+        try:
+            with open(JSON_PATH, "r") as jsonFile:
+                existing_data = json.load(jsonFile)
+        except FileNotFoundError:
+            # If the file doesn't exist, ignore the error and create a new file later
+            pass
+
+        # Update or add the new timezone
+        existing_data["TimeZone"] = timezone
+
+        # Write the updated data back to the file
+        with open(JSON_PATH, "w") as jsonFile:
+            json.dump(existing_data, jsonFile)
