@@ -7,7 +7,7 @@ import tempfile
 
 import tkinter
 from tkinter import filedialog
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import Plotter
 from DataEditor import DataCSV
@@ -42,8 +42,6 @@ except:
 #* TODO: add log frame: https://developers.google.com/calendar/api/guides/errors?hl=it
 #* TODO: resolve problems: https://developers.google.com/calendar/api/troubleshoot-authentication-authorization?hl=it
 #?###########################################################
-#* TODO: set default start date time to local time (hour)
-#* TODO: set default end date time to local time + 1 (hour)
 class NewEventsFrame(customtkinter.CTkFrame):
     main_class = None
     toplevel_window = None
@@ -910,7 +908,6 @@ class SetupFrame(customtkinter.CTkFrame):
         customtkinter.CTkButton(master=self, image=question_image, text="Tutorial Setup", command=lambda: webbrowser.open('https://developers.google.com/workspace/guides/get-started')).pack(padx=20, pady=10, anchor='center')
         customtkinter.CTkButton(master=self, image=arrow_image, text="First Setup", command=lambda: self.setCredentialsPathFrame()).pack(padx=20, pady=10, anchor='center')
     
-    #* TODO: add folder reaserch to obtain credentials.json path
     def setCredentialsPathFrame(self):
         folder_image = tkinter.PhotoImage(file='./imgs/folder.png')
         
@@ -1164,13 +1161,27 @@ class App():
             minutes.grid(row=2, column=0, padx=10, pady=10, sticky="w")
             minutes = customtkinter.CTkEntry(toplevel_window, placeholder_text="mm")
             minutes.grid(row=2, column=0, padx=(70, 0), pady=10, sticky="w")
+            
+            # get current hour
+            now = datetime.now()
+            current_hour = now.strftime("%H")
+
+            # calculate hour after one hour
+            after_one_hour = now + timedelta(hours=1)
+            hour_after_one_hour = after_one_hour.strftime("%H")
                 
             if type == 1:
                 toplevel_window.title("Date From")
                 confirm_button = customtkinter.CTkButton(toplevel_window, text="Confirm", command=lambda: self.get_date(1, toplevel_window, entry_date_from, entry_date_to, log_box, calendar, hours, minutes))
+                # set default hour
+                hours.delete("0", tkinter.END)
+                hours.insert("0", current_hour)
             elif type == 2:
                 toplevel_window.title("Date To")
                 confirm_button = customtkinter.CTkButton(toplevel_window, text="Confirm", command=lambda: self.get_date(2, toplevel_window, entry_date_from, entry_date_to, log_box, calendar, hours, minutes))
+                # set default hour
+                hours.delete("0", tkinter.END)
+                hours.insert("0", hour_after_one_hour)
             else:
                 Exception("type option doesn't exists")
             
