@@ -31,6 +31,7 @@ except:
     subprocess.call([sys.executable, "-m", "pip", "install", "tkcalendar"])
     from tkcalendar import *
 
+#* TODO: allow copy text from lob box
 #* TODO: use correct exception type
 #* TODO: use more function and set private variables and functions where it is possible
 #? TODO: merge all the logbox to one
@@ -417,7 +418,7 @@ class GetEventsFrame(customtkinter.CTkFrame):
         plus_image = tkinter.PhotoImage(file='./imgs/plus.png')
         list_image = tkinter.PhotoImage(file='./imgs/list.png')
         edit_image = tkinter.PhotoImage(file='./imgs/edit.png')
-        folder_image = tkinter.PhotoImage(file='./imgs/folder.png')
+        self.folder_image = tkinter.PhotoImage(file='./imgs/folder.png')
         file_image = tkinter.PhotoImage(file='./imgs/file.png')
         chart_image = tkinter.PhotoImage(file='./imgs/chart.png')
         
@@ -505,7 +506,7 @@ class GetEventsFrame(customtkinter.CTkFrame):
         self.title_label_file.grid(row=0, column=0, columnspan=3, padx=10, pady=10, sticky="s")
         self.file_path = customtkinter.CTkEntry(master=self.file_output_frame, placeholder_text="file path")
         self.file_path.grid(row=1, column=1, padx=0, pady=10, sticky="ew")
-        self.button_file_path = customtkinter.CTkButton(self.file_output_frame, text="", width=10, image=folder_image, command=lambda: self.get_file_path(self.file_path))
+        self.button_file_path = customtkinter.CTkButton(self.file_output_frame, text="", width=10, image=self.folder_image, command=lambda: self.get_file_path(self.file_path))
         self.button_file_path.grid(row=1, column=2, padx=0, pady=10, sticky="w")
         self.button_open_file = customtkinter.CTkButton(master=self.file_output_frame, image=file_image, text="open", command=self.open_file)
         self.button_open_file.grid(row=2, column=0, columnspan=3, padx=10, pady=10, sticky="s")
@@ -627,7 +628,6 @@ class GetEventsFrame(customtkinter.CTkFrame):
         
         return self.toplevel_window
     
-    #! TODO: fixhere -> add ok submit, add button file_path
     def get_filepath_to_save_results(self):
         
         if self.file_path != None and len(self.file_path.get()) != 0:
@@ -639,7 +639,7 @@ class GetEventsFrame(customtkinter.CTkFrame):
             self.toplevel_entry_window = customtkinter.CTkToplevel()
             self.toplevel_entry_window.title('Select a file to save the results')
             self.toplevel_entry_window.geometry("350x50")
-            entry = customtkinter.CTkEntry(self.toplevel_entry_window)
+            entry = customtkinter.CTkEntry(self.toplevel_entry_window, width=250, placeholder_text="file path")
             entry.grid(row=0, column=0, padx=5, pady=(10, 10), sticky="nsew")
             button_add_filepath = customtkinter.CTkButton(self.toplevel_entry_window, width=10, text="", image=self.folder_image, command=lambda: self.get_file_path(entry))
             button_add_filepath.grid(row=0, column=1, padx=5, pady=(10, 10), sticky="nsew")

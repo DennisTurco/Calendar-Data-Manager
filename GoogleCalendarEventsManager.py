@@ -250,6 +250,7 @@ class GoogleCalendarEventsManager:
             print(f"An error occurred: {str(e)}")
             return None
     
+    @staticmethod
     def getEventByID(creds: Credentials, ID: str):
         if creds == None: raise Exception("Credentials can't be null")
         if ID == None: raise Exception("ID can't be null")
@@ -259,12 +260,14 @@ class GoogleCalendarEventsManager:
             service = build("calendar", "v3", credentials=creds)
             event = service.events().get(calendarId='primary', eventId=ID).execute()
             
-            return event
+            if event is not None:
+                return [event]  # Wrap the event in a list
+            else:
+                return None
         except Exception as e:
             raise Exception(f"An error occurred: {str(e)}")
     
     # TODO: add like mode for title and description
-    
     @staticmethod
     def getEvents(creds: Credentials, title: str = None, like_mode: bool = False, description: str = None, start_date: str = None, end_date: str = None, time_zone: str = 'UTC', color_id: int = -1):
         if creds is None: raise Exception("Credentials can't be null")
@@ -501,5 +504,3 @@ class GoogleCalendarEventsManager:
             service.events().delete(calendarId='primary', eventId=ID).execute()
         except Exception as e:
             raise Exception(f"An error occurred: {str(e)}")
-        
-    

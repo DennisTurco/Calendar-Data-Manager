@@ -1,4 +1,3 @@
-
 # Ignore credentials and tokens
 settings/credentials.json
 settings/token.json
@@ -8,3 +7,4 @@ data/data.csv
 
 # Ignore Test folder
 test/*
+personal/*
