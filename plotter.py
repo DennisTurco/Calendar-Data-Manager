@@ -1,7 +1,12 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import plotly.graph_objects as go
+import plotly.express as px
+import webbrowser
+import tempfile
 
 class Plotter:
+    
     @staticmethod
     def loadData(filepath):
         try: 
@@ -32,7 +37,8 @@ class Plotter:
             return data
         except Exception as e:
             raise Exception(f"An error occurred: {str(e)}")
-        
+    
+    @staticmethod
     def __extractTimeData(data):
         # Extract year from the Start column and convert Duration to timedelta
         data['Start'] = pd.to_datetime(data['Start'])
@@ -44,6 +50,7 @@ class Plotter:
         
         return data
     
+    @staticmethod
     def __hoursBySummary(data):
         # Group by 'Summary' and calculate the sum of hours
         hours_by_summary = data.groupby('Summary')['Duration'].sum()
@@ -81,6 +88,29 @@ class Plotter:
             height = bar.get_height()
             plt.text(bar.get_x() + bar.get_width() / 2, height + 0.05, f"{height:.2f}h", ha='center', va='center', color='black', fontsize=9)
         ####################
+        
+    @staticmethod
+    def chart1_plotly(data):
+        #################### Total Hours per Year
+        # Extract time data
+        data = Plotter.__extractTimeData(data)
+
+        # Group by year and calculate the sum of hours
+        yearly_hours = data.groupby('Year')['Duration'].sum().reset_index()
+
+        # Create a bar chart with Plotly
+        fig = px.bar(yearly_hours, x='Year', y='Duration', labels={'Year': 'Year', 'Duration': 'Total Hours'}, title='Total Hours per Year')
+
+        # Add text values above the bars
+        for i, row in yearly_hours.iterrows():
+            fig.add_annotation(x=row['Year'], y=row['Duration'], text=f"{row['Duration']:.2f}h", showarrow=False)
+
+        # Customize layout
+        fig.update_layout(xaxis=dict(tickmode='array', tickvals=yearly_hours['Year'], ticktext=yearly_hours['Year']))
+
+        # Show the plot
+        fig.show()
+        ####################
            
     @staticmethod
     def chart2(data):
@@ -108,6 +138,28 @@ class Plotter:
         ####################
         
     @staticmethod
+    def chart2_plotly(data):
+        #################### Total Hours by Summary
+        # Extract time
+        data = Plotter.__extractTimeData(data)
+        
+        hours_by_summary = Plotter.__hoursBySummary(data)
+
+        # Convert Series to DataFrame
+        hours_by_summary_df = pd.DataFrame({'Summary': hours_by_summary.index, 'Duration': hours_by_summary.values})
+
+        # Create a bar chart using Plotly Express
+        fig = px.bar(hours_by_summary_df, x='Summary', y='Duration', labels={'Duration': 'Total Hours'}, title='Total Hours by Summary')
+
+        # Add text values above the bars
+        for i, val in enumerate(hours_by_summary):
+            fig.add_annotation(x=i, y=val + 0.05, text=f"{val:.2f}h", showarrow=False)
+
+        # Show the plot
+        fig.show()
+        ####################
+    
+    @staticmethod
     def chart3(data):
         #################### Total Hours by Summary Pie chart
         # extract time
@@ -128,6 +180,19 @@ class Plotter:
 
         plt.legend(title='Summary', bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=9)  # Add legend outside the plot
         ####################
+        
+    @staticmethod
+    def chart3_plotly(data):
+        # Extract time
+        data = Plotter.__extractTimeData(data)
+
+        hours_by_summary = Plotter.__hoursBySummary(data)
+
+        # Create a pie chart using Plotly Express
+        fig = px.pie(hours_by_summary, values='Duration', names=hours_by_summary.index, labels={'Duration': 'Total Hours', 'names': 'Summary'}, title='Total Hours by Summary')
+
+        # Show the plot
+        fig.show()
     
     #! TODO: fixhere  
     def chart4(data):
@@ -154,7 +219,6 @@ class Plotter:
         plt.yticks(fontsize=9)
         ####################
    
-    # TODO: ad a new frame that show all stats without any charts
     def allStats(data):
         # extract time
         data = Plotter.__extractTimeData(data) 
@@ -166,35 +230,30 @@ class Plotter:
         
         summary_yearly_hours = data.groupby(['Year', 'Summary'])['Duration'].sum().unstack()
         
-        print(f'''
-        ---------------------
-        Total Hours per Year
-                {yearly_hours}
-        ---------------------
+        stats = [yearly_hours, hours_by_summary]
         
-        ---------------------
-        Total Hours by Summary
-                {hours_by_summary}
-        ---------------------
+        # Save the full error details to a temporary file
+        with tempfile.NamedTemporaryFile(mode='w+', delete=False, suffix=".txt") as temp_file:
+            for stat in stats:  
+                temp_file.write(str(stat) + '\n\n')
         
-        ---------------------
-        Total Hours by Summary and Year
-                {summary_yearly_hours}
-        ---------------------
-        ''')
-    
+        webbrowser.open(f'file://{temp_file.name}')
            
     @classmethod
     def graph(cls, data):
-        cls.chart1(data)
-        cls.chart2(data)
-        cls.chart3(data)
+        #cls.chart1(data)
+        #cls.chart2(data)
+        #cls.chart3(data)
         #cls.chart4(data)
+        #plt.tight_layout()
+        #plt.show()
         
+        cls.chart1_plotly(data)
+        cls.chart2_plotly(data)
+        cls.chart3_plotly(data)
         cls.allStats(data)
         
-        plt.tight_layout()
-        plt.show()
+        
         
 
-#Plotter.graph(Plotter.loadData("C:/Users/Utente/Desktop/Dennis/Programmazione/GoogleCalendarDataManager/data/prova.csv"))
+# Plotter.graph(Plotter.loadData("C:/Users/Utente/Desktop/Dennis/Programmazione/GoogleCalendarDataManager/data/prova.csv"))
