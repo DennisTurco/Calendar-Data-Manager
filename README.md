@@ -7,6 +7,8 @@ This program, with a simple graphical interface, allows you to manage Google cal
 - **get a list of events** by filtering by multiple fields and save the results in a .csv file;
 - **generate graphs** using the .csv file generated after getting the list of events, so you can get statistics for what you want.
 
+## 👀 Overview
+
 
 ## ✨ Installation
 
@@ -20,10 +22,10 @@ These files will be created by following the "Python Quick Guide" step
  
 
 ### Google API
-[Setup](https://developers.google.com/calendar/api/quickstart/python?hl=it)
+[Setup](https://developers.google.com/calendar/api/quickstart/python?hl=en)
 
-
-## 👀 Overview
+#### API info
+* [Errors](https://developers.google.com/calendar/api/guides/errors?hl=en)
 
 ## 🐛 Report a BUG
 To report a BUG -> [ISSUE](https://github.com/DennisTurco/Google-Calendar-Data-Manager/issues)

@@ -1,7 +1,10 @@
 import GoogleCalendarEventsManager as gc
 import webbrowser
 import JSONSettings as js
-import io, subprocess, sys, os
+import subprocess, sys, os
+import traceback
+import tempfile
+import platform
 
 import tkinter
 from tkinter import filedialog
@@ -166,8 +169,9 @@ class NewEventsFrame(customtkinter.CTkFrame):
         try: 
             gc.GoogleCalendarEventsManager.createEvent(self.main_class.get_credentials(), summary, self.entry_description.get("0.0", tkinter.END), date_from, date_to, color_index, timeZone=time_zone)
             self.main_class.write_log(self.log_box, f"Event '{summary}' created succesfully!")
-        except Exception as e:
-            self.main_class.write_log(self.log_box, f"Exception occurred: {str(e)}")   
+        except Exception as error:
+            self.main_class.messagebox_exception(error)
+            self.main_class.write_log(self.log_box, f"Exception occurred: {str(error)}")   
         
     def combobox_callback(self, color):
         self.color_preview.configure(bg=self.event_color.get(color))
@@ -366,8 +370,9 @@ class EditEventsFrame(customtkinter.CTkFrame):
                 self.main_class.write_log(self.log_box, f"No events obtained")
             else:
                 self.main_class.write_log(self.log_box, f"{len(events)} Event(s) edited succesfully!")
-        except Exception as e:
-            self.main_class.write_log(self.log_box, f"Exception occurred: {str(e)}")
+        except Exception as error:
+            self.main_class.messagebox_exception(error)
+            self.main_class.write_log(self.log_box, f"Exception occurred: {str(error)}")
             return
     
     def combobox_callback(self, color):
@@ -520,7 +525,6 @@ class GetEventsFrame(customtkinter.CTkFrame):
         self.log_box.bind("<Key>", lambda e: "break")  # set the textbox readonly
         self.log_box.grid(row=5, column=1, columnspan=2, padx=(0, 0), pady=(20, 0), sticky="nsew")
     
-    #! TODO: error, try passing id = 9e3enj5d2cgcicook4mf14jmm8
     def get_events(self):
         self.events = None
         
@@ -531,8 +535,9 @@ class GetEventsFrame(customtkinter.CTkFrame):
                 self.events_list_viewer_window()
                 self.main_class.write_log(self.log_box, f"Event obtained succesfully!")
                 return
-            except Exception as e:
-                self.main_class.write_log(self.log_box, f"Exception occurred: {str(e)}")
+            except Exception as error:
+                self.main_class.messagebox_exception(error)
+                self.main_class.write_log(self.log_box, f"Exception occurred: {str(error)}")
                 return
         
         summary = self.entry_summary.get()
@@ -563,8 +568,9 @@ class GetEventsFrame(customtkinter.CTkFrame):
             
             self.events_list_viewer_window() # i have to truncate the list for performances reason
             self.main_class.write_log(self.log_box, f"{len(self.events)} Event(s) obtained succesfully!")
-        except Exception as e:
-            self.main_class.write_log(self.log_box, f"Exception occurred: {str(e)}")
+        except Exception as error:
+            self.main_class.messagebox_exception(error)
+            self.main_class.write_log(self.log_box, f"Exception occurred: {str(error)}")
     
     def events_list_viewer_window(self):  
         if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
@@ -687,8 +693,9 @@ class GetEventsFrame(customtkinter.CTkFrame):
             
             self.main_class.write_log(self.log_box, f"{counter} event(s) added to file {self.file_path.get()}")
             
-        except Exception as e:
-            self.main_class.write_log(self.log_box, f"Exception occurred: {str(e)}")
+        except Exception as error:
+            self.main_class.messagebox_exception(error)
+            self.main_class.write_log(self.log_box, f"Exception occurred: {str(error)}")
             return  
     
     def save_results_to_file2(self, entry):
@@ -719,7 +726,7 @@ class GetEventsFrame(customtkinter.CTkFrame):
     
     def date_picker(self, type):
         self.date_picker_window = self.main_class.date_picker_window(type, self.date_picker_window, self.entry_date_from, self.entry_date_to, self.log_box)
-    
+
     def go_to_new_events_frame(self):
         self.main_class.show_frame(NewEventsFrame)
     
@@ -829,8 +836,9 @@ class GraphFrame(customtkinter.CTkFrame):
             self.main_class.write_log(self.log_box, "Generating chart")
             data = Plotter.Plotter.loadData(self.file_path.get())
             Plotter.Plotter.graph(data)
-        except Exception as e:
-            self.main_class.write_log(self.log_box, f"Exception occurred: {str(e)}")
+        except Exception as error:
+            self.main_class.messagebox_exception(error)
+            self.main_class.write_log(self.log_box, f"Exception occurred: {str(error)}")
     
     def go_to_new_events_frame(self):
         self.main_class.show_frame(NewEventsFrame)
@@ -912,7 +920,7 @@ class SetupFrame(customtkinter.CTkFrame):
             # get credentials
             credentials = gc.GoogleCalendarEventsManager.connectionSetup(credentials_path, gc.GoogleCalendarEventsManager.SCOPE, token_path)
         except Exception as error:
-            CTkMessagebox(title="Error", message=str(error), icon="cancel")
+            self.main_class.messagebox_exception(error)
             try: os.remove(token_path) # delete token.json 
             except: pass
         
@@ -950,10 +958,8 @@ class App():
         if listRes != None:
             self.credentials_path = listRes["CredentialsPath"]
             self.token_path = listRes["TokenPath"]
-            try:
-                self.credentials = gc.GoogleCalendarEventsManager.connectionSetup(self.credentials_path, gc.GoogleCalendarEventsManager.SCOPE, self.token_path)
-            except:
-                pass
+            try: self.credentials = gc.GoogleCalendarEventsManager.connectionSetup(self.credentials_path, gc.GoogleCalendarEventsManager.SCOPE, self.token_path)
+            except: pass
             
         self.init_window()
         self.init_menu()
@@ -961,6 +967,48 @@ class App():
         
         self.root.mainloop()
         
+    def messagebox_exception(self, error):
+        error_message = str(error) + '\n\n' + traceback.format_exc()
+        
+        # Save the full error details to a temporary file
+        with tempfile.NamedTemporaryFile(mode='w+', delete=False, suffix=".txt") as temp_file:
+            temp_file.write(error_message)
+            temp_file_path = temp_file.name
+            
+        # Provide a link or an option to view the complete error details externally
+        msg = CTkMessagebox(title="Exception Error", message=error, icon="cancel", option_1="Ok", option_2="View Details")
+
+        if msg.get() == "Ok": msg.destroy()
+        if msg.get() == "View Details": self.messagebox_exception_error_window(error_message)
+           
+    def messagebox_exception_error_window(self, error):
+        if hasattr(self, "toplevel_window") and self.toplevel_window.winfo_exists():
+            self.toplevel_window.focus()  # If window exists, focus it
+            return
+
+        self.toplevel_window = customtkinter.CTkToplevel()
+        self.toplevel_window.title(f'Exception traceback')
+
+        # Create a grid inside the toplevel window
+        self.toplevel_window.grid_rowconfigure(0, weight=1)  # Allow row 0 to expand vertically
+        self.toplevel_window.grid_columnconfigure(0, weight=1)  # Allow column 0 to expand horizontally
+        self.toplevel_window.grid_columnconfigure(1, weight=1)  # Allow column 1 to expand horizontally
+
+        file_viewer = customtkinter.CTkTextbox(self.toplevel_window)
+        file_viewer.grid(row=0, column=0, columnspan=2, padx=0, pady=(0, 10), sticky="nsew")
+
+        button_close = customtkinter.CTkButton(self.toplevel_window, text="Close", command=self.toplevel_window.destroy)
+        button_close.grid(row=1, column=0, padx=5, pady=(0, 10), sticky="nsew")
+
+        button_report = customtkinter.CTkButton(self.toplevel_window, text="Report Exception", command=lambda: webbrowser.open('https://github.com/DennisTurco/Google-Calendar-Data-Manager/issues'))
+        button_report.grid(row=1, column=1, padx=5, pady=(0, 10), sticky="nsew")
+
+        # Insert text into the box
+        file_viewer.delete(0.0, tkinter.END)
+        file_viewer.insert(tkinter.END, str(error))
+
+        self.toplevel_window.attributes("-topmost", False)  # Focus on this window
+    
     # to display the current frame passed as parameter
     def show_frame(self, cont):
         frame = self.frames[cont]
