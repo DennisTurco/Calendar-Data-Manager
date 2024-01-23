@@ -4,7 +4,6 @@ import JSONSettings as js
 import subprocess, sys, os
 import traceback
 import tempfile
-import platform
 
 import tkinter
 from tkinter import filedialog
@@ -34,6 +33,7 @@ except:
     subprocess.call([sys.executable, "-m", "pip", "install", "tkcalendar"])
     from tkcalendar import *
 
+#? TODO: get token expire date and other informations 
 #* TODO: allow copy text from lob box
 #* TODO: use correct exception type
 #* TODO: use more function and set private variables and functions where it is possible
@@ -653,7 +653,7 @@ class GetEventsFrame(customtkinter.CTkFrame):
             button_ok.grid(row=0, column=2, padx=5, pady=(10, 10), sticky="nsew") 
                 
             self.toplevel_entry_window.resizable(False, False)
-            self.toplevel_entry_window.attributes("-topmost", True) # focus to this windows
+            self.toplevel_entry_window.attributes("-topmost", False) # focus to this windows
         else:
             self.toplevel_entry_window.focus()  # if window exists focus it
         
@@ -893,6 +893,7 @@ class SetupFrame(customtkinter.CTkFrame):
     width = 900
     height = 600
     main_class = None
+    toplevel_window = None
     
     def __init__(self, parent, main_class):
         customtkinter.CTkFrame.__init__(self, parent)
@@ -907,14 +908,46 @@ class SetupFrame(customtkinter.CTkFrame):
         customtkinter.CTkLabel(self, text="Set Credentials", fg_color="transparent", font=("Arial", 32)).pack(padx=20, pady=20)
         customtkinter.CTkButton(master=self, image=google_image, text="Google Calendar", command=lambda: webbrowser.open('https://calendar.google.com/')).pack(padx=20, pady=10, anchor='center')
         customtkinter.CTkButton(master=self, image=question_image, text="Tutorial Setup", command=lambda: webbrowser.open('https://developers.google.com/workspace/guides/get-started')).pack(padx=20, pady=10, anchor='center')
-        customtkinter.CTkButton(master=self, image=arrow_image, text="First Setup", command=lambda: self.setCredentialsPath()).pack(padx=20, pady=10, anchor='center')
+        customtkinter.CTkButton(master=self, image=arrow_image, text="First Setup", command=lambda: self.setCredentialsPathFrame()).pack(padx=20, pady=10, anchor='center')
     
     #* TODO: add folder reaserch to obtain credentials.json path
-    def setCredentialsPath(self):
+    def setCredentialsPathFrame(self):
+        folder_image = tkinter.PhotoImage(file='./imgs/folder.png')
+        
+        if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
+            self.toplevel_window = customtkinter.CTkToplevel()
+            self.toplevel_window.title('New Credentials')
+
+            # Create a grid inside the toplevel window
+            self.toplevel_window.grid_rowconfigure(0, weight=1)  # Allow row 0 to expand vertically
+            self.toplevel_window.grid_columnconfigure(0, weight=1)  # Allow column 0 to expand horizontally
+            self.toplevel_window.grid_columnconfigure(1, weight=1)  # Allow column 1 to expand horizontally
+
+            text = customtkinter.CTkLabel(self.toplevel_window, text="Insert credentials path")
+            text.grid(row=0, column=0, columnspan=3, padx=20, pady=20)  # Increase columnspan to make space for button_file_path
+            self.file_path = customtkinter.CTkEntry(self.toplevel_window, placeholder_text="credentials file path")
+            self.file_path.grid(row=1, column=0, columnspan=2, padx=(15, 60), pady=10, sticky="nsew")
+            button_file_path = customtkinter.CTkButton(self.toplevel_window, text="", width=10, image=folder_image, command=self.__getFilePath)
+            button_file_path.grid(row=1, column=0, columnspan=2, padx=15, pady=10, sticky="e")
+            button_save = customtkinter.CTkButton(self.toplevel_window, text="OK", command=self.__setCredentialsPath)
+            button_save.grid(row=2, column=0, padx=15, pady=10, sticky="nsew")
+            button_cancel = customtkinter.CTkButton(self.toplevel_window, text="Cancel", command=self.toplevel_window.destroy)
+            button_cancel.grid(row=2, column=1, padx=15, pady=10, sticky="nsew")
+    
+            self.toplevel_window.attributes("-topmost", True)
+            self.toplevel_window.resizable(False, False)
+        else:
+            self.toplevel_window.focus()  # if window exists focus it
+        
+        return self.toplevel_window
+    
+    def __setCredentialsPath(self):
         # get response from dialog
-        dialog = customtkinter.CTkInputDialog(title="New Credentials", text="Insert credentials path")
-        credentials_path = dialog.get_input()
-        token_path = credentials_path.rsplit("\\", 1)[0] + "\\" + "token.json"
+        credentials_path = self.file_path.get()
+        if len(credentials_path) == 0: return
+        token_path = credentials_path.rsplit("/", 1)[0] + "/" + "token.json"
+        
+        self.toplevel_window.destroy()
         
         try:
             # get credentials
@@ -936,7 +969,12 @@ class SetupFrame(customtkinter.CTkFrame):
             msg = CTkMessagebox(title="Credentials error", message="Do you wish to retry?", icon="cancel", option_1="No", option_2="Yes")
             response = msg.get()
             if response=="Yes":
-                self.setCredentialsPath()
+                self.setCredentialsPathFrame()
+    
+    def __getFilePath(self):
+        file_path = filedialog.askopenfilename(title="Select credentials file", filetypes=(("JSON files", "*.json"), ("All files", "*.*")))
+        self.file_path.delete("0", tkinter.END)
+        self.file_path.insert("0", file_path)
 #?###########################################################
 
 #*###########################################################
@@ -973,7 +1011,6 @@ class App():
         # Save the full error details to a temporary file
         with tempfile.NamedTemporaryFile(mode='w+', delete=False, suffix=".txt") as temp_file:
             temp_file.write(error_message)
-            temp_file_path = temp_file.name
             
         # Provide a link or an option to view the complete error details externally
         msg = CTkMessagebox(title="Exception Error", message=error, icon="cancel", option_1="Ok", option_2="View Details")
