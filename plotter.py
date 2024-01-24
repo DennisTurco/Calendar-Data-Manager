@@ -252,8 +252,6 @@ class Plotter:
         cls.chart2_plotly(data)
         cls.chart3_plotly(data)
         cls.allStats(data)
-        
-        
-        
+
 
 # Plotter.graph(Plotter.loadData("C:/Users/Utente/Desktop/Dennis/Programmazione/GoogleCalendarDataManager/data/prova.csv"))

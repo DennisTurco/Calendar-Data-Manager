@@ -39,8 +39,8 @@ except:
 #* TODO: use more function and set private variables and functions where it is possible
 #? TODO: merge all the logbox to one
 #* TODO: add new frame "delete events"
-#* TODO: add log frame: https://developers.google.com/calendar/api/guides/errors?hl=it
-#* TODO: resolve problems: https://developers.google.com/calendar/api/troubleshoot-authentication-authorization?hl=it
+#* TODO: add log frame: https://developers.google.com/calendar/api/guides/errors?hl=en
+#* TODO: resolve problems: https://developers.google.com/calendar/api/troubleshoot-authentication-authorization?hl=en
 #?###########################################################
 class NewEventsFrame(customtkinter.CTkFrame):
     main_class = None
