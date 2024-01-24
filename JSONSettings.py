@@ -1,6 +1,9 @@
 import json
+import os
 
-JSON_PATH = "settings/session.json"
+FOLDER = "settings/"
+FILE = "session.json"
+JSON_PATH = FOLDER + FILE
 
 class JSONSettings:
     def __init__():
@@ -21,6 +24,10 @@ class JSONSettings:
         if credentials_path is None or len(credentials_path) == 0: raise Exception("Credentials path can't be empty")
         if token_path is None or len(token_path) == 0: raise Exception("Token path can't be empty")
 
+        # check if the folder exists
+        if not os.path.exists(FOLDER):
+            os.mkdir(FOLDER)    
+        
         # Read existing data from the file
         existing_data = {}
         try:
@@ -42,6 +49,10 @@ class JSONSettings:
     def WriteTimeZoneToJSON(timezone: str) -> None:
         if timezone is None or len(timezone) == 0: raise Exception("TimeZone can't be empty")
 
+        # check if the folder exists
+        if not os.path.exists(FOLDER):
+            os.mkdir(FOLDER)
+        
         # Read existing data from the file
         existing_data = {}
         try:
