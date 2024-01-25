@@ -37,7 +37,6 @@ except:
 
 #? TODO: get token expire date and other informations 
 #* TODO: allow copy text from lob box
-#* TODO: use correct exception type
 #* TODO: use more function and set private variables and functions where it is possible
 #? TODO: merge all the logbox to one
 #* TODO: add new frame "delete events"
@@ -1145,7 +1144,8 @@ class App():
         dropdown4 = CustomDropdownMenu(widget=button_4)
         dropdown4.add_option(option="Share", command=lambda: webbrowser.open('https://github.com/DennisTurco/Google-Calendar-Data-Manager'))
         dropdown4.add_option(option="Report a bug", command=lambda: webbrowser.open('https://github.com/DennisTurco/Google-Calendar-Data-Manager/issues'))
-    
+        dropdown4.add_option(option="Donate for this project", command=lambda: webbrowser.open('https://www.buymeacoffee.com/denno'))
+        
     def centerWindow(self):
         screen_width = self.root.winfo_screenwidth()
         screen_height = self.root.winfo_screenheight()
