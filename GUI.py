@@ -8,6 +8,7 @@ import tempfile
 import tkinter
 from tkinter import filedialog
 from datetime import datetime, timedelta
+from babel import numbers
 
 import Plotter
 from DataEditor import DataCSV
@@ -788,7 +789,6 @@ class GetEventsFrame(customtkinter.CTkFrame):
         
     def go_to_graph_frame(self):
         self.main_class.show_frame(GraphFrame)
-        self.main_class.update_logtext(self.log_box, GraphFrame)
 #?###########################################################
 
 #?###########################################################
@@ -1112,9 +1112,6 @@ class App():
     def show_frame(self, cont):
         frame = self.frames[cont]
         frame.tkraise()
-    
-    def update_logtext(self, logbox, next_frame):
-        next_frame.set_logbox_text(text=logbox.get("0.0", tkinter.END))
     
     def init_window(self):
         # configure window
