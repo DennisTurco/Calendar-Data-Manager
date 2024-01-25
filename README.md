@@ -7,6 +7,11 @@ This program, with a simple graphical interface, allows you to manage Google cal
 - **get a list of events** by filtering by multiple fields and save the results in a .csv file;
 - **generate graphs** using the .csv file generated after getting the list of events, so you can get statistics for what you want.
 
+## ☕ Donate for this Project
+<a href="https://www.buymeacoffee.com/denno"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=☕&slug=denno&button_colour=e06c29&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff" /></a>
+
+This project is entirely free, devoid of any paid content or advertisements. It has been developed without any associated costs. If you appreciate this project and would like to contribute to its sustainability, you have the option to make a donation. Your support is genuinely appreciated. Thank you wholeheartedly! 💙
+
 ## 👀 Overview
 
 

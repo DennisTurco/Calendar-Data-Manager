@@ -2,9 +2,15 @@
 settings/credentials.json
 settings/token.json
 
-# Ignore data.csv
-data/data.csv
-
 # Ignore Test folder
-test/*
-personal/*
+test
+personal
+
+# release folders and files
+dist
+build
+GUI.spec
+
+# Ignore files and folder auto generated
+__pycache__
+.vscode

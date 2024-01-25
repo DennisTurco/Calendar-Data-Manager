@@ -35,6 +35,12 @@ class Plotter:
             data['End'] = pd.to_datetime(data['End'], format='%Y-%m-%d %H:%M:%S')
 
             return data
+        except FileNotFoundError as file_not_found_error:
+            raise FileNotFoundError(f"File not found error: {str(file_not_found_error)}")
+        except pd.errors.EmptyDataError as empty_data_error:
+            raise pd.errors.EmptyDataError(f"Empty data error: {str(empty_data_error)}")
+        except pd.errors.ParserError as parser_error:
+            raise pd.errors.ParserError(f"Parsing error: {str(parser_error)}")
         except Exception as e:
             raise Exception(f"An error occurred: {str(e)}")
     
@@ -63,7 +69,7 @@ class Plotter:
         return hours_by_summary
         
     @staticmethod
-    def chart1(data):
+    def __chart1(data):
         #################### Total Hours per Year
         # extract time
         data = Plotter.__extractTimeData(data)
@@ -90,7 +96,7 @@ class Plotter:
         ####################
         
     @staticmethod
-    def chart1_plotly(data):
+    def __chart1_plotly(data):
         #################### Total Hours per Year
         # Extract time data
         data = Plotter.__extractTimeData(data)
@@ -113,7 +119,7 @@ class Plotter:
         ####################
            
     @staticmethod
-    def chart2(data):
+    def __chart2(data):
         #################### Total Hours by Summary
         # extract time
         data = Plotter.__extractTimeData(data)
@@ -138,7 +144,7 @@ class Plotter:
         ####################
         
     @staticmethod
-    def chart2_plotly(data):
+    def __chart2_plotly(data):
         #################### Total Hours by Summary
         # Extract time
         data = Plotter.__extractTimeData(data)
@@ -160,7 +166,7 @@ class Plotter:
         ####################
     
     @staticmethod
-    def chart3(data):
+    def __chart3(data):
         #################### Total Hours by Summary Pie chart
         # extract time
         data = Plotter.__extractTimeData(data)
@@ -182,7 +188,7 @@ class Plotter:
         ####################
         
     @staticmethod
-    def chart3_plotly(data):
+    def __chart3_plotly(data):
         # Extract time
         data = Plotter.__extractTimeData(data)
 
@@ -194,8 +200,9 @@ class Plotter:
         # Show the plot
         fig.show()
     
-    #! TODO: fixhere  
-    def chart4(data):
+    #! TODO: fixhere 
+    @staticmethod
+    def __chart4(data):
         #################### Total Hours by Summary and Year
         # extract time
         data = Plotter.__extractTimeData(data)
@@ -218,8 +225,9 @@ class Plotter:
         plt.xticks(fontsize=9)
         plt.yticks(fontsize=9)
         ####################
-   
-    def allStats(data):
+    
+    @staticmethod
+    def __allStats(data):
         # extract time
         data = Plotter.__extractTimeData(data) 
         
@@ -239,19 +247,20 @@ class Plotter:
         
         webbrowser.open(f'file://{temp_file.name}')
            
-    @classmethod
     def graph(cls, data):
-        #cls.chart1(data)
-        #cls.chart2(data)
-        #cls.chart3(data)
-        #cls.chart4(data)
+        if data == None: raise ValueError("data object can't be null")
+        
+        #cls.__chart1(data)
+        #cls.__chart2(data)
+        #cls.__chart3(data)
+        #cls.__chart4(data)
         #plt.tight_layout()
         #plt.show()
         
-        cls.chart1_plotly(data)
-        cls.chart2_plotly(data)
-        cls.chart3_plotly(data)
-        cls.allStats(data)
+        cls.__chart1_plotly(data)
+        cls.__chart2_plotly(data)
+        cls.__chart3_plotly(data)
+        cls.__allStats(data)
 
 
 # Plotter.graph(Plotter.loadData("C:/Users/Utente/Desktop/Dennis/Programmazione/GoogleCalendarDataManager/data/prova.csv"))

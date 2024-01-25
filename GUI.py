@@ -12,6 +12,8 @@ from datetime import datetime, timedelta
 import Plotter
 from DataEditor import DataCSV
 
+from googleapiclient.errors import HttpError
+
 try:
     import customtkinter
 except:
@@ -167,9 +169,18 @@ class NewEventsFrame(customtkinter.CTkFrame):
         try: 
             gc.GoogleCalendarEventsManager.createEvent(self.main_class.get_credentials(), summary, self.entry_description.get("0.0", tkinter.END), date_from, date_to, color_index, timeZone=time_zone)
             self.main_class.write_log(self.log_box, f"Event '{summary}' created succesfully!")
+        except FileNotFoundError as file_not_found_error:
+            self.main_class.messagebox_exception(file_not_found_error)
+            self.main_class.write_log(self.log_box, f"File not found error: {str(file_not_found_error)}")
+        except PermissionError as permission_error:
+            self.main_class.messagebox_exception(permission_error)
+            self.main_class.write_log(self.log_box, f"Permission error: {str(permission_error)}")
+        except HttpError as http_error:
+            self.main_class.messagebox_exception(http_error)
+            self.main_class.write_log(self.log_box, f"HTTP error: {str(http_error)}")
         except Exception as error:
             self.main_class.messagebox_exception(error)
-            self.main_class.write_log(self.log_box, f"Exception occurred: {str(error)}")   
+            self.main_class.write_log(self.log_box, f"Generic error: {str(error)}")   
         
     def combobox_callback(self, color):
         self.color_preview.configure(bg=self.event_color.get(color))
@@ -368,10 +379,18 @@ class EditEventsFrame(customtkinter.CTkFrame):
                 self.main_class.write_log(self.log_box, f"No events obtained")
             else:
                 self.main_class.write_log(self.log_box, f"{len(events)} Event(s) edited succesfully!")
+        except FileNotFoundError as file_not_found_error:
+            self.main_class.messagebox_exception(file_not_found_error)
+            self.main_class.write_log(self.log_box, f"File not found error: {str(file_not_found_error)}")
+        except PermissionError as permission_error:
+            self.main_class.messagebox_exception(permission_error)
+            self.main_class.write_log(self.log_box, f"Permission error: {str(permission_error)}")
+        except ValueError as value_error:
+            self.main_class.messagebox_exception(value_error)
+            self.main_class.write_log(self.log_box, f"Value error: {str(value_error)}")
         except Exception as error:
             self.main_class.messagebox_exception(error)
-            self.main_class.write_log(self.log_box, f"Exception occurred: {str(error)}")
-            return
+            self.main_class.write_log(self.log_box, f"Generic error: {str(error)}")
     
     def combobox_callback(self, color):
         self.color_preview.configure(bg=self.event_color.get(color))
@@ -533,10 +552,18 @@ class GetEventsFrame(customtkinter.CTkFrame):
                 self.events_list_viewer_window()
                 self.main_class.write_log(self.log_box, f"Event obtained succesfully!")
                 return
+            except FileNotFoundError as file_not_found_error:
+                self.main_class.messagebox_exception(file_not_found_error)
+                self.main_class.write_log(self.log_box, f"File not found error: {str(file_not_found_error)}")
+            except PermissionError as permission_error:
+                self.main_class.messagebox_exception(permission_error)
+                self.main_class.write_log(self.log_box, f"Permission error: {str(permission_error)}")
+            except ValueError as value_error:
+                self.main_class.messagebox_exception(value_error)
+                self.main_class.write_log(self.log_box, f"Value error: {str(value_error)}")
             except Exception as error:
                 self.main_class.messagebox_exception(error)
-                self.main_class.write_log(self.log_box, f"Exception occurred: {str(error)}")
-                return
+                self.main_class.write_log(self.log_box, f"Generic error: {str(error)}")
         
         summary = self.entry_summary.get()
         date_from = self.entry_date_from.get()
@@ -566,9 +593,24 @@ class GetEventsFrame(customtkinter.CTkFrame):
             
             self.events_list_viewer_window() # i have to truncate the list for performances reason
             self.main_class.write_log(self.log_box, f"{len(self.events)} Event(s) obtained succesfully!")
+        except FileNotFoundError as file_not_found_error:
+            self.main_class.messagebox_exception(file_not_found_error)
+            self.main_class.write_log(self.log_box, f"File not found error: {str(file_not_found_error)}")
+        except PermissionError as permission_error:
+            self.main_class.messagebox_exception(permission_error)
+            self.main_class.write_log(self.log_box, f"Permission error: {str(permission_error)}")
+        except ValueError as value_error:
+            self.main_class.messagebox_exception(value_error)
+            self.main_class.write_log(self.log_box, f"Value error: {str(value_error)}")
+        # except GoogleCalendarConnectionError as connection_error:
+        #     self.main_class.messagebox_exception(connection_error)
+        #     self.main_class.write_log(self.log_box, f"Connection error: {str(connection_error)}")
+        # except GoogleCalendarAPIError as api_error:
+        #     self.main_class.messagebox_exception(api_error)
+        #     self.main_class.write_log(self.log_box, f"Google Calendar API error: {str(api_error)}")
         except Exception as error:
             self.main_class.messagebox_exception(error)
-            self.main_class.write_log(self.log_box, f"Exception occurred: {str(error)}")
+            self.main_class.write_log(self.log_box, f"Generic error: {str(error)}")
     
     def events_list_viewer_window(self):  
         if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
@@ -691,10 +733,21 @@ class GetEventsFrame(customtkinter.CTkFrame):
             
             self.main_class.write_log(self.log_box, f"{counter} event(s) added to file {self.file_path.get()}")
             
+        except FileNotFoundError as file_not_found_error:
+            self.main_class.messagebox_exception(file_not_found_error)
+            self.main_class.write_log(self.log_box, f"File not found error: {str(file_not_found_error)}")
+        except PermissionError as permission_error:
+            self.main_class.messagebox_exception(permission_error)
+            self.main_class.write_log(self.log_box, f"Permission error: {str(permission_error)}")
+        except ValueError as value_error:
+            self.main_class.messagebox_exception(value_error)
+            self.main_class.write_log(self.log_box, f"Value error: {str(value_error)}")
+        except KeyError as key_error:
+            self.main_class.messagebox_exception(key_error)
+            self.main_class.write_log(self.log_box, f"Key error: {str(key_error)}")
         except Exception as error:
             self.main_class.messagebox_exception(error)
-            self.main_class.write_log(self.log_box, f"Exception occurred: {str(error)}")
-            return  
+            self.main_class.write_log(self.log_box, f"Generic error: {str(error)}")
     
     def save_results_to_file2(self, entry):
         self.file_path.delete("0", tkinter.END)
@@ -834,9 +887,22 @@ class GraphFrame(customtkinter.CTkFrame):
             self.main_class.write_log(self.log_box, "Generating chart")
             data = Plotter.Plotter.loadData(self.file_path.get())
             Plotter.Plotter.graph(data)
+        except FileNotFoundError as file_not_found_error:
+            self.main_class.messagebox_exception(file_not_found_error)
+            self.main_class.write_log(self.log_box, f"File not found error: {str(file_not_found_error)}")
+        except PermissionError as permission_error:
+            self.main_class.messagebox_exception(permission_error)
+            self.main_class.write_log(self.log_box, f"Permission error: {str(permission_error)}")
+        except ValueError as value_error:
+            self.main_class.messagebox_exception(value_error)
+            self.main_class.write_log(self.log_box, f"Value error: {str(value_error)}")
+        # except Plotter.PlotterError as plotter_error:
+        #     # Replace 'PlotterError' with the actual custom exception class from your Plotter module
+        #     self.main_class.messagebox_exception(plotter_error)
+        #     self.main_class.write_log(self.log_box, f"Plotter error: {str(plotter_error)}")
         except Exception as error:
             self.main_class.messagebox_exception(error)
-            self.main_class.write_log(self.log_box, f"Exception occurred: {str(error)}")
+            self.main_class.write_log(self.log_box, f"Generic error: {str(error)}")
     
     def go_to_new_events_frame(self):
         self.main_class.show_frame(NewEventsFrame)
@@ -1183,7 +1249,7 @@ class App():
                 hours.delete("0", tkinter.END)
                 hours.insert("0", hour_after_one_hour)
             else:
-                Exception("type option doesn't exists")
+                raise Exception("type option doesn't exists")
             
             confirm_button.grid(row=3, column=0, padx=10, pady=10, sticky="nsew") 
             
@@ -1221,7 +1287,7 @@ class App():
             entry_date_to.delete("0", tkinter.END)
             entry_date_to.insert("0", full_date_str)
         else:
-            Exception("type option doesn't exists")
+            raise Exception("type option doesn't exists")
         
         toplevel_window.destroy() 
     

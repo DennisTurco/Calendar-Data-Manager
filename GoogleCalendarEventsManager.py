@@ -24,9 +24,9 @@ class GoogleCalendarEventsManager:
     
     @staticmethod
     def connectionSetup(credentials_path: str, scopes: str, token_path: str) -> Credentials:
-        if token_path == None or len(token_path) == 0: Exception("Token path can't be empty")
-        if credentials_path == None or len(credentials_path) == 0: Exception("Credentials path can't be empty")
-        if scopes == None or len(scopes) == 0: Exception("Scopes link can't be empty")
+        if token_path == None or len(token_path) == 0: raise ValueError("Token path can't be empty")
+        if credentials_path == None or len(credentials_path) == 0: raise ValueError("Credentials path can't be empty")
+        if scopes == None or len(scopes) == 0: raise ValueError("Scopes link can't be empty")
         
         credentials = None
         
@@ -78,7 +78,8 @@ class GoogleCalendarEventsManager:
  
     @staticmethod
     def createEvent(creds: Credentials, summary: str, description: str, start_date: datetime, end_date: datetime, color_event_id: int = 1, timeZone: str = 'UTC'):
-        if creds == None: Exception("Credentials can't be null")
+        if creds == None: raise ValueError("Credentials can't be null")
+        
         service = build("calendar", "v3", credentials=creds)
         
         # set the event
@@ -101,8 +102,8 @@ class GoogleCalendarEventsManager:
     
     @staticmethod
     def getTitleByID(creds: Credentials, ID: str) -> str:
-        if creds == None: Exception("Credentials can't be null")
-        if ID == None: Exception("ID can't be null")
+        if creds == None: raise ValueError("Credentials can't be null")
+        if ID == None: raise ValueError("ID can't be null")
         
         try:
             # Call the Google Calendar API to get the event by ID
@@ -111,13 +112,16 @@ class GoogleCalendarEventsManager:
             
             title = event['summary'] # Extract and return the event title
             return title
-        except Exception as e:
-            raise Exception(f"An error occurred: {str(e)}")
+        except HttpError as http_error:
+            raise HttpError(f"HTTP error occurred: {str(http_error)}")
+        except Exception as generic_exception:
+            raise Exception(f"An error occurred: {str(generic_exception)}")
+
     
     @staticmethod
     def getTitleByDate(creds: Credentials, start_date: str, end_date: str) -> str:
-        if creds == None: Exception("Credentials can't be null")
-        if start_date == None or end_date == None: Exception("Date can't be empty")
+        if creds == None: raise ValueError("Credentials can't be null")
+        if start_date == None or end_date == None: raise ValueError("Date can't be empty")
         
         try:
             service = build("calendar", "v3", credentials=creds)
@@ -138,13 +142,15 @@ class GoogleCalendarEventsManager:
                 return title
             else:
                 return None
-        except Exception as e:
-            raise Exception(f"An error occurred: {str(e)}")
+        except HttpError as http_error:
+            raise HttpError(f"HTTP error occurred: {str(http_error)}")
+        except Exception as generic_exception:
+            raise Exception(f"An error occurred: {str(generic_exception)}")
     
     @staticmethod
     def getIDByTitle(creds: Credentials, title: str) -> str:
-        if creds == None: Exception("Credentials can't be null")
-        if title == None: Exception("Title can't be empty")
+        if creds == None: raise ValueError("Credentials can't be null")
+        if title == None: raise ValueError("Title can't be empty")
         
         try:
             service = build("calendar", "v3", credentials=creds)
@@ -163,13 +169,15 @@ class GoogleCalendarEventsManager:
                 return ID
             else:
                 return None  
-        except Exception as e:
-            raise Exception(f"An error occurred: {str(e)}")
+        except HttpError as http_error:
+            raise HttpError(f"HTTP error occurred: {str(http_error)}")
+        except Exception as generic_exception:
+            raise Exception(f"An error occurred: {str(generic_exception)}")
     
     @staticmethod
     def getIDByDate(creds: Credentials, start_date: str, end_date: str):
-        if creds == None: Exception("Credentials can't be null")
-        if start_date == None or end_date == None: Exception("Date can't be empty")
+        if creds == None: raise ValueError("Credentials can't be null")
+        if start_date == None or end_date == None: raise ValueError("Date can't be empty")
         
         try:
             service = build("calendar", "v3", credentials=creds)
@@ -190,13 +198,15 @@ class GoogleCalendarEventsManager:
                 return ID
             else:
                 return None
-        except Exception as e:
-            raise Exception(f"An error occurred: {str(e)}")
+        except HttpError as http_error:
+            raise HttpError(f"HTTP error occurred: {str(http_error)}")
+        except Exception as generic_exception:
+            raise Exception(f"An error occurred: {str(generic_exception)}")
     
     @staticmethod
     def getDescriptionByID(creds: Credentials, ID: str) -> str:
-        if creds == None: Exception("Credentials can't be null")
-        if ID == None: Exception("ID can't be null")
+        if creds == None: raise ValueError("Credentials can't be null")
+        if ID == None: raise ValueError("ID can't be null")
         
         try:
             # Call the Google Calendar API to get the event by ID
@@ -205,15 +215,17 @@ class GoogleCalendarEventsManager:
             
             description = event.get('description') # Extract and return the event description
             return description
-        except Exception as e:
-            raise Exception(f"An error occurred: {str(e)}")
+        except HttpError as http_error:
+            raise HttpError(f"HTTP error occurred: {str(http_error)}")        
+        except Exception as generic_exception:
+            raise Exception(f"An error occurred: {str(generic_exception)}")
     
     # TODO: test 
     # TODO: add like mode
     @staticmethod
     def getAllDescriptionsByTitle(creds: Credentials, title: str, like_mode: bool = False):
-        if creds == None: Exception("Credentials can't be null")
-        if title == None: Exception("Title can't be null")
+        if creds == None: raise ValueError("Credentials can't be null")
+        if title == None: raise ValueError("Title can't be null")
         
         try:
             service = build("calendar", "v3", credentials=creds)
@@ -246,14 +258,15 @@ class GoogleCalendarEventsManager:
                 return events
             else:
                 return None  
-        except Exception as e:
-            print(f"An error occurred: {str(e)}")
-            return None
+        except HttpError as http_error:
+            raise HttpError(f"HTTP error occurred: {str(http_error)}")
+        except Exception as generic_exception:
+            raise Exception(f"An error occurred: {str(generic_exception)}")
     
     @staticmethod
     def getEventByID(creds: Credentials, ID: str):
-        if creds == None: raise Exception("Credentials can't be null")
-        if ID == None: raise Exception("ID can't be null")
+        if creds == None: raise ValueError("Credentials can't be null")
+        if ID == None: raise ValueError("ID can't be null")
         
         try:
             # Call the Google Calendar API to get the event by ID
@@ -264,13 +277,15 @@ class GoogleCalendarEventsManager:
                 return [event]  # Wrap the event in a list
             else:
                 return None
-        except Exception as e:
-            raise Exception(f"An error occurred: {str(e)}")
+        except HttpError as http_error:
+            raise HttpError(f"HTTP error occurred: {str(http_error)}")
+        except Exception as generic_exception:
+            raise Exception(f"An error occurred: {str(generic_exception)}")
     
     # TODO: add like mode for title and description
     @staticmethod
     def getEvents(creds: Credentials, title: str = None, like_mode: bool = False, description: str = None, start_date: str = None, end_date: str = None, time_zone: str = 'UTC', color_id: int = -1):
-        if creds is None: raise Exception("Credentials can't be null")
+        if creds is None: raise ValueError("Credentials can't be null")
 
         try:
             service = build("calendar", "v3", credentials=creds)
@@ -327,34 +342,37 @@ class GoogleCalendarEventsManager:
             # Filter events by description
             if description and len(description) > 2:  # as default it contains '\n' string
                 events = [event for event in events if description.lower() in event.get('description', '').lower()]
-
+            
             if events:
                 return events
             else:
-                return None
-        except Exception as e:
-            print(e)
-            raise Exception(f"An error occurred: {str(e)}")
+                return None      
+        except HttpError as http_error:
+            raise HttpError(f"HTTP error occurred: {str(http_error)}")
+        except Exception as generic_exception:
+            raise Exception(f"An error occurred: {str(generic_exception)}")
 
     # TODO: test me 
     @staticmethod
     def editEventTitleByID(creds: Credentials, ID: str, title: str):
-        if creds == None: Exception("Credentials can't be null")
-        if ID == None: Exception("ID can't be null")
-        if title == None: Exception("Title can't be empty")
+        if creds == None: raise ValueError("Credentials can't be null")
+        if ID == None: raise ValueError("ID can't be null")
+        if title == None: raise ValueError("Title can't be empty")
         
         try:
             service = build("calendar", "v3", credentials=creds)
             event = service.events().get(calendarId='primary', eventId=ID).execute()
             event['summary'] = title 
-        except Exception as e:
-            raise Exception(f"An error occurred: {str(e)}")
+        except HttpError as http_error:
+            raise HttpError(f"HTTP error occurred: {str(http_error)}")
+        except Exception as generic_exception:
+            raise Exception(f"An error occurred: {str(generic_exception)}")
     
     @staticmethod
     def editEventsTitleByTitle(creds: Credentials, old_title: str, new_title: str, start_date: datetime = None, end_date: datetime = None):
-        if creds == None: Exception("Credentials can't be null")
-        if old_title == None: Exception("Old Title can't be empty")
-        if new_title == None: Exception("New Title can't be empty")
+        if creds == None: raise ValueError("Credentials can't be null")
+        if old_title == None: raise ValueError("Old Title can't be empty")
+        if new_title == None: raise ValueError("New Title can't be empty")
         
         try:
             service = build("calendar", "v3", credentials=creds)
@@ -381,15 +399,17 @@ class GoogleCalendarEventsManager:
 
             return updated_events
 
-        except Exception as e:
-            raise Exception(f"An error occurred: {str(e)}")
+        except HttpError as http_error:
+            raise HttpError(f"HTTP error occurred: {str(http_error)}")
+        except Exception as generic_exception:
+            raise Exception(f"An error occurred: {str(generic_exception)}")
     
     # TODO: test me
     @staticmethod
     def editEventDateByID(creds: Credentials, ID: str, start_date: datetime, end_date: datetime, timeZone: str = 'UTC'):
-        if creds == None: Exception("Credentials can't be null")
-        if ID == None: Exception("ID can't be null")
-        if start_date == None or end_date == None: Exception("Date can't be empty")
+        if creds == None: raise ValueError("Credentials can't be null")
+        if ID == None: raise ValueError("ID can't be null")
+        if start_date == None or end_date == None: raise ValueError("Date can't be empty")
         
         try:
             service = build("calendar", "v3", credentials=creds)
@@ -406,15 +426,17 @@ class GoogleCalendarEventsManager:
                 body=event
             ).execute()
         
-        except Exception as e:
-            raise Exception(f"An error occurred: {str(e)}")
+        except HttpError as http_error:
+            raise HttpError(f"HTTP error occurred: {str(http_error)}")
+        except Exception as generic_exception:
+            raise Exception(f"An error occurred: {str(generic_exception)}")
     
     # TODO: test me 
     @staticmethod
     def editDescriptionEventByID(creds: Credentials, ID: str, description: str):
-        if creds == None: Exception("Credentials can't be null")
-        if ID == None: Exception("ID can't be null")
-        if description == None: Exception("Description can't be null")
+        if creds == None: raise ValueError("Credentials can't be null")
+        if ID == None: raise ValueError("ID can't be null")
+        if description == None: raise ValueError("Description can't be null")
         
         try:
             service = build("calendar", "v3", credentials=creds)
@@ -430,16 +452,18 @@ class GoogleCalendarEventsManager:
                 body=event
             ).execute()
         
-        except Exception as e:
-            raise Exception(f"An error occurred: {str(e)}")
+        except HttpError as http_error:
+            raise HttpError(f"HTTP error occurred: {str(http_error)}")
+        except Exception as generic_exception:
+            raise Exception(f"An error occurred: {str(generic_exception)}")
     
     # TODO: test me 
     # TODO: add like mode
     @staticmethod
     def editDescriptionEventsByTitle(creds: Credentials, title: str, description: str, like_mode: bool = False):
-        if creds == None: Exception("Credentials can't be null")
-        if title == None: Exception("Title can't be null")
-        if description == None: Exception("Description can't be null")
+        if creds == None: raise ValueError("Credentials can't be null")
+        if title == None: raise ValueError("Title can't be null")
+        if description == None: raise ValueError("Description can't be null")
         
         try:
             service = build("calendar", "v3", credentials=creds)
@@ -456,12 +480,14 @@ class GoogleCalendarEventsManager:
                     body=event
                 ).execute()
         
-        except Exception as e:
-            raise Exception(f"An error occurred: {str(e)}")
+        except HttpError as http_error:
+            raise HttpError(f"HTTP error occurred: {str(http_error)}")
+        except Exception as generic_exception:
+            raise Exception(f"An error occurred: {str(generic_exception)}")
 
     @staticmethod
     def editEvent(creds: Credentials, summary_old: str, description_old, color_id_old: int, summary_new: str, description_new: str, color_id_new, start_date: str = None, end_date: str = None, time_zone: str = 'UTC'):
-        if creds == None: Exception("Credentials can't be null")
+        if creds == None: raise ValueError("Credentials can't be null")
         
         try:
             service = build("calendar", "v3", credentials=creds)
@@ -490,17 +516,21 @@ class GoogleCalendarEventsManager:
 
             return updated_events
 
-        except Exception as e:
-            raise Exception(f"An error occurred: {str(e)}")  
+        except HttpError as http_error:
+            raise HttpError(f"HTTP error occurred: {str(http_error)}")
+        except Exception as generic_exception:
+            raise Exception(f"An error occurred: {str(generic_exception)}")  
     
     @staticmethod
     def deleteEventByID(creds: Credentials, ID: str):
-        if creds == None: Exception("Credentials can't be null")
-        if ID == None: Exception("ID can't be null")
+        if creds == None: raise ValueError("Credentials can't be null")
+        if ID == None: raise ValueError("ID can't be null")
 
         service = build('calendar', 'v3', credentials=creds)
 
         try:
             service.events().delete(calendarId='primary', eventId=ID).execute()
-        except Exception as e:
-            raise Exception(f"An error occurred: {str(e)}")
+        except HttpError as http_error:
+            raise HttpError(f"HTTP error occurred: {str(http_error)}")
+        except Exception as generic_exception:
+            raise Exception(f"An error occurred: {str(generic_exception)}")
