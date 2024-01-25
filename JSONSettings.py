@@ -1,6 +1,9 @@
 import json
+import os
 
-JSON_PATH = "settings/session.json"
+DIRECTORY = "settings/"
+FILE = "session.json"
+JSON_PATH = DIRECTORY + FILE
 
 class JSONSettings:
     def __init__():
@@ -21,6 +24,9 @@ class JSONSettings:
         if credentials_path is None or len(credentials_path) == 0: raise ValueError("Credentials path can't be empty")
         if token_path is None or len(token_path) == 0: raise ValueError("Token path can't be empty")
 
+        # check if directory exists
+        JSONSettings.__checkIfDirectoryExists()
+        
         # Read existing data from the file
         existing_data = {}
         try:
@@ -42,6 +48,9 @@ class JSONSettings:
     def WriteTimeZoneToJSON(timezone: str) -> None:
         if timezone is None or len(timezone) == 0: raise ValueError("TimeZone can't be empty")
 
+        # check if directory exists
+        JSONSettings.__checkIfDirectoryExists()
+        
         # Read existing data from the file
         existing_data = {}
         try:
@@ -57,3 +66,8 @@ class JSONSettings:
         # Write the updated data back to the file
         with open(JSON_PATH, "w") as jsonFile:
             json.dump(existing_data, jsonFile)
+ 
+    @staticmethod
+    def __checkIfDirectoryExists():
+        if not os.path.isdir(DIRECTORY):
+            os.mkdir(DIRECTORY)
