@@ -864,7 +864,7 @@ class GraphFrame(customtkinter.CTkFrame):
         self.main_class.write_log(self.log_box, f"color '{color}' selected")
     
     def get_file_path(self):
-        file_path = filedialog.askopenfilename(title="Select file where do you want to save data", filetypes=(("CSV files", "*.csv"), ("All files", "*.*")))
+        file_path = filedialog.askopenfilename(title="Select file where do you want to save data", filetypes=(("CSV files", "*.csv"), ("TXT files", "*.txt"), ("All files", "*.*")))
         self.file_path.delete("0", tkinter.END)
         self.file_path.insert("0", file_path)
         self.main_class.write_log(self.log_box, f"file '{file_path}' selected")
@@ -1292,7 +1292,7 @@ class App():
         toplevel_window.destroy() 
     
     def get_file_path(self, logbox, entry):
-        file_path = filedialog.askopenfilename(title="Select file where do you want to save data", filetypes=(("CSV files", "*.csv"), ("All files", "*.*")))
+        file_path = filedialog.askopenfilename(title="Select file where do you want to save data", filetypes=(("CSV files", "*.csv"), ("TXT files", "*.txt"), ("All files", "*.*")))
         entry.delete("0", tkinter.END)
         entry.insert("0", file_path)
         self.write_log(logbox, f"file '{file_path}' selected")

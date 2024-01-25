@@ -246,10 +246,9 @@ class Plotter:
                 temp_file.write(str(stat) + '\n\n')
         
         webbrowser.open(f'file://{temp_file.name}')
-           
-    def graph(cls, data):
-        if data == None: raise ValueError("data object can't be null")
-        
+    
+    @classmethod    
+    def graph(cls, data):        
         #cls.__chart1(data)
         #cls.__chart2(data)
         #cls.__chart3(data)
@@ -263,4 +262,4 @@ class Plotter:
         cls.__allStats(data)
 
 
-# Plotter.graph(Plotter.loadData("C:/Users/Utente/Desktop/Dennis/Programmazione/GoogleCalendarDataManager/data/prova.csv"))
+# Plotter.graph(Plotter.loadData("C:/Users/Utente/Desktop/New Text Document (2).txt"))
