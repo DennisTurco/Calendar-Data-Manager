@@ -261,5 +261,5 @@ class Plotter:
         cls.__chart3_plotly(data)
         cls.__allStats(data)
 
-
-# Plotter.graph(Plotter.loadData("C:/Users/Utente/Desktop/New Text Document (2).txt"))
+if __name__ == "__main__":
+    Plotter.graph(Plotter.loadData("lezioni.txt"))
