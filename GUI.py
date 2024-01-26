@@ -1085,7 +1085,11 @@ class App():
         self.page_controller()
         
         self.root.mainloop()
-        
+    
+    def change_scaling_event(self, new_scaling: str):
+        new_scaling_float = int(new_scaling.replace("%", "")) / 100
+        customtkinter.set_widget_scaling(new_scaling_float)
+    
     def messagebox_exception(self, error):
         error_message = str(error) + '\n\n' + traceback.format_exc()
         
@@ -1152,10 +1156,18 @@ class App():
         dropdown1.add_separator()
 
         dropdown3 = CustomDropdownMenu(widget=button_3)
-        sub_menu2 = dropdown3.add_submenu("Appearance")
+        sub_menu2 = dropdown3.add_submenu("Theme")
         sub_menu2.add_option(option="System", command=lambda: customtkinter.set_appearance_mode("System"))
         sub_menu2.add_option(option="Dark", command=lambda: customtkinter.set_appearance_mode("dark"))
         sub_menu2.add_option(option="Light", command=lambda: customtkinter.set_appearance_mode("light"))
+        
+        sub_menu3 = dropdown3.add_submenu("Scaling")
+        sub_menu3.add_option(option="120%", command=lambda: self.change_scaling_event("120%"))
+        sub_menu3.add_option(option="110%", command=lambda: self.change_scaling_event("110%"))
+        sub_menu3.add_option(option="100%", command=lambda: self.change_scaling_event("100%"))
+        sub_menu3.add_option(option="90%", command=lambda: self.change_scaling_event("90%"))
+        sub_menu3.add_option(option="80%", command=lambda: self.change_scaling_event("80%"))
+        sub_menu3.add_option(option="70%", command=lambda: self.change_scaling_event("70%"))
 
         dropdown4 = CustomDropdownMenu(widget=button_4)
         dropdown4.add_option(option="Share", command=lambda: webbrowser.open('https://github.com/DennisTurco/Google-Calendar-Data-Manager'))
