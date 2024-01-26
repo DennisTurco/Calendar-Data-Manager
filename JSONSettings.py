@@ -15,6 +15,7 @@ class JSONSettings:
             fileObject = open(JSON_PATH, "r")
             jsonContent = fileObject.read()
             list = json.loads(jsonContent)
+            fileObject.close()
             return list
         except:
             return None
