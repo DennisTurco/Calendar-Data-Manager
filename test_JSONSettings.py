@@ -1,7 +1,7 @@
 import unittest
 import json
 import os
-from JSONSettings import JSONSettings  # Replace 'your_module_name' with the actual module name
+from JSONSettings import JSONSettings  # module name
 
 class TestJSONSettings(unittest.TestCase):
 

@@ -885,6 +885,11 @@ class GraphFrame(customtkinter.CTkFrame):
         try:
             self.main_class.write_log(self.log_box, "Generating chart")
             data = Plotter.Plotter.loadData(self.file_path.get())
+            
+            #! TODO: fixhere
+            # if not data:
+            #     self.main_class.write_log(self.log_box, f"The file '{self.file_path.get()}' doesn't exist or is empty")
+            #     return
             Plotter.Plotter.graph(data)
         except FileNotFoundError as file_not_found_error:
             self.main_class.messagebox_exception(file_not_found_error)

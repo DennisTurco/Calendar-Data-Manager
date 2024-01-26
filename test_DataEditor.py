@@ -24,11 +24,15 @@ class TestDataCSV(unittest.TestCase):
     def test_save_data_to_file(self):
         # Test saving data to a CSV file
         DataCSV.saveDataToFile(self.test_data, self.test_file_path, self.delimiter, self.encoding_type)
-
+        
         # Verify the content of the CSV file
         with open(self.test_file_path, 'r', encoding=self.encoding_type) as file:
             lines = file.readlines()
-            expected_lines = ['1|John|Doe|john.doe@example.com\n', '2|Jane|Smith|jane.smith@example.com\n']
+            expected_lines = ['1|John|Doe|john.doe@example.com\n', '2|Jane|Smith|jane.smith@example.com\n', '3|Alice|Wonderland|alice.wonderland@example.com']
+            
+            print(f"Actual Lines: \n{lines}")
+            print(f"Expected Lines: \n{expected_lines}")
+            
             self.assertEqual(lines, expected_lines)
 
     def test_load_data_from_file(self):
@@ -37,6 +41,9 @@ class TestDataCSV(unittest.TestCase):
 
         # Test loading data from the CSV file
         loaded_data = DataCSV.loadDataFromFile(self.test_file_path, self.delimiter)
+        
+        print(f"test_load_data_from_file: \n{loaded_data}")
+        
         self.assertEqual(loaded_data, self.test_data)
 
     def test_add_data(self):
@@ -45,6 +52,8 @@ class TestDataCSV(unittest.TestCase):
         new_data = ['3', 'Alice', 'Wonderland', 'alice.wonderland@example.com']
         result = DataCSV.addData(self.test_data, new_data_id, new_data)
 
+        print(f"test_add_data: \n{new_data}")
+        
         # Verify that data was added successfully
         self.assertTrue(result)
         self.assertIn(new_data_id, self.test_data)
@@ -55,6 +64,8 @@ class TestDataCSV(unittest.TestCase):
         existing_data_id = '1'
         existing_data = ['1', 'John', 'Doe', 'john.doe@example.com']
         result = DataCSV.addData(self.test_data, existing_data_id, existing_data)
+        
+        print(f"test_add_existing_data: \n{result}")
 
         # Verify that data was not added (already exists)
         self.assertFalse(result)

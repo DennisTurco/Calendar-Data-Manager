@@ -4,11 +4,16 @@ import plotly.graph_objects as go
 import plotly.express as px
 import webbrowser
 import tempfile
+import os
 
 class Plotter:
     
     @staticmethod
     def loadData(filepath):
+        # check if file exists and if it is empty
+        if not os.path.isfile(filepath): return None
+        if os.stat(filepath).st_size == 0: return None
+        
         try: 
             # Load data from the CSV file
             data = pd.read_csv(filepath, sep='|', header=None, encoding='utf-8')
@@ -21,6 +26,10 @@ class Plotter:
             # Remove character 'T'
             data['Start'] = data['Start'].str.replace('T', ' ')
             data['End'] = data['End'].str.replace('T', ' ')
+            
+            # Remove character 'Z'
+            data['Start'] = data['Start'].str.replace('Z', '')
+            data['End'] = data['End'].str.replace('Z', '')
             
             # Set the hours, minutes, and seconds if they are missing
             for index, elem in enumerate(data['Start']):
@@ -35,12 +44,10 @@ class Plotter:
             data['End'] = pd.to_datetime(data['End'], format='%Y-%m-%d %H:%M:%S')
 
             return data
-        except FileNotFoundError as file_not_found_error:
-            raise FileNotFoundError(f"File not found error: {str(file_not_found_error)}")
-        except pd.errors.EmptyDataError as empty_data_error:
-            raise pd.errors.EmptyDataError(f"Empty data error: {str(empty_data_error)}")
         except pd.errors.ParserError as parser_error:
             raise pd.errors.ParserError(f"Parsing error: {str(parser_error)}")
+        except ValueError as value_error:
+            raise ValueError(f"Value error: {str(value_error)}")
         except Exception as e:
             raise Exception(f"An error occurred: {str(e)}")
     
@@ -261,5 +268,5 @@ class Plotter:
         cls.__chart3_plotly(data)
         cls.__allStats(data)
 
-if __name__ == "__main__":
-    Plotter.graph(Plotter.loadData("lezioni.txt"))
+
+#Plotter.graph(Plotter.loadData("lezioni.txt"))
