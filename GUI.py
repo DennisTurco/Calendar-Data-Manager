@@ -37,6 +37,9 @@ except:
     subprocess.call([sys.executable, "-m", "pip", "install", "tkcalendar"])
     from tkcalendar import *
 
+#* TODO: when it is realesed -> https://customtkinter.tomschimansky.com/showcase/
+#* TODO: set preferred scaling text size
+#* TODO: set preferred theme
 #? TODO: get token expire date and other informations 
 #* TODO: allow copy text from lob box
 #* TODO: use more function and set private variables and functions where it is possible
@@ -934,14 +937,26 @@ class MainFrame(customtkinter.CTkFrame):
         list_image = tkinter.PhotoImage(file='./imgs/list.png')
         edit_image = tkinter.PhotoImage(file='./imgs/edit.png')
         chart_image = tkinter.PhotoImage(file='./imgs/chart.png')
+        donation_image = tkinter.PhotoImage(file='./imgs/donation.png')
+        github_image = tkinter.PhotoImage(file='./imgs/github.png')
+        icon = tkinter.PhotoImage(file='./imgs/icon.png')
+    
+        # custom font
+        #! TODO: set custom font
+        title_font = customtkinter.CTkFont(family="Georgia", weight='bold', slant='italic', size=45)
         
         # main
-        customtkinter.CTkLabel(self, text="Choose the action", fg_color="transparent", font=("Arial", 32)).pack(padx=20, pady=20)
+        customtkinter.CTkLabel(self, text="", image=icon, fg_color="transparent").pack(padx=20, pady=(50, 20))
+        customtkinter.CTkLabel(self, text="Google Calendar Data Manager", font=title_font, text_color='#e06c29', fg_color="transparent").pack(padx=20, pady=50)
+        #customtkinter.CTkLabel(self, text="Choose the action", fg_color="transparent", font=("Arial", 32)).pack(padx=20, pady=20)
         customtkinter.CTkButton(master=self, image=plus_image, text="New Events", command=self.go_to_new_events_frame).pack(padx=20, pady=10, anchor='center')
         customtkinter.CTkButton(master=self, image=edit_image, text="Edit Events", command=self.go_to_edit_events_frame).pack(padx=20, pady=10, anchor='center')
         customtkinter.CTkButton(master=self, image=list_image, text="Get Events", command=self.go_to_get_events_by_title_frame).pack(padx=20, pady=10, anchor='center')
         customtkinter.CTkButton(master=self, image=chart_image, text="Graph", command=self.go_to_graph_frame).pack(padx=20, pady=10, anchor='center')
-    
+        
+        customtkinter.CTkButton(master=self, image=github_image, fg_color="transparent", border_width=1, text="", width=32, height=32, command=lambda: webbrowser.open('https://github.com/DennisTurco/Google-Calendar-Data-Manager')).pack(padx=20, pady=10, anchor='sw')
+        customtkinter.CTkButton(master=self, image=donation_image, fg_color="transparent", border_width=1, text="", width=32, height=32, command=lambda: webbrowser.open('https://www.buymeacoffee.com/denno')).pack(padx=20, pady=10, anchor='sw')
+        
     def go_to_new_events_frame(self):
         self.main_class.show_frame(NewEventsFrame)
     
@@ -1214,7 +1229,7 @@ class App():
             
         return color_index
     
-    #* TODO: add button up and down hours, minutes by one
+    #* TODO: add button up and down hours, minutes by one https://customtkinter.tomschimansky.com/tutorial/spinbox
     def date_picker_window(self, type, toplevel_window, entry_date_from, entry_date_to, log_box):
         if toplevel_window is None or not toplevel_window.winfo_exists():
             toplevel_window = customtkinter.CTkToplevel() # create window if its None or destroyed
