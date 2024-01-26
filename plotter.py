@@ -11,8 +11,8 @@ class Plotter:
     @staticmethod
     def loadData(filepath):
         # check if file exists and if it is empty
-        if not os.path.isfile(filepath): return None
-        if os.stat(filepath).st_size == 0: return None
+        if not os.path.isfile(filepath): raise FileNotFoundError()
+        if os.stat(filepath).st_size == 0: raise pd.errors.EmptyDataError()
         
         try: 
             # Load data from the CSV file

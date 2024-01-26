@@ -4,6 +4,7 @@ import JSONSettings as js
 import subprocess, sys, os
 import traceback
 import tempfile
+import pandas
 
 import tkinter
 from tkinter import filedialog
@@ -885,15 +886,13 @@ class GraphFrame(customtkinter.CTkFrame):
         try:
             self.main_class.write_log(self.log_box, "Generating chart")
             data = Plotter.Plotter.loadData(self.file_path.get())
-            
-            #! TODO: fixhere
-            # if not data:
-            #     self.main_class.write_log(self.log_box, f"The file '{self.file_path.get()}' doesn't exist or is empty")
-            #     return
             Plotter.Plotter.graph(data)
-        except FileNotFoundError as file_not_found_error:
-            self.main_class.messagebox_exception(file_not_found_error)
-            self.main_class.write_log(self.log_box, f"File not found error: {str(file_not_found_error)}")
+        except FileNotFoundError:
+            self.main_class.write_log(self.log_box, f"Error, the file '{self.file_path.get()}' doesn't exist")
+            return
+        except pandas.errors.EmptyDataError:
+            self.main_class.write_log(self.log_box, f"Error, the file '{self.file_path.get()}' is empty")
+            return
         except PermissionError as permission_error:
             self.main_class.messagebox_exception(permission_error)
             self.main_class.write_log(self.log_box, f"Permission error: {str(permission_error)}")
