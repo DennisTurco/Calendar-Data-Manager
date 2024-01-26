@@ -22,6 +22,15 @@ class TestPlotter(unittest.TestCase):
         cls.mock_csv_data = 'ID|Summary|Start|End|Duration\n1|Task 1|2022-01-01T10:00:00|2022-01-01T11:00:00|1.0\n2|Task 2|2022-01-01T12:00:00|2022-01-01T13:00:00|1.0\n3|Task 3|2022-01-01T14:00:00|2022-01-01T15:00:00|1.0\n4|Task 4|2024-01-25T18:15:00Z|2024-01-25T19:45:00Z|1:30:00\n'
         cls.mock_csv_file = StringIO(cls.mock_csv_data)
 
+    def test_loadData_file_not_found(self):
+        with self.assertRaises(FileNotFoundError):
+            Plotter.loadData("nonexistent_file.csv")
+
+    def test_loadData_empty_data_error(self):
+        with self.assertRaises(pd.errors.EmptyDataError):
+            with patch('pandas.read_csv', return_value=pd.DataFrame()):
+                Plotter.loadData("./test/empty.txt")
+    
     def test_loadData_parser_error(self):
         return
         with self.assertRaises(pd.errors.ParserError):
@@ -30,7 +39,7 @@ class TestPlotter(unittest.TestCase):
 
     def test_loadData_successful(self):
         with patch('pandas.read_csv', return_value=self.test_data):
-            data = Plotter.loadData("existing_file.csv")
+            data = Plotter.loadData("./test/lezioni.txt")
         
         print(f"test_loadData_successful: \n{data}")
         

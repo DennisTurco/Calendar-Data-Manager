@@ -70,6 +70,26 @@ class TestDataCSV(unittest.TestCase):
         # Verify that data was not added (already exists)
         self.assertFalse(result)
         self.assertEqual(self.test_data[existing_data_id], existing_data)
+        
+    def test_file_not_found(self):
+        with self.assertRaises(FileNotFoundError):
+            DataCSV.loadDataFromFile("nonexistent_file.csv")
+            
+        with self.assertRaises(ValueError):
+            DataCSV.loadDataFromFile("")
+            
+        with self.assertRaises(ValueError):
+            DataCSV.loadDataFromFile(None)
+        
+        existing_data = ['1', 'John', 'Doe', 'john.doe@example.com']
+        
+        with self.assertRaises(ValueError):
+            DataCSV.saveDataToFile(existing_data, "")
+            
+        with self.assertRaises(ValueError):
+            DataCSV.saveDataToFile(existing_data, None)
+
+        
 
 if __name__ == '__main__':
     unittest.main()
