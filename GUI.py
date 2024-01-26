@@ -138,7 +138,7 @@ class NewEventsFrame(customtkinter.CTkFrame):
         self.timezone_selection.grid(row=3, column=1, padx=0, pady=(10, 10), sticky="nsew")
         
         # create button
-        self.create_button = customtkinter.CTkButton(self, image=plus_image, text="Create", command=self.create_event)
+        self.create_button = customtkinter.CTkButton(self, image=plus_image, text="Create", border_width=2, command=self.create_event)
         self.create_button.grid(row=3, column=1, padx=20, pady=20)
         
         # create log textbox
@@ -328,7 +328,7 @@ class EditEventsFrame(customtkinter.CTkFrame):
         self.timezone_selection.grid(row=3, column=1, padx=0, pady=(10, 10), sticky="nsew")
         
         # create button
-        self.create_button = customtkinter.CTkButton(self, image=edit_image, text="Edit", command=self.edit_event)
+        self.create_button = customtkinter.CTkButton(self, image=edit_image, text="Edit", border_width=2, command=self.edit_event)
         self.create_button.grid(row=3, column=1, columnspan=2, padx=20, pady=20)
         
         # create log textbox
@@ -538,7 +538,7 @@ class GetEventsFrame(customtkinter.CTkFrame):
         self.button_open_file.grid(row=2, column=0, columnspan=3, padx=10, pady=10, sticky="s")
 
         # get list button
-        self.get_button = customtkinter.CTkButton(self, image=list_image, text="Get", command=self.get_events)
+        self.get_button = customtkinter.CTkButton(self, image=list_image, text="Get", border_width=2, command=self.get_events)
         self.get_button.grid(row=4, column=1, padx=20, pady=20)
         
         # create log textbox
@@ -855,7 +855,7 @@ class GraphFrame(customtkinter.CTkFrame):
         self.button_open_file.grid(row=2, column=0, columnspan=3, padx=10, pady=10, sticky="n")
 
         # Generate Graph Button
-        self.get_button = customtkinter.CTkButton(self, command=self.generate_graph, image=chart_image, text="Generate")
+        self.get_button = customtkinter.CTkButton(self, command=self.generate_graph, image=chart_image, border_width=2, text="Generate")
         self.get_button.grid(row=4, column=1, padx=20, pady=20)
         
         # create log textbox
@@ -1087,8 +1087,21 @@ class App():
         self.root.mainloop()
     
     def change_scaling_event(self, new_scaling: str):
-        new_scaling_float = int(new_scaling.replace("%", "")) / 100
+        if new_scaling == None: return
+        new_scaling_float = int(new_scaling) / 100
         customtkinter.set_widget_scaling(new_scaling_float)
+        js.JSONSettings.WriteTextScalingToJSON(new_scaling)
+        
+    def change_appearance(self, new_appearance: str):
+        if new_appearance == None: return
+        customtkinter.set_appearance_mode(new_appearance)
+        js.JSONSettings.WriteAppearanceToJSON(new_appearance)
+    
+    #! TODO: the problem is that the color reload only after the restart of the app
+    def change_color_theme(self, color_theme: str):
+        if color_theme == None: return
+        customtkinter.set_default_color_theme(color_theme) 
+        js.JSONSettings.WriteColorThemeToJSON(color_theme)      
     
     def messagebox_exception(self, error):
         error_message = str(error) + '\n\n' + traceback.format_exc()
@@ -1141,7 +1154,23 @@ class App():
         self.root.iconbitmap('./imgs/icon.ico')
         self.root.title("Google Calendar Data Manager")
         self.centerWindow()
-        self.root.minsize(300, 300)
+        self.root.minsize(1100, 900)
+
+        appearance = None
+        text_scaling = None
+        color_theme = None
+        listRes = js.JSONSettings.ReadFromJSON()
+        if listRes != None:
+            try: appearance = listRes["Appearence"]
+            except: pass
+            try: text_scaling = listRes["TextScaling"]
+            except: pass
+            try: color_theme = listRes["ColorTheme"]
+            except: pass
+        
+        self.change_scaling_event(text_scaling) 
+        self.change_appearance(appearance)
+        self.change_color_theme(color_theme)
     
     def init_menu(self):
         menu = CTkMenuBar(self.root)
@@ -1156,18 +1185,23 @@ class App():
         dropdown1.add_separator()
 
         dropdown3 = CustomDropdownMenu(widget=button_3)
-        sub_menu2 = dropdown3.add_submenu("Theme")
-        sub_menu2.add_option(option="System", command=lambda: customtkinter.set_appearance_mode("System"))
-        sub_menu2.add_option(option="Dark", command=lambda: customtkinter.set_appearance_mode("dark"))
-        sub_menu2.add_option(option="Light", command=lambda: customtkinter.set_appearance_mode("light"))
+        sub_menu2 = dropdown3.add_submenu("Appearance")
+        sub_menu2.add_option(option="System", command=lambda: self.change_appearance("System"))
+        sub_menu2.add_option(option="Dark", command=lambda: self.change_appearance("dark"))
+        sub_menu2.add_option(option="Light", command=lambda: self.change_appearance("light"))
         
         sub_menu3 = dropdown3.add_submenu("Scaling")
-        sub_menu3.add_option(option="120%", command=lambda: self.change_scaling_event("120%"))
-        sub_menu3.add_option(option="110%", command=lambda: self.change_scaling_event("110%"))
-        sub_menu3.add_option(option="100%", command=lambda: self.change_scaling_event("100%"))
-        sub_menu3.add_option(option="90%", command=lambda: self.change_scaling_event("90%"))
-        sub_menu3.add_option(option="80%", command=lambda: self.change_scaling_event("80%"))
-        sub_menu3.add_option(option="70%", command=lambda: self.change_scaling_event("70%"))
+        sub_menu3.add_option(option="120%", command=lambda: self.change_scaling_event("120"))
+        sub_menu3.add_option(option="110%", command=lambda: self.change_scaling_event("110"))
+        sub_menu3.add_option(option="100%", command=lambda: self.change_scaling_event("100"))
+        sub_menu3.add_option(option="90%", command=lambda: self.change_scaling_event("90"))
+        sub_menu3.add_option(option="80%", command=lambda: self.change_scaling_event("80"))
+        sub_menu3.add_option(option="70%", command=lambda: self.change_scaling_event("70"))
+        
+        sub_menu4 = dropdown3.add_submenu("Theme")
+        sub_menu4.add_option(option="Blue", command=lambda: self.change_color_theme("blue"))
+        sub_menu4.add_option(option="Dark Blue", command=lambda: self.change_color_theme("dark-blue"))
+        sub_menu4.add_option(option="Green", command=lambda: self.change_color_theme("green"))
 
         dropdown4 = CustomDropdownMenu(widget=button_4)
         dropdown4.add_option(option="Share", command=lambda: webbrowser.open('https://github.com/DennisTurco/Google-Calendar-Data-Manager'))

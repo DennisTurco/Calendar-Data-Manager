@@ -67,7 +67,99 @@ class JSONSettings:
         # Write the updated data back to the file
         with open(JSON_PATH, "w") as jsonFile:
             json.dump(existing_data, jsonFile)
- 
+            
+    @staticmethod
+    def WriteAppearenceToJSON(appearance: str) -> None:
+        if appearance is None or len(appearance) == 0: raise ValueError("Appearance can't be empty")
+
+        # check if directory exists
+        JSONSettings.__checkIfDirectoryExists()
+        
+        # Read existing data from the file
+        existing_data = {}
+        try:
+            with open(JSON_PATH, "r") as jsonFile:
+                existing_data = json.load(jsonFile)
+        except FileNotFoundError:
+            # If the file doesn't exist, ignore the error and create a new file later
+            pass
+
+        # Update or add the new appearance
+        existing_data["Appearence"] = appearance
+
+        # Write the updated data back to the file
+        with open(JSON_PATH, "w") as jsonFile:
+            json.dump(existing_data, jsonFile)
+            
+    @staticmethod
+    def WriteAppearanceToJSON(appearance: str) -> None:
+        if appearance is None or len(appearance) == 0: raise ValueError("Appearance can't be empty")
+
+        # check if directory exists
+        JSONSettings.__checkIfDirectoryExists()
+        
+        # Read existing data from the file
+        existing_data = {}
+        try:
+            with open(JSON_PATH, "r") as jsonFile:
+                existing_data = json.load(jsonFile)
+        except FileNotFoundError:
+            # If the file doesn't exist, ignore the error and create a new file later
+            pass
+
+        # Update or add the new appearance
+        existing_data["Appearence"] = appearance
+
+        # Write the updated data back to the file
+        with open(JSON_PATH, "w") as jsonFile:
+            json.dump(existing_data, jsonFile)
+            
+    @staticmethod
+    def WriteTextScalingToJSON(scaling: str) -> None:
+        if scaling is None or len(scaling) == 0: raise ValueError("TextScaling can't be empty")
+
+        # check if directory exists
+        JSONSettings.__checkIfDirectoryExists()
+        
+        # Read existing data from the file
+        existing_data = {}
+        try:
+            with open(JSON_PATH, "r") as jsonFile:
+                existing_data = json.load(jsonFile)
+        except FileNotFoundError:
+            # If the file doesn't exist, ignore the error and create a new file later
+            pass
+
+        # Update or add the new scaling
+        existing_data["TextScaling"] = scaling
+
+        # Write the updated data back to the file
+        with open(JSON_PATH, "w") as jsonFile:
+            json.dump(existing_data, jsonFile)
+    
+    @staticmethod
+    def WriteColorThemeToJSON(theme: str) -> None:
+        if theme is None or len(theme) == 0: raise ValueError("ColorTheme can't be empty")
+
+        # check if directory exists
+        JSONSettings.__checkIfDirectoryExists()
+        
+        # Read existing data from the file
+        existing_data = {}
+        try:
+            with open(JSON_PATH, "r") as jsonFile:
+                existing_data = json.load(jsonFile)
+        except FileNotFoundError:
+            # If the file doesn't exist, ignore the error and create a new file later
+            pass
+
+        # Update or add the new color theme
+        existing_data["ColorTheme"] = theme
+
+        # Write the updated data back to the file
+        with open(JSON_PATH, "w") as jsonFile:
+            json.dump(existing_data, jsonFile)
+    
     @staticmethod
     def __checkIfDirectoryExists():
         if not os.path.isdir(DIRECTORY):
