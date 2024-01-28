@@ -1,45 +1,26 @@
-import GoogleCalendarEventsManager as gc
 import webbrowser
-import JSONSettings as js
-import subprocess, sys, os
+import os
 import traceback
 import tempfile
 import pandas
-
-import tkinter
-from tkinter import filedialog
 from datetime import datetime, timedelta
 from babel import numbers
+from googleapiclient.errors import HttpError
 
+import JSONSettings as js
+import GoogleCalendarEventsManager as gc
 import Plotter
 from DataEditor import DataCSV
 
-from googleapiclient.errors import HttpError
-
-try:
-    import customtkinter
-except:
-    subprocess.call([sys.executable, "-m", "pip", "install", "customtkinter"])
-    import customtkinter
-try:
-    from CTkMenuBar import *
-except:
-    subprocess.call([sys.executable, "-m", "pip", "install", "CTkMenuBar"])
-    from CTkMenuBar import *
-try:
-    from CTkMessagebox import *
-except:
-    subprocess.call([sys.executable, "-m", "pip", "install", "CTkMessagebox"])
-    from CTkMessagebox import *
-try:
-    from tkcalendar import *
-except:
-    subprocess.call([sys.executable, "-m", "pip", "install", "tkcalendar"])
-    from tkcalendar import *
+import tkinter
+from tkinter import filedialog
+import customtkinter
+from CTkMenuBar import *
+from CTkMessagebox import *
+from tkcalendar import *
+from tkcalendar import *
 
 #* TODO: when it is realesed -> https://customtkinter.tomschimansky.com/showcase/
-#* TODO: set preferred scaling text size
-#* TODO: set preferred theme
 #? TODO: get token expire date and other informations 
 #* TODO: allow copy text from lob box
 #* TODO: use more function and set private variables and functions where it is possible
@@ -1097,11 +1078,14 @@ class App():
         customtkinter.set_appearance_mode(new_appearance)
         js.JSONSettings.WriteAppearanceToJSON(new_appearance)
     
-    #! TODO: the problem is that the color reload only after the restart of the app
     def change_color_theme(self, color_theme: str):
         if color_theme == None: return
         customtkinter.set_default_color_theme(color_theme) 
-        js.JSONSettings.WriteColorThemeToJSON(color_theme)      
+        js.JSONSettings.WriteColorThemeToJSON(color_theme)
+    
+    def set_color_theme(self, color_theme: str):
+        self.change_color_theme(color_theme)
+        CTkMessagebox(title="Information", message="The theme color will be updated when the application is restarted")
     
     def messagebox_exception(self, error):
         error_message = str(error) + '\n\n' + traceback.format_exc()
@@ -1156,21 +1140,20 @@ class App():
         self.centerWindow()
         self.root.minsize(1100, 900)
 
-        appearance = None
-        text_scaling = None
-        color_theme = None
         listRes = js.JSONSettings.ReadFromJSON()
         if listRes != None:
-            try: appearance = listRes["Appearence"]
+            try: 
+                appearance = listRes["Appearence"]
+                self.change_appearance(appearance)
             except: pass
-            try: text_scaling = listRes["TextScaling"]
+            try: 
+                text_scaling = listRes["TextScaling"]
+                self.change_scaling_event(text_scaling)
             except: pass
-            try: color_theme = listRes["ColorTheme"]
-            except: pass
-        
-        self.change_scaling_event(text_scaling) 
-        self.change_appearance(appearance)
-        self.change_color_theme(color_theme)
+            try: 
+                color_theme = listRes["ColorTheme"]
+                self.change_color_theme(color_theme)
+            except: pass 
     
     def init_menu(self):
         menu = CTkMenuBar(self.root)
@@ -1199,9 +1182,9 @@ class App():
         sub_menu3.add_option(option="70%", command=lambda: self.change_scaling_event("70"))
         
         sub_menu4 = dropdown3.add_submenu("Theme")
-        sub_menu4.add_option(option="Blue", command=lambda: self.change_color_theme("blue"))
-        sub_menu4.add_option(option="Dark Blue", command=lambda: self.change_color_theme("dark-blue"))
-        sub_menu4.add_option(option="Green", command=lambda: self.change_color_theme("green"))
+        sub_menu4.add_option(option="Blue", command=lambda: self.set_color_theme("blue"))
+        sub_menu4.add_option(option="Dark Blue", command=lambda: self.set_color_theme("dark-blue"))
+        sub_menu4.add_option(option="Green", command=lambda: self.set_color_theme("green"))
 
         dropdown4 = CustomDropdownMenu(widget=button_4)
         dropdown4.add_option(option="Share", command=lambda: webbrowser.open('https://github.com/DennisTurco/Google-Calendar-Data-Manager'))

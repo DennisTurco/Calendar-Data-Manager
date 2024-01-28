@@ -1,22 +1,12 @@
 import datetime
 import requests
 import os.path
-import io, subprocess, sys
 
-try:
-    from googleapiclient.discovery import build
-    from googleapiclient.errors import HttpError
-    from google.auth.transport.requests import Request
-    from google.oauth2.credentials import Credentials
-    from google_auth_oauthlib.flow import InstalledAppFlow
-except:
-    subprocess.call([sys.executable, "-m", "pip", "install", "--upgrade google-api-python-client", "google-auth-httplib2", "google-auth-oauthlib"])
-    from googleapiclient.discovery import build
-    from googleapiclient.errors import HttpError
-    from google.auth.transport.requests import Request
-    from google.oauth2.credentials import Credentials
-    from google_auth_oauthlib.flow import InstalledAppFlow
-
+from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
+from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
 
 class GoogleCalendarEventsManager:
     

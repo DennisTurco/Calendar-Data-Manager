@@ -1,6 +1,5 @@
 import unittest
 import json
-import os
 from JSONSettings import JSONSettings  # module name
 
 DIRECTORY = "settings/"

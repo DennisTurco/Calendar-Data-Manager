@@ -29,21 +29,14 @@ class JSONSettings:
         JSONSettings.__checkIfDirectoryExists()
         
         # Read existing data from the file
-        existing_data = {}
-        try:
-            with open(JSON_PATH, "r") as jsonFile:
-                existing_data = json.load(jsonFile)
-        except FileNotFoundError:
-            # If the file doesn't exist, ignore the error and create a new file later
-            pass
+        existing_data = JSONSettings.__readFromFile()
 
         # Update or add the new credentials paths
         existing_data["CredentialsPath"] = credentials_path
         existing_data["TokenPath"] = token_path
 
         # Write the updated data back to the file
-        with open(JSON_PATH, "w") as jsonFile:
-            json.dump(existing_data, jsonFile)
+        JSONSettings.__writeToFile(existing_data)
         
     @staticmethod
     def WriteTimeZoneToJSON(timezone: str) -> None:
@@ -53,20 +46,13 @@ class JSONSettings:
         JSONSettings.__checkIfDirectoryExists()
         
         # Read existing data from the file
-        existing_data = {}
-        try:
-            with open(JSON_PATH, "r") as jsonFile:
-                existing_data = json.load(jsonFile)
-        except FileNotFoundError:
-            # If the file doesn't exist, ignore the error and create a new file later
-            pass
+        existing_data = JSONSettings.__readFromFile()
 
         # Update or add the new timezone
         existing_data["TimeZone"] = timezone
 
         # Write the updated data back to the file
-        with open(JSON_PATH, "w") as jsonFile:
-            json.dump(existing_data, jsonFile)
+        JSONSettings.__writeToFile(existing_data)
             
     @staticmethod
     def WriteAppearenceToJSON(appearance: str) -> None:
@@ -76,20 +62,13 @@ class JSONSettings:
         JSONSettings.__checkIfDirectoryExists()
         
         # Read existing data from the file
-        existing_data = {}
-        try:
-            with open(JSON_PATH, "r") as jsonFile:
-                existing_data = json.load(jsonFile)
-        except FileNotFoundError:
-            # If the file doesn't exist, ignore the error and create a new file later
-            pass
+        existing_data = JSONSettings.__readFromFile()
 
         # Update or add the new appearance
         existing_data["Appearence"] = appearance
 
         # Write the updated data back to the file
-        with open(JSON_PATH, "w") as jsonFile:
-            json.dump(existing_data, jsonFile)
+        JSONSettings.__writeToFile(existing_data)
             
     @staticmethod
     def WriteAppearanceToJSON(appearance: str) -> None:
@@ -99,20 +78,13 @@ class JSONSettings:
         JSONSettings.__checkIfDirectoryExists()
         
         # Read existing data from the file
-        existing_data = {}
-        try:
-            with open(JSON_PATH, "r") as jsonFile:
-                existing_data = json.load(jsonFile)
-        except FileNotFoundError:
-            # If the file doesn't exist, ignore the error and create a new file later
-            pass
+        existing_data = JSONSettings.__readFromFile()
 
         # Update or add the new appearance
         existing_data["Appearence"] = appearance
 
         # Write the updated data back to the file
-        with open(JSON_PATH, "w") as jsonFile:
-            json.dump(existing_data, jsonFile)
+        JSONSettings.__writeToFile(existing_data)
             
     @staticmethod
     def WriteTextScalingToJSON(scaling: str) -> None:
@@ -122,20 +94,13 @@ class JSONSettings:
         JSONSettings.__checkIfDirectoryExists()
         
         # Read existing data from the file
-        existing_data = {}
-        try:
-            with open(JSON_PATH, "r") as jsonFile:
-                existing_data = json.load(jsonFile)
-        except FileNotFoundError:
-            # If the file doesn't exist, ignore the error and create a new file later
-            pass
+        existing_data = JSONSettings.__readFromFile()
 
         # Update or add the new scaling
         existing_data["TextScaling"] = scaling
 
         # Write the updated data back to the file
-        with open(JSON_PATH, "w") as jsonFile:
-            json.dump(existing_data, jsonFile)
+        JSONSettings.__writeToFile(existing_data)
     
     @staticmethod
     def WriteColorThemeToJSON(theme: str) -> None:
@@ -145,6 +110,16 @@ class JSONSettings:
         JSONSettings.__checkIfDirectoryExists()
         
         # Read existing data from the file
+        existing_data = JSONSettings.__readFromFile()
+
+        # Update or add the new color theme
+        existing_data["ColorTheme"] = theme
+
+        # Write the updated data back to the file
+        JSONSettings.__writeToFile(existing_data)
+            
+    @staticmethod
+    def __readFromFile() -> dict:
         existing_data = {}
         try:
             with open(JSON_PATH, "r") as jsonFile:
@@ -152,13 +127,12 @@ class JSONSettings:
         except FileNotFoundError:
             # If the file doesn't exist, ignore the error and create a new file later
             pass
-
-        # Update or add the new color theme
-        existing_data["ColorTheme"] = theme
-
-        # Write the updated data back to the file
+        return existing_data
+    
+    @staticmethod
+    def __writeToFile(existing_data) -> None:
         with open(JSON_PATH, "w") as jsonFile:
-            json.dump(existing_data, jsonFile)
+            json.dump(existing_data, jsonFile)  
     
     @staticmethod
     def __checkIfDirectoryExists():
