@@ -495,11 +495,12 @@ class GoogleCalendarEventsManager:
                 event['colorId'] = color_id_new
                 if description_new != None and len(description_new) > 2:   # as default it contains '\n' string
                     event['description'] = description_new
-                                
+                
+                event['start']['timeZone'] = time_zone
+                
                 updated_event = service.events().update(
                     calendarId='primary',
                     eventId=event['id'],
-                    timeZone=time_zone,
                     body=event
                 ).execute()
                 updated_events.append(updated_event)
@@ -507,8 +508,10 @@ class GoogleCalendarEventsManager:
             return updated_events
 
         except HttpError as http_error:
+            print(http_error)
             raise HttpError(f"HTTP error occurred: {str(http_error)}")
         except Exception as generic_exception:
+            print(generic_exception)
             raise Exception(f"An error occurred: {str(generic_exception)}")  
     
     @staticmethod
