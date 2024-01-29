@@ -1,6 +1,5 @@
-# Ignore credentials and tokens
-settings/credentials.json
-settings/token.json
+# Ignore Settings folder
+settings
 
 # Ignore Test folder
 test
@@ -14,3 +13,4 @@ GUI.spec
 # Ignore files and folder auto generated
 __pycache__
 .vscode
+.venv

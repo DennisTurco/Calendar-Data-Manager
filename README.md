@@ -30,9 +30,9 @@ This project is entirely free, devoid of any paid content or advertisements. It 
 ## 🐛 Report a BUG
 To report a BUG -> [ISSUE](https://github.com/DennisTurco/Google-Calendar-Data-Manager/issues)
 
-## Licence
+<!-- ## Licence
 
-[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
+[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/) -->
 
 ## Authors
 
