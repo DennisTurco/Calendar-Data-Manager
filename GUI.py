@@ -20,9 +20,11 @@ from CTkMessagebox import *
 from tkcalendar import *
 from tkcalendar import *
 
+#* TODO: add scrollable dropdown -> https://github.com/Akascape/CTkScrollableDropdown
+#* TODO: add tooltips -> https://github.com/Akascape/CTkToolTip
 #* TODO: when it is realesed -> https://customtkinter.tomschimansky.com/showcase/
 #? TODO: get token expire date and other informations 
-#* TODO: allow copy text from lob box
+#* TODO: allow copy text from log box
 #* TODO: use more function and set private variables and functions where it is possible
 #? TODO: merge all the logbox to one
 #* TODO: add new frame "delete events"
@@ -690,6 +692,11 @@ class GetEventsFrame(customtkinter.CTkFrame):
             if self.toplevel_window: self.close_top_frame_window()
             if self.toplevel_entry_window: self.close_top_frame_entry_window()
             
+            # if file doesn't exist, create it
+            if not os.path.isfile(self.file_path.get()):
+                file = open(self.file_path.get(), "x")
+                file.close()
+            
             # get all from file csv
             self.data = DataCSV.loadDataFromFile(self.file_path.get(), '|')
             
@@ -970,7 +977,7 @@ class SetupFrame(customtkinter.CTkFrame):
         # main content
         customtkinter.CTkLabel(self, text="Set Credentials", fg_color="transparent", font=("Arial", 32)).pack(padx=20, pady=20)
         customtkinter.CTkButton(master=self, image=google_image, text="Google Calendar", command=lambda: webbrowser.open('https://calendar.google.com/')).pack(padx=20, pady=10, anchor='center')
-        customtkinter.CTkButton(master=self, image=question_image, text="Tutorial Setup", command=lambda: webbrowser.open('https://developers.google.com/workspace/guides/get-started')).pack(padx=20, pady=10, anchor='center')
+        customtkinter.CTkButton(master=self, image=question_image, text="Tutorial Setup", command=lambda: webbrowser.open('https://github.com/DennisTurco/Google-Calendar-Data-Manager/blob/master/docs/GoogleCloudAPISetup.md')).pack(padx=20, pady=10, anchor='center')
         customtkinter.CTkButton(master=self, image=arrow_image, text="First Setup", command=lambda: self.setCredentialsPathFrame()).pack(padx=20, pady=10, anchor='center')
     
     def setCredentialsPathFrame(self):
