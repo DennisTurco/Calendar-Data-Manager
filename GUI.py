@@ -19,9 +19,9 @@ from CTkMenuBar import *
 from CTkMessagebox import *
 from tkcalendar import *
 from tkcalendar import *
+from CTkToolTip import *
 
 #* TODO: add scrollable dropdown -> https://github.com/Akascape/CTkScrollableDropdown
-#* TODO: add tooltips -> https://github.com/Akascape/CTkToolTip
 #* TODO: when it is realesed -> https://customtkinter.tomschimansky.com/showcase/
 #? TODO: get token expire date and other informations 
 #* TODO: allow copy text from log box
@@ -123,6 +123,15 @@ class NewEventsFrame(customtkinter.CTkFrame):
         # create button
         self.create_button = customtkinter.CTkButton(self, image=plus_image, text="Create", border_width=2, command=self.create_event)
         self.create_button.grid(row=3, column=1, padx=20, pady=20)
+        
+        # Tooltips
+        CTkToolTip(self.entry_summary, delay=0.3, message="(Required) Insert event title")
+        CTkToolTip(self.entry_description, delay=0.3, message="(Optional) Insert event description")
+        CTkToolTip(self.multi_selection, delay=0.3, message="(Required) Choose event color")
+        CTkToolTip(self.entry_date_from, delay=0.3, message="(Optional) Enter date from")
+        CTkToolTip(self.entry_date_to, delay=0.3, message="(Optional) Enter date to")
+        CTkToolTip(self.timezone_selection, delay=0.3, message="(Optional) Choose time zone")
+        CTkToolTip(self.create_button, delay=0.3, message="Create new event")
         
         # create log textbox
         self.log_box = customtkinter.CTkTextbox(self, width=250, height=100)
@@ -310,9 +319,21 @@ class EditEventsFrame(customtkinter.CTkFrame):
         self.timezone_selection.set(self.main_class.get_timezone())
         self.timezone_selection.grid(row=3, column=1, padx=0, pady=(10, 10), sticky="nsew")
         
-        # create button
-        self.create_button = customtkinter.CTkButton(self, image=edit_image, text="Edit", border_width=2, command=self.edit_event)
-        self.create_button.grid(row=3, column=1, columnspan=2, padx=20, pady=20)
+        # edit button
+        self.edit_button = customtkinter.CTkButton(self, image=edit_image, text="Edit", border_width=2, command=self.edit_event)
+        self.edit_button.grid(row=3, column=1, columnspan=2, padx=20, pady=20)
+        
+        # Tooltips
+        CTkToolTip(self.entry_summary_old, delay=0.3, message="(Required) Insert OLD event title")
+        CTkToolTip(self.entry_description_old, delay=0.3, message="(Optional) Insert the OLD event description")
+        CTkToolTip(self.multi_selection_old, delay=0.3, message="(Optional) Choose OLD event color")
+        CTkToolTip(self.entry_summary_new, delay=0.3, message="(Required) Insert NEW event title")
+        CTkToolTip(self.entry_description_new, delay=0.3, message="(Optional/Required) Insert NEW event description;\n If the old description is set, this field will not be ignored.")
+        CTkToolTip(self.multi_selection_new, delay=0.3, message="(Required) Choose NEW event color")
+        CTkToolTip(self.entry_date_from, delay=0.3, message="(Optional) Enter date from")
+        CTkToolTip(self.entry_date_to, delay=0.3, message="(Optional) Enter date to")
+        CTkToolTip(self.timezone_selection, delay=0.3, message="(Optional) Choose time zone")
+        CTkToolTip(self.edit_button, delay=0.3, message="Edit events")
         
         # create log textbox
         self.log_box = customtkinter.CTkTextbox(self, width=250, height=100)
@@ -523,6 +544,18 @@ class GetEventsFrame(customtkinter.CTkFrame):
         # get list button
         self.get_button = customtkinter.CTkButton(self, image=list_image, text="Get", border_width=2, command=self.get_events)
         self.get_button.grid(row=4, column=1, padx=20, pady=20)
+        
+        # Tooltips
+        CTkToolTip(self.entry_id, delay=0.3, message="(Optional) Enter event id This is a very specific field;\n if you want to get a specific event and you know the specific event id, you can enter it and ignore the fields below.\n Otherwise you can ignore it and proceed to fill in the other fields.")
+        CTkToolTip(self.entry_summary, delay=0.3, message="(Optional) Insert event title")
+        CTkToolTip(self.entry_description, delay=0.3, message="(Optional) Insert the event description")
+        CTkToolTip(self.multi_selection, delay=0.3, message="(Optional) Choose event color")
+        CTkToolTip(self.entry_date_from, delay=0.3, message="(Optional) Enter date from")
+        CTkToolTip(self.entry_date_to, delay=0.3, message="(Optional) Enter date to")
+        CTkToolTip(self.timezone_selection, delay=0.3, message="(Optional) Choose time zone")
+        CTkToolTip(self.file_path, delay=0.3, message="(Optional) Enter the path to the file;\n if you want to save the results to a specific file (.csv, .txt)")
+        CTkToolTip(self.button_open_file, delay=0.3, message="Open file preview")
+        CTkToolTip(self.get_button, delay=0.3, message="Get events")
         
         # create log textbox
         self.log_box = customtkinter.CTkTextbox(self, width=250, height=100)
@@ -843,8 +876,13 @@ class GraphFrame(customtkinter.CTkFrame):
         self.button_open_file.grid(row=2, column=0, columnspan=3, padx=10, pady=10, sticky="n")
 
         # Generate Graph Button
-        self.get_button = customtkinter.CTkButton(self, command=self.generate_graph, image=chart_image, border_width=2, text="Generate")
-        self.get_button.grid(row=4, column=1, padx=20, pady=20)
+        self.graph_button = customtkinter.CTkButton(self, command=self.generate_graph, image=chart_image, border_width=2, text="Generate")
+        self.graph_button.grid(row=4, column=1, padx=20, pady=20)
+        
+        # Tooltips
+        CTkToolTip(self.file_path, delay=0.3, message="(Required) Enter the path to the file you generated from the 'Get Events List' section.")
+        CTkToolTip(self.button_open_file, delay=0.3, message="Open file preview")
+        CTkToolTip(self.graph_button, delay=0.3, message="Generate graphs")
         
         # create log textbox
         self.log_box = customtkinter.CTkTextbox(self, width=250, height=100)

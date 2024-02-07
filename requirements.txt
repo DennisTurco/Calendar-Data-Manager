@@ -1,7 +1,5 @@
 Babel==2.13.1
-CTkMenuBar==0.2
 CTkMenuBar==0.3
-CTkMessagebox==2.5
 CTkMessagebox==2.5
 customtkinter==5.2.1
 google_api_python_client==2.106.0
