@@ -1,3 +1,4 @@
+from ast import List
 import webbrowser
 import os
 import traceback
@@ -483,7 +484,6 @@ class GetEventsFrame(customtkinter.CTkFrame):
         self.title_label_main.grid(row=0, column=1, padx=20, pady=(20, 10), sticky="nsew")
         
         #? TODO: add like mode check box
-        #? TODO: add option to update the previus get list with the new list
         # main entry
         self.main_frame = customtkinter.CTkFrame(self)
         self.main_frame.grid(row=1, column=1, padx=(50, 50), pady=10, sticky="ew")
@@ -542,8 +542,10 @@ class GetEventsFrame(customtkinter.CTkFrame):
         self.file_path.grid(row=1, column=1, padx=0, pady=10, sticky="ew")
         self.button_file_path = customtkinter.CTkButton(self.file_output_frame, text="", width=10, image=self.folder_image, command=lambda: self.get_file_path(self.file_path))
         self.button_file_path.grid(row=1, column=2, padx=0, pady=10, sticky="w")
+        self.overwrite_mode = customtkinter.CTkCheckBox(self.file_output_frame, text="Overwrite file", onvalue="on", offvalue="off")
+        self.overwrite_mode.grid(row=2, column=1, padx=0, pady=10, sticky="ew")
         self.button_open_file = customtkinter.CTkButton(master=self.file_output_frame, image=file_image, text="open", command=self.open_file)
-        self.button_open_file.grid(row=2, column=0, columnspan=3, padx=10, pady=10, sticky="s")
+        self.button_open_file.grid(row=3, column=0, columnspan=3, padx=10, pady=10, sticky="s")
 
         # get list button
         self.get_button = customtkinter.CTkButton(self, image=list_image, text="Get", border_width=2, command=self.get_events)
@@ -558,6 +560,7 @@ class GetEventsFrame(customtkinter.CTkFrame):
         CTkToolTip(self.entry_date_to, delay=0.3, message="(Optional) Enter date to")
         CTkToolTip(self.timezone_selection, delay=0.3, message="(Optional) Choose time zone")
         CTkToolTip(self.file_path, delay=0.3, message="(Optional) Enter the path to the file;\n if you want to save the results to a specific file (.csv, .txt)")
+        CTkToolTip(self.overwrite_mode, delay=0.3, message="If it is enabled, it overwrites the contents of the file with the newly obtained events.\n Otherwise, it adds the newly obtained events without deleting anything.")
         CTkToolTip(self.button_open_file, delay=0.3, message="Open file preview")
         CTkToolTip(self.get_button, delay=0.3, message="Get events")
         
@@ -735,7 +738,9 @@ class GetEventsFrame(customtkinter.CTkFrame):
                 file.close()
             
             # get all from file csv
-            self.data = DataCSV.loadDataFromFile(self.file_path.get(), '|')
+            self.data = {}
+            if self.overwrite_mode.get() == "off":
+                self.data = DataCSV.loadDataFromFile(self.file_path.get(), '|')
             
             # add into data object
             counter = 0
