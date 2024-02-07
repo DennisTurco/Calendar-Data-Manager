@@ -218,6 +218,7 @@ class EditEventsFrame(customtkinter.CTkFrame):
         list_image = tkinter.PhotoImage(file='./imgs/list.png')
         edit_image = tkinter.PhotoImage(file='./imgs/edit.png')
         chart_image = tkinter.PhotoImage(file='./imgs/chart.png')
+        arrow_image = tkinter.PhotoImage(file='./imgs/arrow-right2.png')
         
         # configure grid layout (4x4)
         self.grid_columnconfigure(1, weight=1)
@@ -247,12 +248,12 @@ class EditEventsFrame(customtkinter.CTkFrame):
                 
         # Create a frame with a 1x2 grid
         main_frame = customtkinter.CTkFrame(self)
-        main_frame.grid(row=1, column=1, padx=(50, 50), pady=10, sticky="ew")
+        main_frame.grid(row=1, column=1, padx=50, pady=10, sticky="ew")
         main_frame.grid_columnconfigure((0, 1, 2), weight=1)
         
         # old main values
         self.old_values_frame = customtkinter.CTkFrame(main_frame)
-        self.old_values_frame.grid(row=1, column=1, padx=(50, 25), pady=10, sticky="ew")
+        self.old_values_frame.grid(row=1, column=0, padx=25, pady=10, sticky="ew")
         self.old_values_frame.grid_columnconfigure((0, 1, 2), weight=1)
         self.label_frame_old = customtkinter.CTkLabel(self.old_values_frame, text="OLD Values")
         self.label_frame_old.grid(row=0, column=0, columnspan=3, padx=0, pady=10, sticky="ew")
@@ -272,9 +273,12 @@ class EditEventsFrame(customtkinter.CTkFrame):
         self.color_preview_old = customtkinter.CTkCanvas(self.old_values_frame, width=15, height=15)
         self.color_preview_old.grid(row=3, column=1, sticky="w", padx=(150, 0), pady=(10, 10))
         
+        # Centered img label
+        customtkinter.CTkLabel(main_frame, text="", image=arrow_image).grid(row=1, column=1, padx=0, pady=10, sticky="ew")
+        
         # new main values
         self.new_values_frame = customtkinter.CTkFrame(main_frame)
-        self.new_values_frame.grid(row=1, column=2, padx=(25, 50), pady=10, sticky="ew")
+        self.new_values_frame.grid(row=1, column=2, padx=25, pady=10, sticky="ew")
         self.new_values_frame.grid_columnconfigure((0, 1, 2), weight=1)
         self.label_frame_new = customtkinter.CTkLabel(self.new_values_frame, text="NEW Values")
         self.label_frame_new.grid(row=0, column=0, columnspan=3, padx=0, pady=10, sticky="ew")
