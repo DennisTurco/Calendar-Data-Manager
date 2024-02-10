@@ -1,6 +1,7 @@
 import datetime
 import requests
 import os.path
+from typing import Dict
 
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
@@ -309,7 +310,7 @@ class GoogleCalendarEventsManager:
                     singleEvents=True,
                     orderBy="startTime",
                     timeZone=time_zone,
-                    fields="items(id,summary,description,start,end,colorId)"
+                    fields="items"
                 ).execute()
 
                 events += [event for event in events_result.get('items', []) if title.lower() in event.get('summary', '').lower()]
@@ -476,21 +477,18 @@ class GoogleCalendarEventsManager:
             raise Exception(f"An error occurred: {str(generic_exception)}")
 
     @staticmethod
-    def editEvent(creds: Credentials, summary_old: str, description_old, color_id_old: int, summary_new: str, description_new: str, color_id_new, start_date: str = None, end_date: str = None, time_zone: str = 'UTC'):
+    def editEvent(creds: Credentials, old_events: Dict, summary_new: str, description_new: str, color_id_new, start_date: str = None, end_date: str = None, time_zone: str = 'UTC'):
         if creds == None: raise ValueError("Credentials can't be null")
         
         try:
             service = build("calendar", "v3", credentials=creds)
-            
-            # get events list
-            events = GoogleCalendarEventsManager.getEvents(creds=creds, title=summary_old, description=description_old, color_id=color_id_old, start_date=start_date, end_date=end_date, time_zone=time_zone)
 
-            if events == None or len(events) == 0: 
+            if old_events == None or len(old_events) == 0: 
                 return
             
             # update events
             updated_events = []
-            for event in events:
+            for event in old_events:
                 event['summary'] = summary_new
                 event['colorId'] = color_id_new
                 if description_new != None and len(description_new) > 2:   # as default it contains '\n' string

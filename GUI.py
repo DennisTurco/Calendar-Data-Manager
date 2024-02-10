@@ -79,7 +79,7 @@ class NewEventsFrame(customtkinter.CTkFrame):
         # main entry
         self.main_frame = customtkinter.CTkFrame(self)
         self.main_frame = customtkinter.CTkScrollableFrame(self, label_text="Event Information")
-        self.main_frame.grid(row=1, column=1, padx=(50, 50), pady=10, sticky="ew")
+        self.main_frame.grid(row=1, column=1, padx=(50, 50), pady=10, sticky="nsew")
         self.main_frame.grid_columnconfigure((0, 1, 2), weight=1)
         self.label_summary = customtkinter.CTkLabel(self.main_frame, text="Summary:")
         self.label_summary.grid(row=0, column=0, padx=10, pady=(10, 0), sticky="e")
@@ -323,7 +323,7 @@ class EditEventsFrame(customtkinter.CTkFrame):
         self.timezone_selection.grid(row=2, column=1, padx=0, pady=(10, 10), sticky="nsew")
         
         # edit button
-        self.edit_button = customtkinter.CTkButton(self, image=edit_image, text="Edit", border_width=2, command=self.edit_event)
+        self.edit_button = customtkinter.CTkButton(self, image=edit_image, text="Edit", border_width=2, command=self.edit_events)
         self.edit_button.grid(row=3, column=1, columnspan=2, padx=20, pady=20)
         
         # Tooltips
@@ -346,7 +346,7 @@ class EditEventsFrame(customtkinter.CTkFrame):
     def date_picker(self, type):
         self.date_picker_window = self.main_class.date_picker_window(type, self.date_picker_window, self.entry_date_from, self.entry_date_to, self.log_box)
     
-    def edit_event(self):
+    def edit_events(self):
         events = None
         
         # get values OLD
@@ -384,12 +384,16 @@ class EditEventsFrame(customtkinter.CTkFrame):
         self.main_class.set_timezone(time_zone)
             
         try:
-            events = gc.GoogleCalendarEventsManager.editEvent(self.main_class.get_credentials(), summary_old, description_old, color_index_old, summary_new, description_new, color_index_new, date_from, date_to, time_zone)
+            # retrive events to edit
+            old_events = gc.GoogleCalendarEventsManager.getEvents(self.main_class.get_credentials(), title=summary_old, description=description_old, start_date=date_from, end_date=date_to, time_zone=time_zone, color_id=color_index_old) 
             
-            if events == None or len(events) == 0:
+            if old_events == None or len(old_events) == 0:
                 self.main_class.write_log(self.log_box, f"No events obtained")
             else:
-                self.main_class.write_log(self.log_box, f"{len(events)} Event(s) edited succesfully!")
+                msg = CTkMessagebox(title="Edit events", message=f"Are you sure you want to confirm the changes?\n{len(old_events)} events will be changed.", icon="question", option_1="No", option_2="Yes")
+                if msg.get() == "Yes":
+                    events = gc.GoogleCalendarEventsManager.editEvent(self.main_class.get_credentials(), old_events, summary_new, description_new, color_index_new, date_from, date_to, time_zone)
+                    self.main_class.write_log(self.log_box, f"{len(events)} Event(s) edited succesfully!")       
         except FileNotFoundError as file_not_found_error:
             self.main_class.messagebox_exception(file_not_found_error)
             self.main_class.write_log(self.log_box, f"File not found error: {str(file_not_found_error)}")
@@ -401,7 +405,7 @@ class EditEventsFrame(customtkinter.CTkFrame):
             self.main_class.write_log(self.log_box, f"Value error: {str(value_error)}")
         except Exception as error:
             self.main_class.messagebox_exception(error)
-            self.main_class.write_log(self.log_box, f"Generic error: {str(error)}")
+            self.main_class.write_log(self.log_box, f"Generic error: {str(error)}")        
     
     def combobox_callback(self, color):
         self.color_preview.configure(bg=self.event_color.get(color))
