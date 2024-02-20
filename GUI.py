@@ -842,6 +842,8 @@ class GraphFrame(customtkinter.CTkFrame):
         folder_image = tkinter.PhotoImage(file='./imgs/folder.png')
         file_image = tkinter.PhotoImage(file='./imgs/file.png')
         chart_image = tkinter.PhotoImage(file='./imgs/chart.png')
+        square_image = tkinter.PhotoImage(file='./imgs/square.png')
+        square_check_image = tkinter.PhotoImage(file='./imgs/square-check.png')
         
         # configure grid layout (4x4)
         self.grid_columnconfigure(1, weight=1)
@@ -884,24 +886,28 @@ class GraphFrame(customtkinter.CTkFrame):
         # Graph types
         self.graph_types_frame = customtkinter.CTkScrollableFrame(self, label_text="Set Graph Types")
         self.graph_types_frame.grid(row=2, column=1, padx=(50, 50), pady=10, sticky="ew")
-        self.graph_types_frame.grid_columnconfigure((0, 1, 2), weight=1)
+        self.graph_types_frame.grid_columnconfigure((0, 1), weight=1)
         self.graph_types_frame.grid_rowconfigure((0, 1), weight=1)
+        self.button_select_all = customtkinter.CTkButton(self.graph_types_frame, text="select all", image=square_check_image, command=self.select_all)
+        self.button_select_all.grid(row=0, column=0, padx=10, pady=10, sticky="e")
+        self.button_deselect_all = customtkinter.CTkButton(self.graph_types_frame, text="deselect all", image=square_image, command=self.deselect_all)
+        self.button_deselect_all.grid(row=0, column=1, padx=10, pady=10, sticky="w")
         self.total_hours_per_year = customtkinter.CTkCheckBox(self.graph_types_frame, text="Hours per Year", onvalue="on", offvalue="off")
-        self.total_hours_per_year.grid(row=1, column=1, padx=0, pady=10, sticky="ew")
+        self.total_hours_per_year.grid(row=1, column=0, padx=10, pady=10, sticky="ew")
         self.total_hours_per_year.select()
         self.total_hours_per_month = customtkinter.CTkCheckBox(self.graph_types_frame, text="Hours per Month", onvalue="on", offvalue="off")
-        self.total_hours_per_month.grid(row=2, column=1, padx=0, pady=10, sticky="ew")
+        self.total_hours_per_month.grid(row=1, column=1, padx=10, pady=10, sticky="ew")
         self.total_hours_per_month.select()
         self.total_hours_by_summary = customtkinter.CTkCheckBox(self.graph_types_frame, text="Hours by Summary Bar chart", onvalue="on", offvalue="off")
-        self.total_hours_by_summary.grid(row=3, column=1, padx=0, pady=10, sticky="ew")
+        self.total_hours_by_summary.grid(row=2, column=0, padx=10, pady=10, sticky="ew")
         self.total_hours_by_summary.select()
         self.total_hours_by_summary2 = customtkinter.CTkCheckBox(self.graph_types_frame, text="Hours by Summary Pie chart", onvalue="on", offvalue="off")
-        self.total_hours_by_summary2.grid(row=4, column=1, padx=0, pady=10, sticky="ew")
+        self.total_hours_by_summary2.grid(row=2, column=1, padx=10, pady=10, sticky="ew")
         self.total_hours_by_summary2.select()
         self.total_hours_per_year_by_summary = customtkinter.CTkCheckBox(self.graph_types_frame, text="Hours per Year By Summary", onvalue="on", offvalue="off")
-        self.total_hours_per_year_by_summary.grid(row=5, column=1, padx=0, pady=10, sticky="ew")
+        self.total_hours_per_year_by_summary.grid(row=3, column=0, padx=10, pady=10, sticky="ew")
         self.total_hours_per_month_by_summary = customtkinter.CTkCheckBox(self.graph_types_frame, text="Hours per Month By Summary", onvalue="on", offvalue="off")
-        self.total_hours_per_month_by_summary.grid(row=6, column=1, padx=0, pady=10, sticky="ew")
+        self.total_hours_per_month_by_summary.grid(row=3, column=1, padx=10, pady=10, sticky="ew")
 
         # Generate Graph Button
         self.graph_button = customtkinter.CTkButton(self, command=self.generate_graph, image=chart_image, border_width=2, text="Generate")
@@ -911,6 +917,8 @@ class GraphFrame(customtkinter.CTkFrame):
         CTkToolTip(self.file_path, delay=0.3, message="(Required) Enter the path to the file you generated from the 'Get Events List' section.")
         CTkToolTip(self.button_open_file, delay=0.3, message="Open file preview")
         CTkToolTip(self.graph_button, delay=0.3, message="Generate graphs")
+        CTkToolTip(self.button_select_all, delay=0.3, message="Select all types")
+        CTkToolTip(self.button_deselect_all, delay=0.3, message="Deselect all types")
         
         # create log textbox
         self.log_box = customtkinter.CTkTextbox(self, width=250, height=100)
@@ -933,6 +941,24 @@ class GraphFrame(customtkinter.CTkFrame):
     
     def open_file(self):
         self.file_viewer_window = self.main_class.file_viewer_window(self.file_viewer_window, self.file_path.get(), self.log_box)
+    
+    def select_all(self):
+        self.total_hours_per_year.select()
+        self.total_hours_per_month.select()
+        self.total_hours_by_summary.select()
+        self.total_hours_by_summary2.select()
+        self.total_hours_per_year_by_summary.select()
+        self.total_hours_per_month_by_summary.select()
+        self.main_class.write_log(self.log_box, f"all chart types selected")
+        
+    def deselect_all(self):
+        self.total_hours_per_year.deselect()
+        self.total_hours_per_month.deselect()
+        self.total_hours_by_summary.deselect()
+        self.total_hours_by_summary2.deselect()
+        self.total_hours_per_year_by_summary.deselect()
+        self.total_hours_per_month_by_summary.deselect()
+        self.main_class.write_log(self.log_box, f"all chart types deselected")
     
     def date_picker(self, type):
         self.date_picker_window = self.main_class.date_picker_window(type, self.date_picker_window, self.entry_date_from, self.entry_date_to, self.log_box)
