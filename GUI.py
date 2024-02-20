@@ -863,7 +863,7 @@ class GraphFrame(customtkinter.CTkFrame):
         self.sidebar_button_4 = customtkinter.CTkButton(self.sidebar_frame, image=chart_image, text="Graph", command=self.go_to_graph_frame)
         self.sidebar_button_4.grid(row=4, column=0, padx=20, pady=10)
         self.google_calendar_link = customtkinter.CTkButton(self.sidebar_frame, image=google_image, text="Google Calendar", command=lambda: webbrowser.open('https://calendar.google.com/'))
-        self.google_calendar_link.grid(row=6, column=0, padx=20, pady=(10, 10))
+        self.google_calendar_link.grid(row=6, column=0, padx=20, pady=10)
         
         # create main panel
         self.title_label_main = customtkinter.CTkLabel(self, text="Create Graph", font=customtkinter.CTkFont(size=20, weight="bold"))
@@ -880,6 +880,28 @@ class GraphFrame(customtkinter.CTkFrame):
         self.button_file_path.grid(row=0, column=2, padx=0, pady=10, sticky="w")
         self.button_open_file = customtkinter.CTkButton(master=self.file_output_frame, image=file_image, text="open", command=self.open_file)
         self.button_open_file.grid(row=1, column=0, columnspan=3, padx=10, pady=10, sticky="n")
+        
+        # Graph types
+        self.graph_types_frame = customtkinter.CTkScrollableFrame(self, label_text="Set Graph Types")
+        self.graph_types_frame.grid(row=2, column=1, padx=(50, 50), pady=10, sticky="ew")
+        self.graph_types_frame.grid_columnconfigure((0, 1, 2), weight=1)
+        self.graph_types_frame.grid_rowconfigure((0, 1), weight=1)
+        self.total_hours_per_year = customtkinter.CTkCheckBox(self.graph_types_frame, text="Hours per Year", onvalue="on", offvalue="off")
+        self.total_hours_per_year.grid(row=1, column=1, padx=0, pady=10, sticky="ew")
+        self.total_hours_per_year.select()
+        self.total_hours_per_month = customtkinter.CTkCheckBox(self.graph_types_frame, text="Hours per Month", onvalue="on", offvalue="off")
+        self.total_hours_per_month.grid(row=2, column=1, padx=0, pady=10, sticky="ew")
+        self.total_hours_per_month.select()
+        self.total_hours_by_summary = customtkinter.CTkCheckBox(self.graph_types_frame, text="Hours by Summary Bar chart", onvalue="on", offvalue="off")
+        self.total_hours_by_summary.grid(row=3, column=1, padx=0, pady=10, sticky="ew")
+        self.total_hours_by_summary.select()
+        self.total_hours_by_summary2 = customtkinter.CTkCheckBox(self.graph_types_frame, text="Hours by Summary Pie chart", onvalue="on", offvalue="off")
+        self.total_hours_by_summary2.grid(row=4, column=1, padx=0, pady=10, sticky="ew")
+        self.total_hours_by_summary2.select()
+        self.total_hours_per_year_by_summary = customtkinter.CTkCheckBox(self.graph_types_frame, text="Hours per Year By Summary", onvalue="on", offvalue="off")
+        self.total_hours_per_year_by_summary.grid(row=5, column=1, padx=0, pady=10, sticky="ew")
+        self.total_hours_per_month_by_summary = customtkinter.CTkCheckBox(self.graph_types_frame, text="Hours per Month By Summary", onvalue="on", offvalue="off")
+        self.total_hours_per_month_by_summary.grid(row=6, column=1, padx=0, pady=10, sticky="ew")
 
         # Generate Graph Button
         self.graph_button = customtkinter.CTkButton(self, command=self.generate_graph, image=chart_image, border_width=2, text="Generate")
@@ -921,7 +943,16 @@ class GraphFrame(customtkinter.CTkFrame):
         try:
             self.main_class.write_log(self.log_box, "Generating chart")
             data = Plotter.Plotter.loadData(self.file_path.get())
-            Plotter.Plotter.graph(data)
+            
+            Plotter.Plotter.allStats(data) 
+            
+            if self.total_hours_per_year.get() == "on": Plotter.Plotter.chart_TotalHoursPerYear(data)   
+            if self.total_hours_per_month.get() == "on": Plotter.Plotter.chart_TotalHoursPerMonth(data)   
+            if self.total_hours_by_summary.get() == "on": Plotter.Plotter.chart_TotalHoursBySummary(data)   
+            if self.total_hours_by_summary2.get() == "on": Plotter.Plotter.chart_TotalHoursBySummaryPie(data)
+            if self.total_hours_per_year_by_summary.get() == "on": Plotter.Plotter.chart_TotalHoursPerYearBySummary(data)
+            if self.total_hours_per_month_by_summary.get() == "on": Plotter.Plotter.chart_TotalHoursPerMonthBySummary(data)
+               
         except FileNotFoundError:
             self.main_class.write_log(self.log_box, f"Error, the file '{self.file_path.get()}' doesn't exist")
             return

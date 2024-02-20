@@ -57,6 +57,7 @@ class Plotter:
         data['Start'] = pd.to_datetime(data['Start'])
         data['End'] = pd.to_datetime(data['End'])
         data['Year'] = data['Start'].dt.year
+        data['Month'] = data['Start'].dt.month
 
         # Calculate duration in hours
         data['Duration'] = pd.to_timedelta(data['End'] - data['Start']).dt.total_seconds() / 3600
@@ -103,29 +104,6 @@ class Plotter:
         ####################
         
     @staticmethod
-    def __chart1_plotly(data):
-        #################### Total Hours per Year
-        # Extract time data
-        data = Plotter.__extractTimeData(data)
-
-        # Group by year and calculate the sum of hours
-        yearly_hours = data.groupby('Year')['Duration'].sum().reset_index()
-
-        # Create a bar chart with Plotly
-        fig = px.bar(yearly_hours, x='Year', y='Duration', labels={'Year': 'Year', 'Duration': 'Total Hours'}, title='Total Hours per Year')
-
-        # Add text values above the bars
-        for i, row in yearly_hours.iterrows():
-            fig.add_annotation(x=row['Year'], y=row['Duration'], text=f"{row['Duration']:.2f}h", showarrow=False)
-
-        # Customize layout
-        fig.update_layout(xaxis=dict(tickmode='array', tickvals=yearly_hours['Year'], ticktext=yearly_hours['Year']))
-
-        # Show the plot
-        fig.show()
-        ####################
-           
-    @staticmethod
     def __chart2(data):
         #################### Total Hours by Summary
         # extract time
@@ -151,28 +129,6 @@ class Plotter:
         ####################
         
     @staticmethod
-    def __chart2_plotly(data):
-        #################### Total Hours by Summary
-        # Extract time
-        data = Plotter.__extractTimeData(data)
-        
-        hours_by_summary = Plotter.__hoursBySummary(data)
-
-        # Convert Series to DataFrame
-        hours_by_summary_df = pd.DataFrame({'Summary': hours_by_summary.index, 'Duration': hours_by_summary.values})
-
-        # Create a bar chart using Plotly Express
-        fig = px.bar(hours_by_summary_df, x='Summary', y='Duration', labels={'Duration': 'Total Hours'}, title='Total Hours by Summary')
-
-        # Add text values above the bars
-        for i, val in enumerate(hours_by_summary):
-            fig.add_annotation(x=i, y=val + 0.05, text=f"{val:.2f}h", showarrow=False)
-
-        # Show the plot
-        fig.show()
-        ####################
-    
-    @staticmethod
     def __chart3(data):
         #################### Total Hours by Summary Pie chart
         # extract time
@@ -193,19 +149,6 @@ class Plotter:
 
         plt.legend(title='Summary', bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=9)  # Add legend outside the plot
         ####################
-        
-    @staticmethod
-    def __chart3_plotly(data):
-        # Extract time
-        data = Plotter.__extractTimeData(data)
-
-        hours_by_summary = Plotter.__hoursBySummary(data)
-
-        # Create a pie chart using Plotly Express
-        fig = px.pie(hours_by_summary, values='Duration', names=hours_by_summary.index, labels={'Duration': 'Total Hours', 'names': 'Summary'}, title='Total Hours by Summary')
-
-        # Show the plot
-        fig.show()
     
     #! TODO: fixhere 
     @staticmethod
@@ -232,9 +175,142 @@ class Plotter:
         plt.xticks(fontsize=9)
         plt.yticks(fontsize=9)
         ####################
+        
+    @staticmethod
+    def chart_TotalHoursPerYear(data):
+        #################### Total Hours per Year
+        # Extract time data
+        data = Plotter.__extractTimeData(data)
+
+        # Group by year and calculate the sum of hours
+        yearly_hours = data.groupby('Year')['Duration'].sum().reset_index()
+
+        # Create a bar chart with Plotly
+        fig = px.bar(yearly_hours, x='Year', y='Duration', labels={'Year': 'Year', 'Duration': 'Total Hours'}, title='Total Hours per Year')
+
+        # Add text values above the bars
+        for i, row in yearly_hours.iterrows():
+            fig.add_annotation(x=row['Year'], y=row['Duration'], text=f"{row['Duration']:.2f}h", showarrow=False)
+
+        # Customize layout
+        fig.update_layout(xaxis=dict(tickmode='array', tickvals=yearly_hours['Year'], ticktext=yearly_hours['Year']))
+
+        # Show the plot
+        fig.show()
+        ####################
     
     @staticmethod
-    def __allStats(data):
+    def chart_TotalHoursPerMonth(data):
+        #################### Total Hours per Month
+        # Extract time data
+        data = Plotter.__extractTimeData(data)
+
+        # Group by month and calculate the sum of hours
+        monthly_hours = data.groupby('Month')['Duration'].sum().reset_index()
+
+        # Create a bar chart with Plotly
+        fig = px.bar(monthly_hours, x='Month', y='Duration', labels={'Month': 'Month', 'Duration': 'Total Hours'}, title='Total Hours per Month')
+
+        # Add text values above the bars
+        for i, row in monthly_hours.iterrows():
+            fig.add_annotation(x=row['Month'], y=row['Duration'], text=f"{row['Duration']:.2f}h", showarrow=False)
+
+        # Customize layout
+        fig.update_layout(xaxis=dict(tickmode='array', tickvals=monthly_hours['Month'], ticktext=monthly_hours['Month']))
+
+        # Show the plot
+        fig.show()
+        ####################
+    
+    @staticmethod
+    def chart_TotalHoursBySummary(data):
+        #################### Total Hours by Summary
+        # Extract time
+        data = Plotter.__extractTimeData(data)
+        
+        hours_by_summary = Plotter.__hoursBySummary(data)
+
+        # Convert Series to DataFrame
+        hours_by_summary_df = pd.DataFrame({'Summary': hours_by_summary.index, 'Duration': hours_by_summary.values})
+
+        # Create a bar chart using Plotly Express
+        fig = px.bar(hours_by_summary_df, x='Summary', y='Duration', labels={'Duration': 'Total Hours'}, title='Total Hours by Summary')
+
+        # Add text values above the bars
+        for i, val in enumerate(hours_by_summary):
+            fig.add_annotation(x=i, y=val + 0.05, text=f"{val:.2f}h", showarrow=False)
+
+        # Show the plot
+        fig.show()
+        ####################
+            
+    @staticmethod
+    def chart_TotalHoursBySummaryPie(data):
+        #################### Total Hours by Summary Pie chart
+        # Extract time
+        data = Plotter.__extractTimeData(data)
+
+        hours_by_summary = Plotter.__hoursBySummary(data)
+
+        # Create a pie chart using Plotly Express
+        fig = px.pie(hours_by_summary, values='Duration', names=hours_by_summary.index, labels={'Duration': 'Total Hours', 'names': 'Summary'}, title='Total Hours by Summary Pie chart')
+
+        # Show the plot
+        fig.show()
+        ####################
+    
+    @staticmethod
+    def chart_TotalHoursPerYearBySummary(data):
+        #################### Total Hours per Year by Summary
+        # Extract time data
+        data = Plotter.__extractTimeData(data)
+
+        # Group by year and summary, calculate the sum of hours
+        yearly_hours_by_summary = data.groupby(['Year', 'Summary'])['Duration'].sum().reset_index()
+
+        # Create a bar chart with Plotly
+        fig = px.bar(yearly_hours_by_summary, x='Year', y='Duration', color='Summary',
+                    labels={'Year': 'Year', 'Duration': 'Total Hours'}, title='Total Hours per Year by Summary')
+
+        # Add text values above the bars
+        for i, row in yearly_hours_by_summary.iterrows():
+            fig.add_annotation(x=row['Year'], y=row['Duration'], text=f"{row['Duration']:.2f}h", showarrow=False)
+
+        # Customize layout
+        fig.update_layout(xaxis=dict(tickmode='array', tickvals=yearly_hours_by_summary['Year'],
+                                    ticktext=yearly_hours_by_summary['Year']))
+
+        # Show the plot
+        fig.show()
+        ####################
+    
+    @staticmethod
+    def chart_TotalHoursPerMonthBySummary(data):
+        #################### Total Hours per Month by Summary
+        # Extract time data
+        data = Plotter.__extractTimeData(data)
+
+        # Group by month and summary, calculate the sum of hours
+        monthly_hours_by_summary = data.groupby(['Month', 'Summary'])['Duration'].sum().reset_index()
+
+        # Create a bar chart with Plotly
+        fig = px.bar(monthly_hours_by_summary, x='Month', y='Duration', color='Summary',
+                    labels={'Month': 'Month', 'Duration': 'Total Hours'}, title='Total Hours per Month by Summary')
+
+        # Add text values above the bars
+        for i, row in monthly_hours_by_summary.iterrows():
+            fig.add_annotation(x=row['Month'], y=row['Duration'], text=f"{row['Duration']:.2f}h", showarrow=False)
+
+        # Customize layout
+        fig.update_layout(xaxis=dict(tickmode='array', tickvals=monthly_hours_by_summary['Month'],
+                                    ticktext=monthly_hours_by_summary['Month']))
+
+        # Show the plot
+        fig.show()
+        ####################
+    
+    @staticmethod
+    def allStats(data):
         # extract time
         data = Plotter.__extractTimeData(data) 
         
@@ -253,20 +329,3 @@ class Plotter:
                 temp_file.write(str(stat) + '\n\n')
         
         webbrowser.open(f'file://{temp_file.name}')
-    
-    @classmethod    
-    def graph(cls, data):        
-        #cls.__chart1(data)
-        #cls.__chart2(data)
-        #cls.__chart3(data)
-        #cls.__chart4(data)
-        #plt.tight_layout()
-        #plt.show()
-        
-        cls.__chart1_plotly(data)
-        cls.__chart2_plotly(data)
-        cls.__chart3_plotly(data)
-        cls.__allStats(data)
-
-
-#Plotter.graph(Plotter.loadData("lezioni.txt"))
