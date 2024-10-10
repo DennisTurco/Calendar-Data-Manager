@@ -7,6 +7,7 @@ import pandas
 from datetime import datetime, timedelta
 from babel import numbers
 from googleapiclient.errors import HttpError
+from googleapiclient.discovery import build
 
 import JSONSettings as js
 import GoogleCalendarEventsManager as gc
@@ -21,6 +22,7 @@ from CTkMessagebox import *
 from tkcalendar import *
 from tkcalendar import *
 from CTkToolTip import *
+
 
 #?###########################################################
 class NewEventsFrame(ctk.CTkFrame):
@@ -589,7 +591,6 @@ class GetEventsFrame(ctk.CTkFrame):
         self.title_label_main = ctk.CTkLabel(self, text="Get Events List", font=ctk.CTkFont(size=20, weight="bold"))
         self.title_label_main.grid(row=0, column=1, padx=20, pady=(20, 10), sticky="nsew")
         
-        #? TODO: add like mode check box
         # main entry
         self.main_frame = ctk.CTkScrollableFrame(self, label_text="Event Information")
         self.main_frame.grid(row=1, column=1, padx=(50, 50), pady=10, sticky="ew")
@@ -1270,9 +1271,11 @@ class App():
         if listRes != None:
             self.credentials_path = listRes["CredentialsPath"]
             self.token_path = listRes["TokenPath"]
-            try: self.credentials = gc.GoogleCalendarEventsManager.connectionSetup(self.credentials_path, gc.GoogleCalendarEventsManager.SCOPE, self.token_path)
-            except: pass
-            
+            try: 
+                self.credentials = gc.GoogleCalendarEventsManager.connectionSetup(self.credentials_path, gc.GoogleCalendarEventsManager.SCOPE, self.token_path)
+            except Exception as e:
+                print(f"Errore: {e}")
+                
         self.init_window()
         self.init_menu()
         self.page_controller()
@@ -1372,6 +1375,13 @@ class App():
         button_1 = menu.add_cascade("File")
         button_3 = menu.add_cascade("Settings")
         button_4 = menu.add_cascade("About")
+        
+        if self.credentials is not None:
+            (_, email) = gc.GoogleCalendarEventsManager.get_user_info(self.credentials)
+            button_5 = menu.add_cascade(str(email))
+            dropdown5 = CustomDropdownMenu(widget=button_5)
+            dropdown5.add_option(option="Google Calendar", command=lambda: webbrowser.open('https://calendar.google.com/'))
+            dropdown5.add_option(option="Log out", command=lambda: self.show_frame(SetupFrame))
 
         dropdown1 = CustomDropdownMenu(widget=button_1)
         dropdown1.add_option(option="New Credentials", command=lambda: self.show_frame(SetupFrame))

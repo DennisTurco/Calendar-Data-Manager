@@ -11,7 +11,19 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 
 class GoogleCalendarEventsManager:
     
-    SCOPE = ["https://www.googleapis.com/auth/calendar"]
+    SCOPE = [
+        'https://www.googleapis.com/auth/calendar',
+        'openid',
+        'https://www.googleapis.com/auth/userinfo.email',
+        'https://www.googleapis.com/auth/userinfo.profile'
+    ]
+    
+    @staticmethod
+    def get_user_info(credentials_path: str):
+        user_info_service = build('oauth2', 'v2', credentials=credentials_path)
+        user_info = user_info_service.userinfo().get().execute()
+
+        return user_info.get('name'), user_info.get('email')
     
     @staticmethod
     def connectionSetup(credentials_path: str, scopes: str, token_path: str) -> Credentials:
@@ -31,7 +43,8 @@ class GoogleCalendarEventsManager:
                 try:
                     flow = InstalledAppFlow.from_client_secrets_file(credentials_path, scopes)
                     credentials = flow.run_local_server(port=0)
-                except:
+                except Exception as e:
+                    print(f"Errore: {e}")
                     return None
                 
             with open(token_path, "w") as token:
