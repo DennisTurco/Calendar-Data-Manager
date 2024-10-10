@@ -22,6 +22,7 @@ from CTkMessagebox import *
 from tkcalendar import *
 from tkcalendar import *
 from CTkToolTip import *
+from CTkScrollableDropdown import *
 
 
 #?###########################################################
@@ -110,6 +111,7 @@ class NewEventsFrame(ctk.CTkFrame):
         self.label_timezone = ctk.CTkLabel(self.date_frame, text="Timezone:")
         self.label_timezone.grid(row=2, column=0, padx=10, pady=10, sticky="e")
         self.timezone_selection = ctk.CTkComboBox(self.date_frame, state="readonly", values=list(self.timezone), command=self.combobox_callback)
+        CTkScrollableDropdown(self.timezone_selection, values=list(self.timezone), justify="left", button_color="transparent")
         self.timezone_selection.set(self.main_class.get_timezone())
         self.timezone_selection.grid(row=2, column=1, padx=0, pady=(10, 10), sticky="nsew")
         
@@ -312,6 +314,7 @@ class EditEventsFrame(ctk.CTkFrame):
         self.label_timezone = ctk.CTkLabel(self.date_frame, text="Timezone:")
         self.label_timezone.grid(row=2, column=0, padx=10, pady=10, sticky="e")
         self.timezone_selection = ctk.CTkComboBox(self.date_frame, state="readonly", values=list(self.timezone), command=self.combobox_callback)
+        CTkScrollableDropdown(self.timezone_selection, values=list(self.timezone), justify="left", button_color="transparent")
         self.timezone_selection.set(self.main_class.get_timezone())
         self.timezone_selection.grid(row=2, column=1, padx=0, pady=(10, 10), sticky="nsew")
         
@@ -635,6 +638,7 @@ class GetEventsFrame(ctk.CTkFrame):
         self.label_timezone = ctk.CTkLabel(self.date_frame, text="Timezone:")
         self.label_timezone.grid(row=2, column=0, padx=10, pady=10, sticky="e")
         self.timezone_selection = ctk.CTkComboBox(self.date_frame, state="readonly", values=list(self.timezone), command=self.combobox_callback)
+        CTkScrollableDropdown(self.timezone_selection, values=list(self.timezone), justify="left", button_color="transparent")
         self.timezone_selection.set(self.main_class.get_timezone())
         self.timezone_selection.grid(row=2, column=1, padx=0, pady=(10, 10), sticky="nsew")
 
