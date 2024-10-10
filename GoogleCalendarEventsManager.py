@@ -513,6 +513,34 @@ class GoogleCalendarEventsManager:
             raise Exception(f"An error occurred: {str(generic_exception)}")  
     
     @staticmethod
+    def simulateEventUpdates(creds: Credentials, old_events: Dict, summary_new: str, description_new: str, color_id_new, start_date: str = None, end_date: str = None, time_zone: str = 'UTC'):
+        if creds is None:
+            raise ValueError("Credentials can't be null")
+
+        try:
+            if old_events is None or len(old_events) == 0:
+                return []
+            
+            # Simulate updates
+            simulated_events = []
+            for event in old_events:
+                simulated_event = event.copy()  # copy the origina event to avoid edit
+                simulated_event['summary'] = summary_new
+                simulated_event['colorId'] = color_id_new
+                if description_new is not None and len(description_new) > 2:
+                    simulated_event['description'] = description_new
+                
+                simulated_event['start']['timeZone'] = time_zone
+                
+                simulated_events.append(simulated_event)
+            
+            return simulated_events
+
+        except Exception as generic_exception:
+            print(generic_exception)
+            raise Exception(f"An error occurred: {str(generic_exception)}")
+    
+    @staticmethod
     def deleteEventByID(creds: Credentials, ID: str):
         if creds == None: raise ValueError("Credentials can't be null")
         if ID == None: raise ValueError("ID can't be null")
