@@ -104,13 +104,13 @@ class NewEventsFrame(customtkinter.CTkFrame):
         self.date_frame.grid_columnconfigure((0, 1, 2), weight=1)
         self.label_date_from = customtkinter.CTkLabel(self.date_frame, text="From:")
         self.label_date_from.grid(row=0, column=0, padx=10, pady=10, sticky="e")
-        self.entry_date_from = customtkinter.CTkEntry(self.date_frame, placeholder_text="yyyy-mm-dd hh:mm")
+        self.entry_date_from = customtkinter.CTkEntry(self.date_frame, placeholder_text="dd-mm-yyyy hh:mm")
         self.entry_date_from.grid(row=0, column=1, padx=0, pady=10, sticky="ew")
         self.entry_date_button = customtkinter.CTkButton(self.date_frame, text="", width=10, image=calendar_image, command=lambda: self.date_picker(1))
         self.entry_date_button.grid(row=0, column=2, padx=0, pady=10, sticky="w")
         self.label_date_to = customtkinter.CTkLabel(self.date_frame, text="To:")
         self.label_date_to.grid(row=1, column=0, padx=10, pady=10, sticky="e")
-        self.entry_date_to = customtkinter.CTkEntry(self.date_frame, placeholder_text="yyyy-mm-dd hh:mm")
+        self.entry_date_to = customtkinter.CTkEntry(self.date_frame, placeholder_text="dd-mm-yyyy hh:mm")
         self.entry_date_to.grid(row=1, column=1, padx=0, pady=10, sticky="ew")
         self.entry_date_button2 = customtkinter.CTkButton(self.date_frame, text="", width=10, image=calendar_image, command=lambda: self.date_picker(2))
         self.entry_date_button2.grid(row=1, column=2, padx=0, pady=10, sticky="w")
@@ -154,8 +154,8 @@ class NewEventsFrame(customtkinter.CTkFrame):
             self.main_class.write_log(self.log_box, f"Error on creating event: date is missing")
             return
         try:
-            date_from = datetime.strptime(date_from, '%Y-%m-%d %H:%M')
-            date_to = datetime.strptime(date_to, '%Y-%m-%d %H:%M')
+            date_from = datetime.strptime(date_from, '%d-%m-%Y %H:%M')
+            date_to = datetime.strptime(date_to, '%d-%m-%Y %H:%M')
         except ValueError:
             self.main_class.write_log(self.log_box, f"Error on creating event: date format is not correct")
         
@@ -306,13 +306,13 @@ class EditEventsFrame(customtkinter.CTkFrame):
         self.date_frame.grid_rowconfigure((0, 1), weight=0)
         self.label_date_from = customtkinter.CTkLabel(self.date_frame, text="From:")
         self.label_date_from.grid(row=0, column=0, padx=10, pady=10, sticky="e")
-        self.entry_date_from = customtkinter.CTkEntry(self.date_frame, placeholder_text="yyyy-mm-dd hh:mm")
+        self.entry_date_from = customtkinter.CTkEntry(self.date_frame, placeholder_text="dd-mm-yyyy hh:mm")
         self.entry_date_from.grid(row=0, column=1, padx=0, pady=10, sticky="ew")
         self.entry_date_button = customtkinter.CTkButton(self.date_frame, text="", width=10, image=calendar_image, command=lambda: self.date_picker(1))
         self.entry_date_button.grid(row=0, column=2, padx=0, pady=10, sticky="w")
         self.label_date_to = customtkinter.CTkLabel(self.date_frame, text="To:")
         self.label_date_to.grid(row=1, column=0, padx=10, pady=10, sticky="e")
-        self.entry_date_to = customtkinter.CTkEntry(self.date_frame, placeholder_text="yyyy-mm-dd hh:mm")
+        self.entry_date_to = customtkinter.CTkEntry(self.date_frame, placeholder_text="dd-mm-yyyy hh:mm")
         self.entry_date_to.grid(row=1, column=1, padx=0, pady=10, sticky="ew")
         self.entry_date_button2 = customtkinter.CTkButton(self.date_frame, text="", width=10, image=calendar_image, command=lambda: self.date_picker(2))
         self.entry_date_button2.grid(row=1, column=2, padx=0, pady=10, sticky="w")
@@ -372,9 +372,9 @@ class EditEventsFrame(customtkinter.CTkFrame):
         date_to = self.entry_date_to.get()
         try:
             if len(date_from) != 0:
-                date_from = datetime.strptime(date_from, '%Y-%m-%d %H:%M')
+                date_from = datetime.strptime(date_from, '%d-%m-%Y %H:%M')
             if len(date_to) != 0:
-                date_to = datetime.strptime(date_to, '%Y-%m-%d %H:%M')
+                date_to = datetime.strptime(date_to, '%d-%m-%Y %H:%M')
         except ValueError:
             self.main_class.write_log(self.log_box, f"Error on creating event: date format is not correct")
             
@@ -517,13 +517,13 @@ class GetEventsFrame(customtkinter.CTkFrame):
         self.date_frame.grid_rowconfigure((0, 1), weight=0)
         self.label_date_from = customtkinter.CTkLabel(self.date_frame, text="From:")
         self.label_date_from.grid(row=0, column=0, padx=10, pady=10, sticky="e")
-        self.entry_date_from = customtkinter.CTkEntry(self.date_frame, placeholder_text="yyyy-mm-dd hh:mm")
+        self.entry_date_from = customtkinter.CTkEntry(self.date_frame, placeholder_text="dd-mm-yyyy hh:mm")
         self.entry_date_from.grid(row=0, column=1, padx=0, pady=10, sticky="ew")
         self.entry_date_button = customtkinter.CTkButton(self.date_frame, text="", width=10, image=calendar_image, command=lambda: self.date_picker(1))
         self.entry_date_button.grid(row=0, column=2, padx=0, pady=10, sticky="w")
         self.label_date_to = customtkinter.CTkLabel(self.date_frame, text="To:")
         self.label_date_to.grid(row=1, column=0, padx=10, pady=10, sticky="e")
-        self.entry_date_to = customtkinter.CTkEntry(self.date_frame, placeholder_text="yyyy-mm-dd hh:mm")
+        self.entry_date_to = customtkinter.CTkEntry(self.date_frame, placeholder_text="dd-mm-yyyy hh:mm")
         self.entry_date_to.grid(row=1, column=1, padx=0, pady=10, sticky="ew")
         self.entry_date_button2 = customtkinter.CTkButton(self.date_frame, text="", width=10, image=calendar_image, command=lambda: self.date_picker(2))
         self.entry_date_button2.grid(row=1, column=2, padx=0, pady=10, sticky="w")
@@ -602,9 +602,9 @@ class GetEventsFrame(customtkinter.CTkFrame):
          
         try:
             if len(date_from) != 0:
-                date_from = datetime.strptime(date_from, '%Y-%m-%d %H:%M')
+                date_from = datetime.strptime(date_from, '%d-%m-%Y %H:%M')
             if len(date_to) != 0:
-                date_to = datetime.strptime(date_to, '%Y-%m-%d %H:%M')
+                date_to = datetime.strptime(date_to, '%d-%m-%Y %H:%M')
         except ValueError:
             self.main_class.write_log(self.log_box, f"Error on creating event: date format is not correct")
         
@@ -1426,10 +1426,10 @@ class App():
         except ValueError:
             return
         
-        # Format the datetime object as a string in "%Y-%m-%d %H:%M" format
+        # Format the datetime object as a string in "%d-%m-%Y %H:%M" format
         date = datetime.strptime(date, "%m/%d/%y")  
         full_date = datetime(date.year, date.month, date.day, hour, minute)
-        full_date_str = full_date.strftime("%Y-%m-%d %H:%M")  
+        full_date_str = full_date.strftime("%d-%m-%Y %H:%M")  
         
         if type == 1:
             self.write_log(log_box, "Date Selected From: " + full_date_str)
