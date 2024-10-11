@@ -1197,17 +1197,23 @@ class SetupFrame(ctk.CTkFrame):
     def __init__(self, parent, main_class):
         ctk.CTkFrame.__init__(self, parent)
         self.main_class = main_class
-        
+
         # load images
         google_image = tkinter.PhotoImage(file='./imgs/google.png')
-        question_image = tkinter.PhotoImage(file='./imgs/question.png')
         arrow_image = tkinter.PhotoImage(file='./imgs/arrow-right.png')
-        
-        # main content
-        ctk.CTkLabel(self, text="Set Credentials", fg_color="transparent", font=("Arial", 32)).pack(padx=20, pady=20)
-        ctk.CTkButton(master=self, image=google_image, text="Google Calendar", command=lambda: webbrowser.open(GOOGLE_CALENDAR_LINK)).pack(padx=20, pady=10, anchor='center')
-        ctk.CTkButton(master=self, image=question_image, text="Tutorial Setup", command=lambda: webbrowser.open(TUTORIAL_SETUP_LINK)).pack(padx=20, pady=10, anchor='center')
-        ctk.CTkButton(master=self, image=arrow_image, text="First Setup", command=lambda: self.setCredentialsPathFrame()).pack(padx=20, pady=10, anchor='center')
+
+        ctk.CTkLabel(self, text="Login", fg_color="transparent", font=("Arial", 32)).pack(padx=20, pady=20)
+
+        google_calendar = ctk.CTkButton(master=self, image=google_image, text="Google Calendar", height=50, width=250, command=lambda: webbrowser.open(GOOGLE_CALENDAR_LINK))
+        google_login = ctk.CTkButton(master=self, image=arrow_image, text="Login with Google", height=50, width=250, command=lambda: self.setCredentialsPathFrame())
+
+        google_calendar.pack(padx=20, pady=10, anchor='center')
+        google_login.pack(padx=20, pady=10, anchor='center')
+
+        # Tooltips
+        CTkToolTip(google_calendar, delay=0.3, message="View and manage your Google Calendar")
+        CTkToolTip(google_login, delay=0.3, message="Login using your Google account")
+
             
     def setCredentialsPathFrame(self):
         folder_image = tkinter.PhotoImage(file='./imgs/folder.png')
@@ -1258,7 +1264,8 @@ class SetupFrame(ctk.CTkFrame):
         
         # response message box
         if credentials is not None:
-            CTkMessagebox(message="Credentials setted succeffully", icon="check", option_1="Ok")
+            (user, _) = gc.CalendarEventsManager.get_user_info(credentials)
+            CTkMessagebox(message=f"Hello {user}! \nYou have logged in successfully.", icon="check", option_1="Ok")
             
             # set credentials values to main class
             self.main_class.set_credentials(credentials, credentials_path, token_path)
@@ -1272,9 +1279,6 @@ class SetupFrame(ctk.CTkFrame):
     
     def updateUsernameMenuItem(self):
         self.main_class.updateUsernameMenuItem()
-        
-    def setUsernameMenuItemToEmpty(self):
-        self.main_class.setUsernameMenuItemToEmpty()
     
     def __getFilePath(self):
         file_path = filedialog.askopenfilename(title="Select credentials file", filetypes=(("JSON files", "*.json"), ("All files", "*.*")))
@@ -1289,6 +1293,7 @@ class App():
     token_path = None
     credentials = None
     menu = None
+    button_5 = None
     
     app_width = 1100
     app_height = 900
@@ -1443,10 +1448,11 @@ class App():
     
     def updateUsernameMenuItem(self):
         (_, email) = gc.CalendarEventsManager.get_user_info(self.credentials)
-        button_5 = self.menu.add_cascade(str(email))
-        dropdown5 = CustomDropdownMenu(widget=button_5)
+        self.button_5 = self.menu.add_cascade(str(email))
+        dropdown5 = CustomDropdownMenu(widget=self.button_5)
         dropdown5.add_option(option="Google Calendar", command=lambda: webbrowser.open(GOOGLE_CALENDAR_LINK))
         dropdown5.add_option(option="Log out", command=lambda: self.show_frame(SetupFrame))
+        
     
     def centerWindow(self):
         screen_width = self.root.winfo_screenwidth()
