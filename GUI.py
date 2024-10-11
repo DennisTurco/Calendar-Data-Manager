@@ -163,6 +163,7 @@ class NewEventsFrame(ctk.CTkFrame):
             date_to = datetime.strptime(date_to, DATE_FORMATTER)
         except ValueError:
             self.main_class.write_log(self.log_box, f"Error on creating event: date format is not correct")
+            return
         
         # get color index
         color_index = self.main_class.get_color_id(EVENT_COLOR, self.multi_selection.get())
@@ -728,6 +729,7 @@ class GetEventsFrame(ctk.CTkFrame):
                 date_to = datetime.strptime(date_to, DATE_FORMATTER)
         except ValueError:
             self.main_class.write_log(self.log_box, f"Error on creating event: date format is not correct")
+            return
         
         # get color index
         color_index = self.main_class.get_color_id(EVENT_COLOR, self.multi_selection.get())
@@ -1188,7 +1190,7 @@ class MainFrame(ctk.CTkFrame):
 #?###########################################################
 
 #?###########################################################   
-class SetupFrame(ctk.CTkFrame):
+class LoginFrame(ctk.CTkFrame):
     width = 900
     height = 600
     main_class = None
@@ -1416,7 +1418,7 @@ class App():
             self.updateUsernameMenuItem()
 
         dropdown1 = CustomDropdownMenu(widget=button_1)
-        dropdown1.add_option(option="New Credentials", command=lambda: self.show_frame(SetupFrame))
+        dropdown1.add_option(option="New Credentials", command=lambda: self.show_frame(LoginFrame))
         dropdown1.add_option(option="Exit", command=lambda: exit())
 
         dropdown1.add_separator()
@@ -1451,7 +1453,7 @@ class App():
         self.button_5 = self.menu.add_cascade(str(email))
         dropdown5 = CustomDropdownMenu(widget=self.button_5)
         dropdown5.add_option(option="Google Calendar", command=lambda: webbrowser.open(GOOGLE_CALENDAR_LINK))
-        dropdown5.add_option(option="Log out", command=lambda: self.show_frame(SetupFrame))
+        dropdown5.add_option(option="Log out", command=lambda: self.show_frame(LoginFrame))
         
     
     def centerWindow(self):
@@ -1475,7 +1477,7 @@ class App():
         self.frames = {} 
 
         # iterating through a tuple consisting of the different page layouts
-        for F in (SetupFrame, MainFrame, NewEventsFrame, EditEventsFrame, GetEventsFrame, GraphFrame):
+        for F in (LoginFrame, MainFrame, NewEventsFrame, EditEventsFrame, GetEventsFrame, GraphFrame):
 
             frame = F(container, self)
 
@@ -1485,7 +1487,7 @@ class App():
             frame.grid(row = 0, column = 0, sticky ="nsew")
         
         if self.credentials is None or self.credentials_path is None:
-            self.show_frame(SetupFrame)
+            self.show_frame(LoginFrame)
         else:
             self.show_frame(MainFrame)
     
