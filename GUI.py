@@ -1,4 +1,5 @@
 from ast import List
+from typing import Final, List
 import webbrowser
 import os
 import traceback
@@ -24,13 +25,23 @@ from tkcalendar import *
 from CTkToolTip import *
 from CTkScrollableDropdown import *
 
+# consts
+EVENT_COLOR: Final[dict] = {"Light Blue": "#7986cb", "Green": "#33b679", "Purple": "#8e24aa", "Pink": "#e67c73", "Yellow": "#f6bf26", "Orange": "#f4511e", "Blue": "#039be5", "Grey": "#616161", "Dark Blue": "#3f51b5", "Dark Green": "#0b8043", "Red": "#d50000"}
+TIMEZONE: Final[List[str]] = ['Africa/Abidjan', 'Africa/Accra', 'Africa/Algiers', 'Africa/Bissau', 'Africa/Cairo', 'Africa/Casablanca', 'Africa/Ceuta', 'Africa/El_Aaiun', 'Africa/Juba', 'Africa/Khartoum', 'Africa/Lagos', 'Africa/Maputo', 'Africa/Monrovia', 'Africa/Nairobi', 'Africa/Ndjamena', 'Africa/Sao_Tome', 'Africa/Tripoli', 'Africa/Tunis', 'Africa/Windhoek', 'America/Adak', 'America/Anchorage', 'America/Araguaina', 'America/Argentina/Buenos_Aires', 'America/Argentina/Catamarca', 'America/Argentina/Cordoba', 'America/Argentina/Jujuy', 'America/Argentina/La_Rioja', 'America/Argentina/Mendoza', 'America/Argentina/Rio_Gallegos', 'America/Argentina/Salta', 'America/Argentina/San_Juan', 'America/Argentina/San_Luis', 'America/Argentina/Tucuman', 'America/Argentina/Ushuaia', 'America/Asuncion', 'America/Atikokan', 'America/Bahia', 'America/Bahia_Banderas', 'America/Barbados', 'America/Belem', 'America/Belize', 'America/Blanc-Sablon', 'America/Boa_Vista', 'America/Bogota', 'America/Boise', 'America/Cambridge_Bay', 'America/Campo_Grande', 'America/Cancun', 'America/Caracas', 'America/Cayenne', 'America/Chicago', 'America/Chihuahua', 'America/Costa_Rica', 'America/Creston', 'America/Cuiaba', 'America/Curacao', 'America/Danmarkshavn', 'America/Dawson', 'America/Dawson_Creek', 'America/Denver', 'America/Detroit', 'America/Edmonton', 'America/Eirunepe', 'America/El_Salvador', 'America/Fort_Nelson', 'America/Fortaleza', 'America/Glace_Bay', 'America/Godthab', 'America/Goose_Bay', 'America/Grand_Turk', 'America/Guatemala', 'America/Guayaquil', 'America/Guyana', 'America/Halifax', 'America/Havana', 'America/Hermosillo', 'America/Indiana/Indianapolis', 'America/Indiana/Knox', 'America/Indiana/Marengo', 'America/Indiana/Petersburg', 'America/Indiana/Tell_City', 'America/Indiana/Vevay', 'America/Indiana/Vincennes', 'America/Indiana/Winamac', 'America/Inuvik', 'America/Iqaluit', 'America/Jamaica', 'America/Juneau', 'America/Kentucky/Louisville', 'America/Kentucky/Monticello', 'America/Kralendijk', 'America/La_Paz', 'America/Lima', 'America/Los_Angeles', 'America/Louisville', 'America/Lower_Princes', 'America/Maceio', 'America/Managua', 'America/Manaus', 'America/Marigot', 'America/Martinique', 'America/Matamoros', 'America/Mazatlan', 'America/Menominee', 'America/Merida', 'America/Metlakatla', 'America/Mexico_City', 'America/Miquelon', 'America/Moncton', 'America/Monterrey', 'America/Montevideo', 'America/Montreal', 'America/Montserrat', 'America/Nassau', 'America/New_York', 'America/Nipigon', 'America/Nome', 'America/Noronha', 'America/North_Dakota/Beulah', 'America/North_Dakota/Center', 'America/North_Dakota/New_Salem', 'America/Nuuk', 'America/Ojinaga', 'America/Panama', 'America/Pangnirtung', 'America/Paramaribo', 'America/Phoenix', 'America/Port-au-Prince', 'America/Port_of_Spain', 'America/Porto_Acre', 'America/Porto_Velho', 'America/Puerto_Rico', 'America/Punta_Arenas', 'America/Rainy_River', 'America/Rankin_Inlet', 'America/Recife', 'America/Regina', 'America/Resolute', 'America/Rio_Branco', 'America/Santarem', 'America/Santiago', 'America/Santo_Domingo', 'America/Sao_Paulo', 'America/Scoresbysund', 'America/Sitka', 'America/St_Barthelemy', 'America/St_Johns', 'America/St_Kitts', 'America/St_Lucia', 'America/St_Thomas', 'America/St_Vincent', 'America/Swift_Current', 'America/Tegucigalpa', 'America/Thule', 'America/Thunder_Bay', 'America/Tijuana', 'America/Toronto', 'America/Tortola', 'America/Vancouver', 'America/Whitehorse', 'America/Winnipeg', 'America/Yakutat', 'America/Yellowknife', 'Antarctica/Casey', 'Antarctica/Davis', 'Antarctica/DumontDUrville', 'Antarctica/Macquarie', 'Antarctica/Mawson', 'Antarctica/McMurdo', 'Antarctica/Palmer', 'Antarctica/Rothera', 'Antarctica/Syowa', 'Antarctica/Troll', 'Antarctica/Vostok', 'Arctic/Longyearbyen', 'Asia/Aden', 'Asia/Almaty', 'Asia/Amman', 'Asia/Anadyr', 'Asia/Aqtau', 'Asia/Aqtobe', 'Asia/Ashgabat', 'Asia/Atyrau', 'Asia/Baghdad', 'Asia/Bahrain', 'Asia/Baku', 'Asia/Bangkok', 'Asia/Barnaul', 'Asia/Beirut', 'Asia/Bishkek', 'Asia/Brunei', 'Asia/Chita', 'Asia/Choibalsan', 'Asia/Colombo', 'Asia/Damascus', 'Asia/Dhaka', 'Asia/Dili', 'Asia/Dubai', 'Asia/Dushanbe', 'Asia/Famagusta', 'Asia/Gaza', 'Asia/Hebron', 'Asia/Ho_Chi_Minh', 'Asia/Hong_Kong', 'Asia/Hovd', 'Asia/Irkutsk', 'Asia/Istanbul', 'Asia/Jakarta', 'Asia/Jayapura', 'Asia/Jerusalem', 'Asia/Kabul', 'Asia/Kamchatka', 'Asia/Karachi', 'Asia/Kathmandu', 'Asia/Khandyga', 'Asia/Kolkata', 'Asia/Krasnoyarsk', 'Asia/Kuala_Lumpur', 'Asia/Kuching', 'Asia/Kuwait', 'Asia/Macau', 'Asia/Magadan', 'Asia/Makassar', 'Asia/Manila', 'Asia/Muscat', 'Asia/Nicosia', 'Asia/Novokuznetsk', 'Asia/Novosibirsk', 'Asia/Omsk', 'Asia/Oral', 'Asia/Phnom_Penh', 'Asia/Pontianak', 'Asia/Pyongyang', 'Asia/Qatar', 'Asia/Qostanay', 'Asia/Qyzylorda', 'Asia/Riyadh', 'Asia/Sakhalin', 'Asia/Samarkand', 'Asia/Seoul', 'Asia/Shanghai', 'Asia/Singapore', 'Asia/Srednekolymsk', 'Asia/Taipei', 'Asia/Tashkent', 'Asia/Tbilisi', 'Asia/Tehran', 'Asia/Thimphu', 'Asia/Tokyo', 'Asia/Tomsk', 'Asia/Ulaanbaatar', 'Asia/Urumqi', 'Asia/Ust-Nera', 'Asia/Vientiane', 'Asia/Vladivostok', 'Asia/Yakutsk', 'Asia/Yangon', 'Asia/Yekaterinburg', 'Asia/Yerevan', 'Atlantic/Azores', 'Atlantic/Bermuda', 'Atlantic/Canary', 'Atlantic/Cape_Verde', 'Atlantic/Faroe', 'Atlantic/Madeira', 'Atlantic/Reykjavik', 'Atlantic/South_Georgia', 'Atlantic/St_Helena', 'Atlantic/Stanley', 'Australia/Adelaide', 'Australia/Brisbane', 'Australia/Broken_Hill', 'Australia/Currie', 'Australia/Darwin', 'Australia/Eucla', 'Australia/Hobart', 'Australia/Lindeman', 'Australia/Lord_Howe', 'Australia/Melbourne', 'Australia/Perth', 'Australia/Sydney', 'Canada/Atlantic', 'Canada/Central', 'Canada/Eastern', 'Canada/Mountain', 'Canada/Newfoundland', 'Canada/Pacific', 'Europe/Amsterdam', 'Europe/Andorra', 'Europe/Astrakhan', 'Europe/Athens', 'Europe/Belgrade', 'Europe/Berlin', 'Europe/Bratislava', 'Europe/Brussels', 'Europe/Bucharest', 'Europe/Budapest', 'Europe/Busingen', 'Europe/Chisinau', 'Europe/Copenhagen', 'Europe/Dublin', 'Europe/Gibraltar', 'Europe/Guernsey', 'Europe/Helsinki', 'Europe/Isle_of_Man', 'Europe/Istanbul', 'Europe/Jersey', 'Europe/Kaliningrad', 'Europe/Kiev', 'Europe/Kirov', 'Europe/Lisbon', 'Europe/Ljubljana', 'Europe/London', 'Europe/Luxembourg', 'Europe/Madrid', 'Europe/Malta', 'Europe/Mariehamn', 'Europe/Minsk', 'Europe/Monaco', 'Europe/Moscow', 'Europe/Oslo', 'Europe/Paris', 'Europe/Podgorica', 'Europe/Prague', 'Europe/Riga', 'Europe/Rome', 'Europe/Samara', 'Europe/San_Marino', 'Europe/Sarajevo', 'Europe/Saratov', 'Europe/Simferopol', 'Europe/Skopje', 'Europe/Sofia', 'Europe/Stockholm', 'Europe/Tallinn', 'Europe/Tirane', 'Europe/Ulyanovsk', 'Europe/Uzhgorod', 'Europe/Vaduz', 'Europe/Vatican', 'Europe/Vienna', 'Europe/Vilnius', 'Europe/Volgograd', 'Europe/Warsaw', 'Europe/Zagreb', 'Europe/Zaporozhye', 'Europe/Zurich', 'GMT', 'Indian/Antananarivo', 'Indian/Chagos', 'Indian/Christmas', 'Indian/Cocos', 'Indian/Comoro', 'Indian/Kerguelen', 'Indian/Mahe', 'Indian/Maldives', 'Indian/Mauritius', 'Indian/Mayotte', 'Indian/Reunion', 'Pacific/Apia', 'Pacific/Auckland', 'Pacific/Bougainville', 'Pacific/Chatham', 'Pacific/Chuuk', 'Pacific/Easter', 'Pacific/Efate', 'Pacific/Enderbury', 'Pacific/Fakaofo', 'Pacific/Fiji', 'Pacific/Funafuti', 'Pacific/Galapagos', 'Pacific/Gambier', 'Pacific/Guadalcanal', 'Pacific/Guam', 'Pacific/Honolulu', 'Pacific/Kiritimati', 'Pacific/Kosrae', 'Pacific/Kwajalein', 'Pacific/Majuro', 'Pacific/Marquesas', 'Pacific/Midway', 'Pacific/Nauru', 'Pacific/Niue', 'Pacific/Norfolk', 'Pacific/Noumea', 'Pacific/Pago_Pago', 'Pacific/Palau', 'Pacific/Pitcairn', 'Pacific/Pohnpei', 'Pacific/Port_Moresby', 'Pacific/Rarotonga', 'Pacific/Saipan', 'Pacific/Tahiti', 'Pacific/Tarawa', 'Pacific/Tongatapu', 'Pacific/Wake', 'Pacific/Wallis', 'UTC']
+
+GOOGLE_CALENDAR_LINK: Final[str] = 'https://calendar.google.com/'
+TUTORIAL_SETUP_LINK: Final[str] = 'https://github.com/DennisTurco/Calendar-Data-Manager/blob/master/docs/GoogleCloudAPISetup.md'
+GITHUB_ISSUES_LINK: Final[str] = 'https://github.com/DennisTurco/Calendar-Data-Manager/issues'
+GITHUB_PAGE_LINK: Final[str] = 'https://github.com/DennisTurco/Calendar-Data-Manager'
+DONATE_PAGE_LINK: Final[str] = 'https://www.buymeacoffee.com/denno'
+
+DATE_FORMATTER: Final[str] = '%d-%m-%Y %H:%M'
+DAY_FORMATTER: Final[str] = "%d/%m/%Y"
 
 #?###########################################################
 class NewEventsFrame(ctk.CTkFrame):
     main_class = None
     toplevel_window = None
-    event_color = {"Lavender": "#7986cb", "Sage": "#33b679", "Grape": "#8e24aa", "Flamingo": "#e67c73", "Banana": "#f6bf26", "Tangerine": "#f4511e", "Peacock": "#039be5", "Graphite": "#616161", "Blueberry": "#3f51b5", "Basil": "#0b8043", "Tomato": "#d50000"}
-    timezone = ['Africa/Abidjan', 'Africa/Accra', 'Africa/Algiers', 'Africa/Bissau', 'Africa/Cairo', 'Africa/Casablanca', 'Africa/Ceuta', 'Africa/El_Aaiun', 'Africa/Juba', 'Africa/Khartoum', 'Africa/Lagos', 'Africa/Maputo', 'Africa/Monrovia', 'Africa/Nairobi', 'Africa/Ndjamena', 'Africa/Sao_Tome', 'Africa/Tripoli', 'Africa/Tunis', 'Africa/Windhoek', 'America/Adak', 'America/Anchorage', 'America/Araguaina', 'America/Argentina/Buenos_Aires', 'America/Argentina/Catamarca', 'America/Argentina/Cordoba', 'America/Argentina/Jujuy', 'America/Argentina/La_Rioja', 'America/Argentina/Mendoza', 'America/Argentina/Rio_Gallegos', 'America/Argentina/Salta', 'America/Argentina/San_Juan', 'America/Argentina/San_Luis', 'America/Argentina/Tucuman', 'America/Argentina/Ushuaia', 'America/Asuncion', 'America/Atikokan', 'America/Bahia', 'America/Bahia_Banderas', 'America/Barbados', 'America/Belem', 'America/Belize', 'America/Blanc-Sablon', 'America/Boa_Vista', 'America/Bogota', 'America/Boise', 'America/Cambridge_Bay', 'America/Campo_Grande', 'America/Cancun', 'America/Caracas', 'America/Cayenne', 'America/Chicago', 'America/Chihuahua', 'America/Costa_Rica', 'America/Creston', 'America/Cuiaba', 'America/Curacao', 'America/Danmarkshavn', 'America/Dawson', 'America/Dawson_Creek', 'America/Denver', 'America/Detroit', 'America/Edmonton', 'America/Eirunepe', 'America/El_Salvador', 'America/Fort_Nelson', 'America/Fortaleza', 'America/Glace_Bay', 'America/Godthab', 'America/Goose_Bay', 'America/Grand_Turk', 'America/Guatemala', 'America/Guayaquil', 'America/Guyana', 'America/Halifax', 'America/Havana', 'America/Hermosillo', 'America/Indiana/Indianapolis', 'America/Indiana/Knox', 'America/Indiana/Marengo', 'America/Indiana/Petersburg', 'America/Indiana/Tell_City', 'America/Indiana/Vevay', 'America/Indiana/Vincennes', 'America/Indiana/Winamac', 'America/Inuvik', 'America/Iqaluit', 'America/Jamaica', 'America/Juneau', 'America/Kentucky/Louisville', 'America/Kentucky/Monticello', 'America/Kralendijk', 'America/La_Paz', 'America/Lima', 'America/Los_Angeles', 'America/Louisville', 'America/Lower_Princes', 'America/Maceio', 'America/Managua', 'America/Manaus', 'America/Marigot', 'America/Martinique', 'America/Matamoros', 'America/Mazatlan', 'America/Menominee', 'America/Merida', 'America/Metlakatla', 'America/Mexico_City', 'America/Miquelon', 'America/Moncton', 'America/Monterrey', 'America/Montevideo', 'America/Montreal', 'America/Montserrat', 'America/Nassau', 'America/New_York', 'America/Nipigon', 'America/Nome', 'America/Noronha', 'America/North_Dakota/Beulah', 'America/North_Dakota/Center', 'America/North_Dakota/New_Salem', 'America/Nuuk', 'America/Ojinaga', 'America/Panama', 'America/Pangnirtung', 'America/Paramaribo', 'America/Phoenix', 'America/Port-au-Prince', 'America/Port_of_Spain', 'America/Porto_Acre', 'America/Porto_Velho', 'America/Puerto_Rico', 'America/Punta_Arenas', 'America/Rainy_River', 'America/Rankin_Inlet', 'America/Recife', 'America/Regina', 'America/Resolute', 'America/Rio_Branco', 'America/Santarem', 'America/Santiago', 'America/Santo_Domingo', 'America/Sao_Paulo', 'America/Scoresbysund', 'America/Sitka', 'America/St_Barthelemy', 'America/St_Johns', 'America/St_Kitts', 'America/St_Lucia', 'America/St_Thomas', 'America/St_Vincent', 'America/Swift_Current', 'America/Tegucigalpa', 'America/Thule', 'America/Thunder_Bay', 'America/Tijuana', 'America/Toronto', 'America/Tortola', 'America/Vancouver', 'America/Whitehorse', 'America/Winnipeg', 'America/Yakutat', 'America/Yellowknife', 'Antarctica/Casey', 'Antarctica/Davis', 'Antarctica/DumontDUrville', 'Antarctica/Macquarie', 'Antarctica/Mawson', 'Antarctica/McMurdo', 'Antarctica/Palmer', 'Antarctica/Rothera', 'Antarctica/Syowa', 'Antarctica/Troll', 'Antarctica/Vostok', 'Arctic/Longyearbyen', 'Asia/Aden', 'Asia/Almaty', 'Asia/Amman', 'Asia/Anadyr', 'Asia/Aqtau', 'Asia/Aqtobe', 'Asia/Ashgabat', 'Asia/Atyrau', 'Asia/Baghdad', 'Asia/Bahrain', 'Asia/Baku', 'Asia/Bangkok', 'Asia/Barnaul', 'Asia/Beirut', 'Asia/Bishkek', 'Asia/Brunei', 'Asia/Chita', 'Asia/Choibalsan', 'Asia/Colombo', 'Asia/Damascus', 'Asia/Dhaka', 'Asia/Dili', 'Asia/Dubai', 'Asia/Dushanbe', 'Asia/Famagusta', 'Asia/Gaza', 'Asia/Hebron', 'Asia/Ho_Chi_Minh', 'Asia/Hong_Kong', 'Asia/Hovd', 'Asia/Irkutsk', 'Asia/Istanbul', 'Asia/Jakarta', 'Asia/Jayapura', 'Asia/Jerusalem', 'Asia/Kabul', 'Asia/Kamchatka', 'Asia/Karachi', 'Asia/Kathmandu', 'Asia/Khandyga', 'Asia/Kolkata', 'Asia/Krasnoyarsk', 'Asia/Kuala_Lumpur', 'Asia/Kuching', 'Asia/Kuwait', 'Asia/Macau', 'Asia/Magadan', 'Asia/Makassar', 'Asia/Manila', 'Asia/Muscat', 'Asia/Nicosia', 'Asia/Novokuznetsk', 'Asia/Novosibirsk', 'Asia/Omsk', 'Asia/Oral', 'Asia/Phnom_Penh', 'Asia/Pontianak', 'Asia/Pyongyang', 'Asia/Qatar', 'Asia/Qostanay', 'Asia/Qyzylorda', 'Asia/Riyadh', 'Asia/Sakhalin', 'Asia/Samarkand', 'Asia/Seoul', 'Asia/Shanghai', 'Asia/Singapore', 'Asia/Srednekolymsk', 'Asia/Taipei', 'Asia/Tashkent', 'Asia/Tbilisi', 'Asia/Tehran', 'Asia/Thimphu', 'Asia/Tokyo', 'Asia/Tomsk', 'Asia/Ulaanbaatar', 'Asia/Urumqi', 'Asia/Ust-Nera', 'Asia/Vientiane', 'Asia/Vladivostok', 'Asia/Yakutsk', 'Asia/Yangon', 'Asia/Yekaterinburg', 'Asia/Yerevan', 'Atlantic/Azores', 'Atlantic/Bermuda', 'Atlantic/Canary', 'Atlantic/Cape_Verde', 'Atlantic/Faroe', 'Atlantic/Madeira', 'Atlantic/Reykjavik', 'Atlantic/South_Georgia', 'Atlantic/St_Helena', 'Atlantic/Stanley', 'Australia/Adelaide', 'Australia/Brisbane', 'Australia/Broken_Hill', 'Australia/Currie', 'Australia/Darwin', 'Australia/Eucla', 'Australia/Hobart', 'Australia/Lindeman', 'Australia/Lord_Howe', 'Australia/Melbourne', 'Australia/Perth', 'Australia/Sydney', 'Canada/Atlantic', 'Canada/Central', 'Canada/Eastern', 'Canada/Mountain', 'Canada/Newfoundland', 'Canada/Pacific', 'Europe/Amsterdam', 'Europe/Andorra', 'Europe/Astrakhan', 'Europe/Athens', 'Europe/Belgrade', 'Europe/Berlin', 'Europe/Bratislava', 'Europe/Brussels', 'Europe/Bucharest', 'Europe/Budapest', 'Europe/Busingen', 'Europe/Chisinau', 'Europe/Copenhagen', 'Europe/Dublin', 'Europe/Gibraltar', 'Europe/Guernsey', 'Europe/Helsinki', 'Europe/Isle_of_Man', 'Europe/Istanbul', 'Europe/Jersey', 'Europe/Kaliningrad', 'Europe/Kiev', 'Europe/Kirov', 'Europe/Lisbon', 'Europe/Ljubljana', 'Europe/London', 'Europe/Luxembourg', 'Europe/Madrid', 'Europe/Malta', 'Europe/Mariehamn', 'Europe/Minsk', 'Europe/Monaco', 'Europe/Moscow', 'Europe/Oslo', 'Europe/Paris', 'Europe/Podgorica', 'Europe/Prague', 'Europe/Riga', 'Europe/Rome', 'Europe/Samara', 'Europe/San_Marino', 'Europe/Sarajevo', 'Europe/Saratov', 'Europe/Simferopol', 'Europe/Skopje', 'Europe/Sofia', 'Europe/Stockholm', 'Europe/Tallinn', 'Europe/Tirane', 'Europe/Ulyanovsk', 'Europe/Uzhgorod', 'Europe/Vaduz', 'Europe/Vatican', 'Europe/Vienna', 'Europe/Vilnius', 'Europe/Volgograd', 'Europe/Warsaw', 'Europe/Zagreb', 'Europe/Zaporozhye', 'Europe/Zurich', 'GMT', 'Indian/Antananarivo', 'Indian/Chagos', 'Indian/Christmas', 'Indian/Cocos', 'Indian/Comoro', 'Indian/Kerguelen', 'Indian/Mahe', 'Indian/Maldives', 'Indian/Mauritius', 'Indian/Mayotte', 'Indian/Reunion', 'Pacific/Apia', 'Pacific/Auckland', 'Pacific/Bougainville', 'Pacific/Chatham', 'Pacific/Chuuk', 'Pacific/Easter', 'Pacific/Efate', 'Pacific/Enderbury', 'Pacific/Fakaofo', 'Pacific/Fiji', 'Pacific/Funafuti', 'Pacific/Galapagos', 'Pacific/Gambier', 'Pacific/Guadalcanal', 'Pacific/Guam', 'Pacific/Honolulu', 'Pacific/Kiritimati', 'Pacific/Kosrae', 'Pacific/Kwajalein', 'Pacific/Majuro', 'Pacific/Marquesas', 'Pacific/Midway', 'Pacific/Nauru', 'Pacific/Niue', 'Pacific/Norfolk', 'Pacific/Noumea', 'Pacific/Pago_Pago', 'Pacific/Palau', 'Pacific/Pitcairn', 'Pacific/Pohnpei', 'Pacific/Port_Moresby', 'Pacific/Rarotonga', 'Pacific/Saipan', 'Pacific/Tahiti', 'Pacific/Tarawa', 'Pacific/Tongatapu', 'Pacific/Wake', 'Pacific/Wallis', 'UTC']
     
     def __init__(self, parent, main_class):
         ctk.CTkFrame.__init__(self, parent)
@@ -63,7 +74,7 @@ class NewEventsFrame(ctk.CTkFrame):
         self.sidebar_button_3.grid(row=3, column=0, padx=20, pady=10)
         self.sidebar_button_4 = ctk.CTkButton(self.sidebar_frame, image=chart_image, text="Graph", command=self.go_to_graph_frame)
         self.sidebar_button_4.grid(row=4, column=0, padx=20, pady=10)
-        self.google_calendar_link = ctk.CTkButton(self.sidebar_frame, image=google_image, text="Google Calendar", command=lambda: webbrowser.open('https://calendar.google.com/'))
+        self.google_calendar_link = ctk.CTkButton(self.sidebar_frame, image=google_image, text="Google Calendar", command=lambda: webbrowser.open(GOOGLE_CALENDAR_LINK))
         self.google_calendar_link.grid(row=6, column=0, padx=20, pady=(10, 10))
         
         # create main panel
@@ -85,12 +96,11 @@ class NewEventsFrame(ctk.CTkFrame):
         self.entry_description.grid(row=1, column=1, padx=(0, 0), pady=(10, 0), sticky="ew")
         self.label_color = ctk.CTkLabel(self.main_frame, text="Color:")
         self.label_color.grid(row=2, column=0, padx=10, pady=(10, 0), sticky="e")
-        self.multi_selection = ctk.CTkComboBox(self.main_frame, state="readonly", values=list(self.event_color.keys()), command=self.combobox_callback)
-        self.multi_selection.set("Lavender")
+        self.multi_selection = ctk.CTkComboBox(self.main_frame, state="readonly")
+        CTkScrollableDropdown(self.multi_selection, values=list(EVENT_COLOR.keys()), width=170, button_color="transparent", command=self.combobox_callback)
+        self.multi_selection.configure(button_color=EVENT_COLOR.get("Light Blue"))
+        self.multi_selection.set("Light Blue")
         self.multi_selection.grid(row=2, column=1, padx=0, pady=(10, 10), sticky="w")
-        self.color_preview = ctk.CTkCanvas(self.main_frame, width=15, height=15)
-        self.color_preview.grid(row=2, column=1, sticky="w", padx=(150, 0), pady=(10, 10))
-        self.color_preview.configure(bg=self.event_color.get('Lavender'))
         
         # date
         self.date_frame = ctk.CTkScrollableFrame(self, label_text="Date Interval")
@@ -110,8 +120,8 @@ class NewEventsFrame(ctk.CTkFrame):
         self.entry_date_button2.grid(row=1, column=2, padx=0, pady=10, sticky="w")
         self.label_timezone = ctk.CTkLabel(self.date_frame, text="Timezone:")
         self.label_timezone.grid(row=2, column=0, padx=10, pady=10, sticky="e")
-        self.timezone_selection = ctk.CTkComboBox(self.date_frame, state="readonly", command=self.combobox_callback)
-        CTkScrollableDropdown(self.timezone_selection, values=list(self.timezone), justify="left", button_color="transparent")
+        self.timezone_selection = ctk.CTkComboBox(self.date_frame, state="readonly")
+        CTkScrollableDropdown(self.timezone_selection, values=list(TIMEZONE), justify="left", button_color="transparent")
         self.timezone_selection.set(self.main_class.get_timezone())
         self.timezone_selection.grid(row=2, column=1, padx=0, pady=(10, 10), sticky="nsew")
         
@@ -149,13 +159,13 @@ class NewEventsFrame(ctk.CTkFrame):
             self.main_class.write_log(self.log_box, f"Error on creating event: date is missing")
             return
         try:
-            date_from = datetime.strptime(date_from, '%d-%m-%Y %H:%M')
-            date_to = datetime.strptime(date_to, '%d-%m-%Y %H:%M')
+            date_from = datetime.strptime(date_from, DATE_FORMATTER)
+            date_to = datetime.strptime(date_to, DATE_FORMATTER)
         except ValueError:
             self.main_class.write_log(self.log_box, f"Error on creating event: date format is not correct")
         
         # get color index
-        color_index = self.main_class.get_color_id(self.event_color, self.multi_selection.get())
+        color_index = self.main_class.get_color_id(EVENT_COLOR, self.multi_selection.get())
         
         try: 
             gc.CalendarEventsManager.createEvent(self.main_class.get_credentials(), summary, self.entry_description.get("0.0", tkinter.END), date_from, date_to, color_index, timeZone=time_zone)
@@ -174,7 +184,8 @@ class NewEventsFrame(ctk.CTkFrame):
             self.main_class.write_log(self.log_box, f"Generic error: {str(error)}")   
         
     def combobox_callback(self, color):
-        self.color_preview.configure(bg=self.event_color.get(color))
+        self.multi_selection.configure(button_color=EVENT_COLOR.get(color))
+        self.multi_selection.set(color)
         self.main_class.write_log(self.log_box, f"color '{color}' selected")
     
     def date_picker(self, type):
@@ -198,13 +209,14 @@ class EditEventsFrame(ctk.CTkFrame):
     main_class = None
     toplevel_window = None
     date_picker_window = None
-    event_color_from = {"Lavender": "#7986cb", "Sage": "#33b679", "Grape": "#8e24aa", "Flamingo": "#e67c73", "Banana": "#f6bf26", "Tangerine": "#f4511e", "Peacock": "#039be5", "Graphite": "#616161", "Blueberry": "#3f51b5", "Basil": "#0b8043", "Tomato": "#d50000", "No Color Filtering": ""}
-    event_color_to = {"Lavender": "#7986cb", "Sage": "#33b679", "Grape": "#8e24aa", "Flamingo": "#e67c73", "Banana": "#f6bf26", "Tangerine": "#f4511e", "Peacock": "#039be5", "Graphite": "#616161", "Blueberry": "#3f51b5", "Basil": "#0b8043", "Tomato": "#d50000"}
-    timezone = ['Africa/Abidjan', 'Africa/Accra', 'Africa/Algiers', 'Africa/Bissau', 'Africa/Cairo', 'Africa/Casablanca', 'Africa/Ceuta', 'Africa/El_Aaiun', 'Africa/Juba', 'Africa/Khartoum', 'Africa/Lagos', 'Africa/Maputo', 'Africa/Monrovia', 'Africa/Nairobi', 'Africa/Ndjamena', 'Africa/Sao_Tome', 'Africa/Tripoli', 'Africa/Tunis', 'Africa/Windhoek', 'America/Adak', 'America/Anchorage', 'America/Araguaina', 'America/Argentina/Buenos_Aires', 'America/Argentina/Catamarca', 'America/Argentina/Cordoba', 'America/Argentina/Jujuy', 'America/Argentina/La_Rioja', 'America/Argentina/Mendoza', 'America/Argentina/Rio_Gallegos', 'America/Argentina/Salta', 'America/Argentina/San_Juan', 'America/Argentina/San_Luis', 'America/Argentina/Tucuman', 'America/Argentina/Ushuaia', 'America/Asuncion', 'America/Atikokan', 'America/Bahia', 'America/Bahia_Banderas', 'America/Barbados', 'America/Belem', 'America/Belize', 'America/Blanc-Sablon', 'America/Boa_Vista', 'America/Bogota', 'America/Boise', 'America/Cambridge_Bay', 'America/Campo_Grande', 'America/Cancun', 'America/Caracas', 'America/Cayenne', 'America/Chicago', 'America/Chihuahua', 'America/Costa_Rica', 'America/Creston', 'America/Cuiaba', 'America/Curacao', 'America/Danmarkshavn', 'America/Dawson', 'America/Dawson_Creek', 'America/Denver', 'America/Detroit', 'America/Edmonton', 'America/Eirunepe', 'America/El_Salvador', 'America/Fort_Nelson', 'America/Fortaleza', 'America/Glace_Bay', 'America/Godthab', 'America/Goose_Bay', 'America/Grand_Turk', 'America/Guatemala', 'America/Guayaquil', 'America/Guyana', 'America/Halifax', 'America/Havana', 'America/Hermosillo', 'America/Indiana/Indianapolis', 'America/Indiana/Knox', 'America/Indiana/Marengo', 'America/Indiana/Petersburg', 'America/Indiana/Tell_City', 'America/Indiana/Vevay', 'America/Indiana/Vincennes', 'America/Indiana/Winamac', 'America/Inuvik', 'America/Iqaluit', 'America/Jamaica', 'America/Juneau', 'America/Kentucky/Louisville', 'America/Kentucky/Monticello', 'America/Kralendijk', 'America/La_Paz', 'America/Lima', 'America/Los_Angeles', 'America/Louisville', 'America/Lower_Princes', 'America/Maceio', 'America/Managua', 'America/Manaus', 'America/Marigot', 'America/Martinique', 'America/Matamoros', 'America/Mazatlan', 'America/Menominee', 'America/Merida', 'America/Metlakatla', 'America/Mexico_City', 'America/Miquelon', 'America/Moncton', 'America/Monterrey', 'America/Montevideo', 'America/Montreal', 'America/Montserrat', 'America/Nassau', 'America/New_York', 'America/Nipigon', 'America/Nome', 'America/Noronha', 'America/North_Dakota/Beulah', 'America/North_Dakota/Center', 'America/North_Dakota/New_Salem', 'America/Nuuk', 'America/Ojinaga', 'America/Panama', 'America/Pangnirtung', 'America/Paramaribo', 'America/Phoenix', 'America/Port-au-Prince', 'America/Port_of_Spain', 'America/Porto_Acre', 'America/Porto_Velho', 'America/Puerto_Rico', 'America/Punta_Arenas', 'America/Rainy_River', 'America/Rankin_Inlet', 'America/Recife', 'America/Regina', 'America/Resolute', 'America/Rio_Branco', 'America/Santarem', 'America/Santiago', 'America/Santo_Domingo', 'America/Sao_Paulo', 'America/Scoresbysund', 'America/Sitka', 'America/St_Barthelemy', 'America/St_Johns', 'America/St_Kitts', 'America/St_Lucia', 'America/St_Thomas', 'America/St_Vincent', 'America/Swift_Current', 'America/Tegucigalpa', 'America/Thule', 'America/Thunder_Bay', 'America/Tijuana', 'America/Toronto', 'America/Tortola', 'America/Vancouver', 'America/Whitehorse', 'America/Winnipeg', 'America/Yakutat', 'America/Yellowknife', 'Antarctica/Casey', 'Antarctica/Davis', 'Antarctica/DumontDUrville', 'Antarctica/Macquarie', 'Antarctica/Mawson', 'Antarctica/McMurdo', 'Antarctica/Palmer', 'Antarctica/Rothera', 'Antarctica/Syowa', 'Antarctica/Troll', 'Antarctica/Vostok', 'Arctic/Longyearbyen', 'Asia/Aden', 'Asia/Almaty', 'Asia/Amman', 'Asia/Anadyr', 'Asia/Aqtau', 'Asia/Aqtobe', 'Asia/Ashgabat', 'Asia/Atyrau', 'Asia/Baghdad', 'Asia/Bahrain', 'Asia/Baku', 'Asia/Bangkok', 'Asia/Barnaul', 'Asia/Beirut', 'Asia/Bishkek', 'Asia/Brunei', 'Asia/Chita', 'Asia/Choibalsan', 'Asia/Colombo', 'Asia/Damascus', 'Asia/Dhaka', 'Asia/Dili', 'Asia/Dubai', 'Asia/Dushanbe', 'Asia/Famagusta', 'Asia/Gaza', 'Asia/Hebron', 'Asia/Ho_Chi_Minh', 'Asia/Hong_Kong', 'Asia/Hovd', 'Asia/Irkutsk', 'Asia/Istanbul', 'Asia/Jakarta', 'Asia/Jayapura', 'Asia/Jerusalem', 'Asia/Kabul', 'Asia/Kamchatka', 'Asia/Karachi', 'Asia/Kathmandu', 'Asia/Khandyga', 'Asia/Kolkata', 'Asia/Krasnoyarsk', 'Asia/Kuala_Lumpur', 'Asia/Kuching', 'Asia/Kuwait', 'Asia/Macau', 'Asia/Magadan', 'Asia/Makassar', 'Asia/Manila', 'Asia/Muscat', 'Asia/Nicosia', 'Asia/Novokuznetsk', 'Asia/Novosibirsk', 'Asia/Omsk', 'Asia/Oral', 'Asia/Phnom_Penh', 'Asia/Pontianak', 'Asia/Pyongyang', 'Asia/Qatar', 'Asia/Qostanay', 'Asia/Qyzylorda', 'Asia/Riyadh', 'Asia/Sakhalin', 'Asia/Samarkand', 'Asia/Seoul', 'Asia/Shanghai', 'Asia/Singapore', 'Asia/Srednekolymsk', 'Asia/Taipei', 'Asia/Tashkent', 'Asia/Tbilisi', 'Asia/Tehran', 'Asia/Thimphu', 'Asia/Tokyo', 'Asia/Tomsk', 'Asia/Ulaanbaatar', 'Asia/Urumqi', 'Asia/Ust-Nera', 'Asia/Vientiane', 'Asia/Vladivostok', 'Asia/Yakutsk', 'Asia/Yangon', 'Asia/Yekaterinburg', 'Asia/Yerevan', 'Atlantic/Azores', 'Atlantic/Bermuda', 'Atlantic/Canary', 'Atlantic/Cape_Verde', 'Atlantic/Faroe', 'Atlantic/Madeira', 'Atlantic/Reykjavik', 'Atlantic/South_Georgia', 'Atlantic/St_Helena', 'Atlantic/Stanley', 'Australia/Adelaide', 'Australia/Brisbane', 'Australia/Broken_Hill', 'Australia/Currie', 'Australia/Darwin', 'Australia/Eucla', 'Australia/Hobart', 'Australia/Lindeman', 'Australia/Lord_Howe', 'Australia/Melbourne', 'Australia/Perth', 'Australia/Sydney', 'Canada/Atlantic', 'Canada/Central', 'Canada/Eastern', 'Canada/Mountain', 'Canada/Newfoundland', 'Canada/Pacific', 'Europe/Amsterdam', 'Europe/Andorra', 'Europe/Astrakhan', 'Europe/Athens', 'Europe/Belgrade', 'Europe/Berlin', 'Europe/Bratislava', 'Europe/Brussels', 'Europe/Bucharest', 'Europe/Budapest', 'Europe/Busingen', 'Europe/Chisinau', 'Europe/Copenhagen', 'Europe/Dublin', 'Europe/Gibraltar', 'Europe/Guernsey', 'Europe/Helsinki', 'Europe/Isle_of_Man', 'Europe/Istanbul', 'Europe/Jersey', 'Europe/Kaliningrad', 'Europe/Kiev', 'Europe/Kirov', 'Europe/Lisbon', 'Europe/Ljubljana', 'Europe/London', 'Europe/Luxembourg', 'Europe/Madrid', 'Europe/Malta', 'Europe/Mariehamn', 'Europe/Minsk', 'Europe/Monaco', 'Europe/Moscow', 'Europe/Oslo', 'Europe/Paris', 'Europe/Podgorica', 'Europe/Prague', 'Europe/Riga', 'Europe/Rome', 'Europe/Samara', 'Europe/San_Marino', 'Europe/Sarajevo', 'Europe/Saratov', 'Europe/Simferopol', 'Europe/Skopje', 'Europe/Sofia', 'Europe/Stockholm', 'Europe/Tallinn', 'Europe/Tirane', 'Europe/Ulyanovsk', 'Europe/Uzhgorod', 'Europe/Vaduz', 'Europe/Vatican', 'Europe/Vienna', 'Europe/Vilnius', 'Europe/Volgograd', 'Europe/Warsaw', 'Europe/Zagreb', 'Europe/Zaporozhye', 'Europe/Zurich', 'GMT', 'Indian/Antananarivo', 'Indian/Chagos', 'Indian/Christmas', 'Indian/Cocos', 'Indian/Comoro', 'Indian/Kerguelen', 'Indian/Mahe', 'Indian/Maldives', 'Indian/Mauritius', 'Indian/Mayotte', 'Indian/Reunion', 'Pacific/Apia', 'Pacific/Auckland', 'Pacific/Bougainville', 'Pacific/Chatham', 'Pacific/Chuuk', 'Pacific/Easter', 'Pacific/Efate', 'Pacific/Enderbury', 'Pacific/Fakaofo', 'Pacific/Fiji', 'Pacific/Funafuti', 'Pacific/Galapagos', 'Pacific/Gambier', 'Pacific/Guadalcanal', 'Pacific/Guam', 'Pacific/Honolulu', 'Pacific/Kiritimati', 'Pacific/Kosrae', 'Pacific/Kwajalein', 'Pacific/Majuro', 'Pacific/Marquesas', 'Pacific/Midway', 'Pacific/Nauru', 'Pacific/Niue', 'Pacific/Norfolk', 'Pacific/Noumea', 'Pacific/Pago_Pago', 'Pacific/Palau', 'Pacific/Pitcairn', 'Pacific/Pohnpei', 'Pacific/Port_Moresby', 'Pacific/Rarotonga', 'Pacific/Saipan', 'Pacific/Tahiti', 'Pacific/Tarawa', 'Pacific/Tongatapu', 'Pacific/Wake', 'Pacific/Wallis', 'UTC']
+    event_color_from = EVENT_COLOR
+    event_color_to = EVENT_COLOR
     
     def __init__(self, parent, main_class):
         ctk.CTkFrame.__init__(self, parent)
         self.main_class = main_class
+        
+        self.event_color_from["No Color Filtering"] = "" # adding a new element inside the dictionary
         
         # load images
         calendar_image = tkinter.PhotoImage(file='./imgs/calendar.png')
@@ -234,7 +246,7 @@ class EditEventsFrame(ctk.CTkFrame):
         self.sidebar_button_3.grid(row=3, column=0, padx=20, pady=10)
         self.sidebar_button_4 = ctk.CTkButton(self.sidebar_frame, image=chart_image, text="Graph", command=self.go_to_graph_frame)
         self.sidebar_button_4.grid(row=4, column=0, padx=20, pady=10)
-        self.google_calendar_link = ctk.CTkButton(self.sidebar_frame, image=google_image, text="Google Calendar", command=lambda: webbrowser.open('https://calendar.google.com/'))
+        self.google_calendar_link = ctk.CTkButton(self.sidebar_frame, image=google_image, text="Google Calendar", command=lambda: webbrowser.open(GOOGLE_CALENDAR_LINK))
         self.google_calendar_link.grid(row=6, column=0, padx=20, pady=(10, 10))
         
         # create main panel
@@ -262,11 +274,11 @@ class EditEventsFrame(ctk.CTkFrame):
         self.entry_description_old.grid(row=2, column=1, padx=(0, 0), pady=5, sticky="ew")
         self.label_color_old = ctk.CTkLabel(self.old_values_frame, text="Color:")
         self.label_color_old.grid(row=3, column=0, padx=10, pady=5, sticky="e")
-        self.multi_selection_old = ctk.CTkComboBox(self.old_values_frame, state="readonly", values=list(self.event_color_from.keys()), command=self.combobox_callback_color1)
+        self.multi_selection_old = ctk.CTkComboBox(self.old_values_frame, state="readonly")
+        CTkScrollableDropdown(self.multi_selection_old, values=list(self.event_color_from.keys()), width=170, button_color="transparent", command=self.combobox_callback_color1)
+        self.multi_selection_old.configure(button_color=EVENT_COLOR.get("No Color Filtering"))
         self.multi_selection_old.set("No Color Filtering")
         self.multi_selection_old.grid(row=3, column=1, padx=0, pady=5, sticky="w")
-        self.color_preview_old = ctk.CTkCanvas(self.old_values_frame, width=15, height=15)
-        self.color_preview_old.grid(row=3, column=1, sticky="w", padx=(150, 0), pady=5)
         
         # Centered img label
         ctk.CTkLabel(main_frame, text="", image=arrow_image).grid(row=1, column=1, padx=0, pady=10, sticky="ew")
@@ -287,12 +299,11 @@ class EditEventsFrame(ctk.CTkFrame):
         self.entry_description_new.grid(row=2, column=1, padx=(0, 0), pady=5, sticky="ew")
         self.label_color_new = ctk.CTkLabel(self.new_values_frame, text="Color:")
         self.label_color_new.grid(row=3, column=0, padx=10, pady=5, sticky="e")
-        self.multi_selection_new = ctk.CTkComboBox(self.new_values_frame, state="readonly", values=list(self.event_color_to.keys()), command=self.combobox_callback_color2)
-        self.multi_selection_new.set("Lavander")
+        self.multi_selection_new = ctk.CTkComboBox(self.new_values_frame, state="readonly")
+        CTkScrollableDropdown(self.multi_selection_new, values=list(self.event_color_to.keys()), width=170, button_color="transparent", command=self.combobox_callback_color2)
+        self.multi_selection_new.configure(button_color=EVENT_COLOR.get("Light Blue"))
+        self.multi_selection_new.set("Light Blue")
         self.multi_selection_new.grid(row=3, column=1, padx=0, pady=5, sticky="w")
-        self.color_preview_new = ctk.CTkCanvas(self.new_values_frame, width=15, height=15)
-        self.color_preview_new.grid(row=3, column=1, sticky="w", padx=(150, 0), pady=5)
-        self.color_preview_new.configure(bg=self.event_color_to.get('Lavender'))
         
         # date
         self.date_frame = ctk.CTkScrollableFrame(self, label_text="Date Interval")
@@ -313,8 +324,8 @@ class EditEventsFrame(ctk.CTkFrame):
         self.entry_date_button2.grid(row=1, column=2, padx=0, pady=10, sticky="w")
         self.label_timezone = ctk.CTkLabel(self.date_frame, text="Timezone:")
         self.label_timezone.grid(row=2, column=0, padx=10, pady=10, sticky="e")
-        self.timezone_selection = ctk.CTkComboBox(self.date_frame, state="readonly", command=self.combobox_callback)
-        CTkScrollableDropdown(self.timezone_selection, values=list(self.timezone), justify="left", button_color="transparent")
+        self.timezone_selection = ctk.CTkComboBox(self.date_frame, state="readonly")
+        CTkScrollableDropdown(self.timezone_selection, values=list(TIMEZONE), justify="left", button_color="transparent")
         self.timezone_selection.set(self.main_class.get_timezone())
         self.timezone_selection.grid(row=2, column=1, padx=0, pady=(10, 10), sticky="nsew")
         
@@ -368,9 +379,9 @@ class EditEventsFrame(ctk.CTkFrame):
         try:
             # Parse dates if provided
             if date_from:
-                date_from = datetime.strptime(date_from, '%d-%m-%Y %H:%M')
+                date_from = datetime.strptime(date_from, DATE_FORMATTER)
             if date_to:
-                date_to = datetime.strptime(date_to, '%d-%m-%Y %H:%M')
+                date_to = datetime.strptime(date_to, DATE_FORMATTER)
         except ValueError:
             self.main_class.write_log(self.log_box, "ERROR: Invalid date format")
             return
@@ -425,15 +436,18 @@ class EditEventsFrame(ctk.CTkFrame):
             self.main_class.write_log(self.log_box, f"Generic error: {str(e)}")       
     
     def combobox_callback(self, color):
-        self.color_preview.configure(bg=self.event_color.get(color))
+        self.multi_selection.configure(button_color=EVENT_COLOR.get(color))
+        self.multi_selection.set(color)
         self.main_class.write_log(self.log_box, f"color '{color}' selected")
         
     def combobox_callback_color1(self, color):
-        self.color_preview_old.configure(bg=self.event_color_from.get(color))
+        self.multi_selection_old.configure(button_color=self.event_color_from.get(color))
+        self.multi_selection_old.set(color)
         self.main_class.write_log(self.log_box, f"color '{color}' selected")
     
     def combobox_callback_color2(self, color):
-        self.color_preview_new.configure(bg=self.event_color_to.get(color))
+        self.multi_selection_new.configure(button_color=self.event_color_to.get(color))
+        self.multi_selection_new.set(color)
         self.main_class.write_log(self.log_box, f"color '{color}' selected")
     
     def go_to_new_events_frame(self):
@@ -551,8 +565,6 @@ class GetEventsFrame(ctk.CTkFrame):
     file_viewer_window = None
     data = None
     events = None
-    event_color = {"Lavender": "#7986cb", "Sage": "#33b679", "Grape": "#8e24aa", "Flamingo": "#e67c73", "Banana": "#f6bf26", "Tangerine": "#f4511e", "Peacock": "#039be5", "Graphite": "#616161", "Blueberry": "#3f51b5", "Basil": "#0b8043", "Tomato": "#d50000", "No Color Filtering": ""}
-    timezone = ['Africa/Abidjan', 'Africa/Accra', 'Africa/Algiers', 'Africa/Bissau', 'Africa/Cairo', 'Africa/Casablanca', 'Africa/Ceuta', 'Africa/El_Aaiun', 'Africa/Juba', 'Africa/Khartoum', 'Africa/Lagos', 'Africa/Maputo', 'Africa/Monrovia', 'Africa/Nairobi', 'Africa/Ndjamena', 'Africa/Sao_Tome', 'Africa/Tripoli', 'Africa/Tunis', 'Africa/Windhoek', 'America/Adak', 'America/Anchorage', 'America/Araguaina', 'America/Argentina/Buenos_Aires', 'America/Argentina/Catamarca', 'America/Argentina/Cordoba', 'America/Argentina/Jujuy', 'America/Argentina/La_Rioja', 'America/Argentina/Mendoza', 'America/Argentina/Rio_Gallegos', 'America/Argentina/Salta', 'America/Argentina/San_Juan', 'America/Argentina/San_Luis', 'America/Argentina/Tucuman', 'America/Argentina/Ushuaia', 'America/Asuncion', 'America/Atikokan', 'America/Bahia', 'America/Bahia_Banderas', 'America/Barbados', 'America/Belem', 'America/Belize', 'America/Blanc-Sablon', 'America/Boa_Vista', 'America/Bogota', 'America/Boise', 'America/Cambridge_Bay', 'America/Campo_Grande', 'America/Cancun', 'America/Caracas', 'America/Cayenne', 'America/Chicago', 'America/Chihuahua', 'America/Costa_Rica', 'America/Creston', 'America/Cuiaba', 'America/Curacao', 'America/Danmarkshavn', 'America/Dawson', 'America/Dawson_Creek', 'America/Denver', 'America/Detroit', 'America/Edmonton', 'America/Eirunepe', 'America/El_Salvador', 'America/Fort_Nelson', 'America/Fortaleza', 'America/Glace_Bay', 'America/Godthab', 'America/Goose_Bay', 'America/Grand_Turk', 'America/Guatemala', 'America/Guayaquil', 'America/Guyana', 'America/Halifax', 'America/Havana', 'America/Hermosillo', 'America/Indiana/Indianapolis', 'America/Indiana/Knox', 'America/Indiana/Marengo', 'America/Indiana/Petersburg', 'America/Indiana/Tell_City', 'America/Indiana/Vevay', 'America/Indiana/Vincennes', 'America/Indiana/Winamac', 'America/Inuvik', 'America/Iqaluit', 'America/Jamaica', 'America/Juneau', 'America/Kentucky/Louisville', 'America/Kentucky/Monticello', 'America/Kralendijk', 'America/La_Paz', 'America/Lima', 'America/Los_Angeles', 'America/Louisville', 'America/Lower_Princes', 'America/Maceio', 'America/Managua', 'America/Manaus', 'America/Marigot', 'America/Martinique', 'America/Matamoros', 'America/Mazatlan', 'America/Menominee', 'America/Merida', 'America/Metlakatla', 'America/Mexico_City', 'America/Miquelon', 'America/Moncton', 'America/Monterrey', 'America/Montevideo', 'America/Montreal', 'America/Montserrat', 'America/Nassau', 'America/New_York', 'America/Nipigon', 'America/Nome', 'America/Noronha', 'America/North_Dakota/Beulah', 'America/North_Dakota/Center', 'America/North_Dakota/New_Salem', 'America/Nuuk', 'America/Ojinaga', 'America/Panama', 'America/Pangnirtung', 'America/Paramaribo', 'America/Phoenix', 'America/Port-au-Prince', 'America/Port_of_Spain', 'America/Porto_Acre', 'America/Porto_Velho', 'America/Puerto_Rico', 'America/Punta_Arenas', 'America/Rainy_River', 'America/Rankin_Inlet', 'America/Recife', 'America/Regina', 'America/Resolute', 'America/Rio_Branco', 'America/Santarem', 'America/Santiago', 'America/Santo_Domingo', 'America/Sao_Paulo', 'America/Scoresbysund', 'America/Sitka', 'America/St_Barthelemy', 'America/St_Johns', 'America/St_Kitts', 'America/St_Lucia', 'America/St_Thomas', 'America/St_Vincent', 'America/Swift_Current', 'America/Tegucigalpa', 'America/Thule', 'America/Thunder_Bay', 'America/Tijuana', 'America/Toronto', 'America/Tortola', 'America/Vancouver', 'America/Whitehorse', 'America/Winnipeg', 'America/Yakutat', 'America/Yellowknife', 'Antarctica/Casey', 'Antarctica/Davis', 'Antarctica/DumontDUrville', 'Antarctica/Macquarie', 'Antarctica/Mawson', 'Antarctica/McMurdo', 'Antarctica/Palmer', 'Antarctica/Rothera', 'Antarctica/Syowa', 'Antarctica/Troll', 'Antarctica/Vostok', 'Arctic/Longyearbyen', 'Asia/Aden', 'Asia/Almaty', 'Asia/Amman', 'Asia/Anadyr', 'Asia/Aqtau', 'Asia/Aqtobe', 'Asia/Ashgabat', 'Asia/Atyrau', 'Asia/Baghdad', 'Asia/Bahrain', 'Asia/Baku', 'Asia/Bangkok', 'Asia/Barnaul', 'Asia/Beirut', 'Asia/Bishkek', 'Asia/Brunei', 'Asia/Chita', 'Asia/Choibalsan', 'Asia/Colombo', 'Asia/Damascus', 'Asia/Dhaka', 'Asia/Dili', 'Asia/Dubai', 'Asia/Dushanbe', 'Asia/Famagusta', 'Asia/Gaza', 'Asia/Hebron', 'Asia/Ho_Chi_Minh', 'Asia/Hong_Kong', 'Asia/Hovd', 'Asia/Irkutsk', 'Asia/Istanbul', 'Asia/Jakarta', 'Asia/Jayapura', 'Asia/Jerusalem', 'Asia/Kabul', 'Asia/Kamchatka', 'Asia/Karachi', 'Asia/Kathmandu', 'Asia/Khandyga', 'Asia/Kolkata', 'Asia/Krasnoyarsk', 'Asia/Kuala_Lumpur', 'Asia/Kuching', 'Asia/Kuwait', 'Asia/Macau', 'Asia/Magadan', 'Asia/Makassar', 'Asia/Manila', 'Asia/Muscat', 'Asia/Nicosia', 'Asia/Novokuznetsk', 'Asia/Novosibirsk', 'Asia/Omsk', 'Asia/Oral', 'Asia/Phnom_Penh', 'Asia/Pontianak', 'Asia/Pyongyang', 'Asia/Qatar', 'Asia/Qostanay', 'Asia/Qyzylorda', 'Asia/Riyadh', 'Asia/Sakhalin', 'Asia/Samarkand', 'Asia/Seoul', 'Asia/Shanghai', 'Asia/Singapore', 'Asia/Srednekolymsk', 'Asia/Taipei', 'Asia/Tashkent', 'Asia/Tbilisi', 'Asia/Tehran', 'Asia/Thimphu', 'Asia/Tokyo', 'Asia/Tomsk', 'Asia/Ulaanbaatar', 'Asia/Urumqi', 'Asia/Ust-Nera', 'Asia/Vientiane', 'Asia/Vladivostok', 'Asia/Yakutsk', 'Asia/Yangon', 'Asia/Yekaterinburg', 'Asia/Yerevan', 'Atlantic/Azores', 'Atlantic/Bermuda', 'Atlantic/Canary', 'Atlantic/Cape_Verde', 'Atlantic/Faroe', 'Atlantic/Madeira', 'Atlantic/Reykjavik', 'Atlantic/South_Georgia', 'Atlantic/St_Helena', 'Atlantic/Stanley', 'Australia/Adelaide', 'Australia/Brisbane', 'Australia/Broken_Hill', 'Australia/Currie', 'Australia/Darwin', 'Australia/Eucla', 'Australia/Hobart', 'Australia/Lindeman', 'Australia/Lord_Howe', 'Australia/Melbourne', 'Australia/Perth', 'Australia/Sydney', 'Canada/Atlantic', 'Canada/Central', 'Canada/Eastern', 'Canada/Mountain', 'Canada/Newfoundland', 'Canada/Pacific', 'Europe/Amsterdam', 'Europe/Andorra', 'Europe/Astrakhan', 'Europe/Athens', 'Europe/Belgrade', 'Europe/Berlin', 'Europe/Bratislava', 'Europe/Brussels', 'Europe/Bucharest', 'Europe/Budapest', 'Europe/Busingen', 'Europe/Chisinau', 'Europe/Copenhagen', 'Europe/Dublin', 'Europe/Gibraltar', 'Europe/Guernsey', 'Europe/Helsinki', 'Europe/Isle_of_Man', 'Europe/Istanbul', 'Europe/Jersey', 'Europe/Kaliningrad', 'Europe/Kiev', 'Europe/Kirov', 'Europe/Lisbon', 'Europe/Ljubljana', 'Europe/London', 'Europe/Luxembourg', 'Europe/Madrid', 'Europe/Malta', 'Europe/Mariehamn', 'Europe/Minsk', 'Europe/Monaco', 'Europe/Moscow', 'Europe/Oslo', 'Europe/Paris', 'Europe/Podgorica', 'Europe/Prague', 'Europe/Riga', 'Europe/Rome', 'Europe/Samara', 'Europe/San_Marino', 'Europe/Sarajevo', 'Europe/Saratov', 'Europe/Simferopol', 'Europe/Skopje', 'Europe/Sofia', 'Europe/Stockholm', 'Europe/Tallinn', 'Europe/Tirane', 'Europe/Ulyanovsk', 'Europe/Uzhgorod', 'Europe/Vaduz', 'Europe/Vatican', 'Europe/Vienna', 'Europe/Vilnius', 'Europe/Volgograd', 'Europe/Warsaw', 'Europe/Zagreb', 'Europe/Zaporozhye', 'Europe/Zurich', 'GMT', 'Indian/Antananarivo', 'Indian/Chagos', 'Indian/Christmas', 'Indian/Cocos', 'Indian/Comoro', 'Indian/Kerguelen', 'Indian/Mahe', 'Indian/Maldives', 'Indian/Mauritius', 'Indian/Mayotte', 'Indian/Reunion', 'Pacific/Apia', 'Pacific/Auckland', 'Pacific/Bougainville', 'Pacific/Chatham', 'Pacific/Chuuk', 'Pacific/Easter', 'Pacific/Efate', 'Pacific/Enderbury', 'Pacific/Fakaofo', 'Pacific/Fiji', 'Pacific/Funafuti', 'Pacific/Galapagos', 'Pacific/Gambier', 'Pacific/Guadalcanal', 'Pacific/Guam', 'Pacific/Honolulu', 'Pacific/Kiritimati', 'Pacific/Kosrae', 'Pacific/Kwajalein', 'Pacific/Majuro', 'Pacific/Marquesas', 'Pacific/Midway', 'Pacific/Nauru', 'Pacific/Niue', 'Pacific/Norfolk', 'Pacific/Noumea', 'Pacific/Pago_Pago', 'Pacific/Palau', 'Pacific/Pitcairn', 'Pacific/Pohnpei', 'Pacific/Port_Moresby', 'Pacific/Rarotonga', 'Pacific/Saipan', 'Pacific/Tahiti', 'Pacific/Tarawa', 'Pacific/Tongatapu', 'Pacific/Wake', 'Pacific/Wallis', 'UTC']
     
     def __init__(self, parent, main_class):
         ctk.CTkFrame.__init__(self, parent)
@@ -587,7 +599,7 @@ class GetEventsFrame(ctk.CTkFrame):
         self.sidebar_button_3.grid(row=3, column=0, padx=20, pady=10)
         self.sidebar_button_4 = ctk.CTkButton(self.sidebar_frame, image=chart_image, text="Graph", command=self.go_to_graph_frame)
         self.sidebar_button_4.grid(row=4, column=0, padx=20, pady=10)
-        self.google_calendar_link = ctk.CTkButton(self.sidebar_frame, image=google_image, text="Google Calendar", command=lambda: webbrowser.open('https://calendar.google.com/'))
+        self.google_calendar_link = ctk.CTkButton(self.sidebar_frame, image=google_image, text="Google Calendar", command=lambda: webbrowser.open(GOOGLE_CALENDAR_LINK))
         self.google_calendar_link.grid(row=6, column=0, padx=20, pady=(10, 10))
         
         # create main panel
@@ -612,11 +624,11 @@ class GetEventsFrame(ctk.CTkFrame):
         self.entry_description.grid(row=2, column=1, padx=(0, 0), pady=5, sticky="ew")
         self.label_color = ctk.CTkLabel(self.main_frame, text="Color:")
         self.label_color.grid(row=3, column=0, padx=10, pady=5, sticky="e")
-        self.multi_selection = ctk.CTkComboBox(self.main_frame, state="readonly", values=list(self.event_color.keys()), command=self.combobox_callback)
+        self.multi_selection = ctk.CTkComboBox(self.main_frame, state="readonly")
+        CTkScrollableDropdown(self.multi_selection, values=list(EVENT_COLOR.keys()), width=170, button_color="transparent", command=self.combobox_callback)
+        self.multi_selection.configure(button_color=EVENT_COLOR.get("No Color Filtering"))
         self.multi_selection.set("No Color Filtering")
         self.multi_selection.grid(row=3, column=1, padx=0, pady=5, sticky="w")
-        self.color_preview = ctk.CTkCanvas(self.main_frame, width=15, height=15)
-        self.color_preview.grid(row=3, column=1, sticky="w", padx=(150, 0), pady=5)
         
         # date
         self.date_frame = ctk.CTkScrollableFrame(self, label_text="Date Interval")
@@ -637,8 +649,8 @@ class GetEventsFrame(ctk.CTkFrame):
         self.entry_date_button2.grid(row=1, column=2, padx=0, pady=10, sticky="w")
         self.label_timezone = ctk.CTkLabel(self.date_frame, text="Timezone:")
         self.label_timezone.grid(row=2, column=0, padx=10, pady=10, sticky="e")
-        self.timezone_selection = ctk.CTkComboBox(self.date_frame, state="readonly", command=self.combobox_callback)
-        CTkScrollableDropdown(self.timezone_selection, values=list(self.timezone), justify="left", button_color="transparent")
+        self.timezone_selection = ctk.CTkComboBox(self.date_frame, state="readonly")
+        CTkScrollableDropdown(self.timezone_selection, values=list(TIMEZONE), justify="left", button_color="transparent")
         self.timezone_selection.set(self.main_class.get_timezone())
         self.timezone_selection.grid(row=2, column=1, padx=0, pady=(10, 10), sticky="nsew")
 
@@ -711,14 +723,14 @@ class GetEventsFrame(ctk.CTkFrame):
          
         try:
             if len(date_from) != 0:
-                date_from = datetime.strptime(date_from, '%d-%m-%Y %H:%M')
+                date_from = datetime.strptime(date_from, DATE_FORMATTER)
             if len(date_to) != 0:
-                date_to = datetime.strptime(date_to, '%d-%m-%Y %H:%M')
+                date_to = datetime.strptime(date_to, DATE_FORMATTER)
         except ValueError:
             self.main_class.write_log(self.log_box, f"Error on creating event: date format is not correct")
         
         # get color index
-        color_index = self.main_class.get_color_id(self.event_color, self.multi_selection.get())
+        color_index = self.main_class.get_color_id(EVENT_COLOR, self.multi_selection.get())
         
         try: 
             self.events = gc.CalendarEventsManager.getEvents(creds=self.main_class.get_credentials(), title=summary, start_date=date_from, end_date=date_to, color_id=color_index, description=description, time_zone=time_zone)
@@ -904,7 +916,8 @@ class GetEventsFrame(ctk.CTkFrame):
         self.toplevel_entry_window.destroy()
         
     def combobox_callback(self, color):
-        self.color_preview.configure(bg=self.event_color.get(color))
+        self.multi_selection.configure(button_color=EVENT_COLOR.get(color))
+        self.multi_selection.set(color)
         self.main_class.write_log(self.log_box, f"color '{color}' selected")
     
     def get_file_path(self, entry):
@@ -973,7 +986,7 @@ class GraphFrame(ctk.CTkFrame):
         self.sidebar_button_3.grid(row=3, column=0, padx=20, pady=10)
         self.sidebar_button_4 = ctk.CTkButton(self.sidebar_frame, image=chart_image, text="Graph", command=self.go_to_graph_frame)
         self.sidebar_button_4.grid(row=4, column=0, padx=20, pady=10)
-        self.google_calendar_link = ctk.CTkButton(self.sidebar_frame, image=google_image, text="Google Calendar", command=lambda: webbrowser.open('https://calendar.google.com/'))
+        self.google_calendar_link = ctk.CTkButton(self.sidebar_frame, image=google_image, text="Google Calendar", command=lambda: webbrowser.open(GOOGLE_CALENDAR_LINK))
         self.google_calendar_link.grid(row=6, column=0, padx=20, pady=10)
         
         # create main panel
@@ -1035,7 +1048,8 @@ class GraphFrame(ctk.CTkFrame):
         self.log_box.grid(row=5, column=1, columnspan=2, padx=(0, 0), pady=(20, 0), sticky="nsew")
     
     def combobox_callback(self, color):
-        self.color_preview.configure(bg=self.event_color.get(color))
+        self.multi_selection.configure(button_color=EVENT_COLOR.get(color))
+        self.multi_selection.set(color)
         self.main_class.write_log(self.log_box, f"color '{color}' selected")
     
     def get_file_path(self):
@@ -1152,9 +1166,9 @@ class MainFrame(ctk.CTkFrame):
         ctk.CTkButton(master=self, image=list_image, text="Get Events", command=self.go_to_get_events_by_title_frame).pack(padx=20, pady=10, anchor='center')
         ctk.CTkButton(master=self, image=chart_image, text="Graph", command=self.go_to_graph_frame).pack(padx=20, pady=10, anchor='center')
         
-        github_btn = ctk.CTkButton(master=self, image=github_image, fg_color="transparent", border_width=1, text="", width=32, height=32, command=lambda: webbrowser.open('https://github.com/DennisTurco/Calendar-Data-Manager'))
+        github_btn = ctk.CTkButton(master=self, image=github_image, fg_color="transparent", border_width=1, text="", width=32, height=32, command=lambda: webbrowser.open(GITHUB_PAGE_LINK))
         github_btn.pack(padx=20, pady=10, anchor='sw')
-        donate_btn = ctk.CTkButton(master=self, image=donation_image, fg_color="transparent", border_width=1, text="", width=32, height=32, command=lambda: webbrowser.open('https://www.buymeacoffee.com/denno'))
+        donate_btn = ctk.CTkButton(master=self, image=donation_image, fg_color="transparent", border_width=1, text="", width=32, height=32, command=lambda: webbrowser.open(DONATE_PAGE_LINK))
         donate_btn.pack(padx=20, pady=10, anchor='sw')
         
         CTkToolTip(github_btn, delay=0.3, message="Github page")
@@ -1191,8 +1205,8 @@ class SetupFrame(ctk.CTkFrame):
         
         # main content
         ctk.CTkLabel(self, text="Set Credentials", fg_color="transparent", font=("Arial", 32)).pack(padx=20, pady=20)
-        ctk.CTkButton(master=self, image=google_image, text="Google Calendar", command=lambda: webbrowser.open('https://calendar.google.com/')).pack(padx=20, pady=10, anchor='center')
-        ctk.CTkButton(master=self, image=question_image, text="Tutorial Setup", command=lambda: webbrowser.open('https://github.com/DennisTurco/Calendar-Data-Manager/blob/master/docs/GoogleCloudAPISetup.md')).pack(padx=20, pady=10, anchor='center')
+        ctk.CTkButton(master=self, image=google_image, text="Google Calendar", command=lambda: webbrowser.open(GOOGLE_CALENDAR_LINK)).pack(padx=20, pady=10, anchor='center')
+        ctk.CTkButton(master=self, image=question_image, text="Tutorial Setup", command=lambda: webbrowser.open(TUTORIAL_SETUP_LINK)).pack(padx=20, pady=10, anchor='center')
         ctk.CTkButton(master=self, image=arrow_image, text="First Setup", command=lambda: self.setCredentialsPathFrame()).pack(padx=20, pady=10, anchor='center')
             
     def setCredentialsPathFrame(self):
@@ -1351,7 +1365,7 @@ class App():
         button_close = ctk.CTkButton(self.toplevel_window, text="Close", command=self.toplevel_window.destroy)
         button_close.grid(row=1, column=0, padx=5, pady=(0, 10), sticky="nsew")
 
-        button_report = ctk.CTkButton(self.toplevel_window, text="Report Exception", command=lambda: webbrowser.open('https://github.com/DennisTurco/Calendar-Data-Manager/issues'))
+        button_report = ctk.CTkButton(self.toplevel_window, text="Report Exception", command=lambda: webbrowser.open(GITHUB_ISSUES_LINK))
         button_report.grid(row=1, column=1, padx=5, pady=(0, 10), sticky="nsew")
 
         # Insert text into the box
@@ -1422,15 +1436,16 @@ class App():
         sub_menu4.add_option(option="Green", command=lambda: self.set_color_theme("green"))
 
         dropdown4 = CustomDropdownMenu(widget=button_4)
-        dropdown4.add_option(option="Share", command=lambda: webbrowser.open('https://github.com/DennisTurco/Calendar-Data-Manager'))
-        dropdown4.add_option(option="Report a bug", command=lambda: webbrowser.open('https://github.com/DennisTurco/Calendar-Data-Manager/issues'))
-        dropdown4.add_option(option="Donate for this project", command=lambda: webbrowser.open('https://www.buymeacoffee.com/denno'))
+        dropdown4.add_option(option="Share", command=lambda: webbrowser.open(GITHUB_PAGE_LINK))
+        dropdown4.add_option(option="Report a bug", command=lambda: webbrowser.open(GITHUB_ISSUES_LINK))
+        dropdown4.add_option(option="Donate for this project", command=lambda: webbrowser.open(DONATE_PAGE_LINK))
+
     
     def updateUsernameMenuItem(self):
         (_, email) = gc.CalendarEventsManager.get_user_info(self.credentials)
         button_5 = self.menu.add_cascade(str(email))
         dropdown5 = CustomDropdownMenu(widget=button_5)
-        dropdown5.add_option(option="Google Calendar", command=lambda: webbrowser.open('https://calendar.google.com/'))
+        dropdown5.add_option(option="Google Calendar", command=lambda: webbrowser.open(GOOGLE_CALENDAR_LINK))
         dropdown5.add_option(option="Log out", command=lambda: self.show_frame(SetupFrame))
     
     def centerWindow(self):
@@ -1559,10 +1574,10 @@ class App():
         except ValueError:
             return
         
-        # Format the datetime object as a string in "%d-%m-%Y %H:%M" format
-        date = datetime.strptime(date, "%m/%d/%y")  
+        # Format the datetime object as a string in DATE_FORMATTER
+        date = datetime.strptime(date, DAY_FORMATTER)  
         full_date = datetime(date.year, date.month, date.day, hour, minute)
-        full_date_str = full_date.strftime("%d-%m-%Y %H:%M")  
+        full_date_str = full_date.strftime(DATE_FORMATTER)  
         
         if type == 1:
             self.write_log(log_box, "Date Selected From: " + full_date_str)
