@@ -10,7 +10,7 @@ from googleapiclient.errors import HttpError
 from googleapiclient.discovery import build
 
 import JSONSettings as js
-import GoogleCalendarEventsManager as gc
+import CalendarEventsManager as gc
 import Plotter
 from DataEditor import DataCSV
 
@@ -110,7 +110,7 @@ class NewEventsFrame(ctk.CTkFrame):
         self.entry_date_button2.grid(row=1, column=2, padx=0, pady=10, sticky="w")
         self.label_timezone = ctk.CTkLabel(self.date_frame, text="Timezone:")
         self.label_timezone.grid(row=2, column=0, padx=10, pady=10, sticky="e")
-        self.timezone_selection = ctk.CTkComboBox(self.date_frame, state="readonly", values=list(self.timezone), command=self.combobox_callback)
+        self.timezone_selection = ctk.CTkComboBox(self.date_frame, state="readonly", command=self.combobox_callback)
         CTkScrollableDropdown(self.timezone_selection, values=list(self.timezone), justify="left", button_color="transparent")
         self.timezone_selection.set(self.main_class.get_timezone())
         self.timezone_selection.grid(row=2, column=1, padx=0, pady=(10, 10), sticky="nsew")
@@ -158,7 +158,7 @@ class NewEventsFrame(ctk.CTkFrame):
         color_index = self.main_class.get_color_id(self.event_color, self.multi_selection.get())
         
         try: 
-            gc.GoogleCalendarEventsManager.createEvent(self.main_class.get_credentials(), summary, self.entry_description.get("0.0", tkinter.END), date_from, date_to, color_index, timeZone=time_zone)
+            gc.CalendarEventsManager.createEvent(self.main_class.get_credentials(), summary, self.entry_description.get("0.0", tkinter.END), date_from, date_to, color_index, timeZone=time_zone)
             self.main_class.write_log(self.log_box, f"Event '{summary}' created succesfully!")
         except FileNotFoundError as file_not_found_error:
             self.main_class.messagebox_exception(file_not_found_error)
@@ -313,7 +313,7 @@ class EditEventsFrame(ctk.CTkFrame):
         self.entry_date_button2.grid(row=1, column=2, padx=0, pady=10, sticky="w")
         self.label_timezone = ctk.CTkLabel(self.date_frame, text="Timezone:")
         self.label_timezone.grid(row=2, column=0, padx=10, pady=10, sticky="e")
-        self.timezone_selection = ctk.CTkComboBox(self.date_frame, state="readonly", values=list(self.timezone), command=self.combobox_callback)
+        self.timezone_selection = ctk.CTkComboBox(self.date_frame, state="readonly", command=self.combobox_callback)
         CTkScrollableDropdown(self.timezone_selection, values=list(self.timezone), justify="left", button_color="transparent")
         self.timezone_selection.set(self.main_class.get_timezone())
         self.timezone_selection.grid(row=2, column=1, padx=0, pady=(10, 10), sticky="nsew")
@@ -383,7 +383,7 @@ class EditEventsFrame(ctk.CTkFrame):
 
         try:
             # Retrieve events to edit
-            old_events = gc.GoogleCalendarEventsManager.getEvents(
+            old_events = gc.CalendarEventsManager.getEvents(
                 self.main_class.get_credentials(),
                 title=summary_old,
                 description=description_old,
@@ -397,7 +397,7 @@ class EditEventsFrame(ctk.CTkFrame):
                 self.main_class.write_log(self.log_box, "No events found")
             else:
                 # Simulate event updates without applying them
-                new_events = gc.GoogleCalendarEventsManager.simulateEventUpdates(
+                new_events = gc.CalendarEventsManager.simulateEventUpdates(
                     self.main_class.get_credentials(),
                     old_events,
                     summary_new,
@@ -452,7 +452,7 @@ class EditEventsFrame(ctk.CTkFrame):
         # Apply updates to the events
         msg = CTkMessagebox(title="Edit events", message=f"Are you sure you want to confirm the changes?\n{len(old_events)} events will be changed.", icon="question", option_1="No", option_2="Yes")
         if msg.get() == "Yes":
-            updated_events = gc.GoogleCalendarEventsManager.editEvent(
+            updated_events = gc.CalendarEventsManager.editEvent(
                 self.main_class.get_credentials(),
                 old_events,
                 summary_new,
@@ -637,7 +637,7 @@ class GetEventsFrame(ctk.CTkFrame):
         self.entry_date_button2.grid(row=1, column=2, padx=0, pady=10, sticky="w")
         self.label_timezone = ctk.CTkLabel(self.date_frame, text="Timezone:")
         self.label_timezone.grid(row=2, column=0, padx=10, pady=10, sticky="e")
-        self.timezone_selection = ctk.CTkComboBox(self.date_frame, state="readonly", values=list(self.timezone), command=self.combobox_callback)
+        self.timezone_selection = ctk.CTkComboBox(self.date_frame, state="readonly", command=self.combobox_callback)
         CTkScrollableDropdown(self.timezone_selection, values=list(self.timezone), justify="left", button_color="transparent")
         self.timezone_selection.set(self.main_class.get_timezone())
         self.timezone_selection.grid(row=2, column=1, padx=0, pady=(10, 10), sticky="nsew")
@@ -683,7 +683,7 @@ class GetEventsFrame(ctk.CTkFrame):
         id = self.entry_id.get()
         if len(id) != 0:
             try: 
-                self.events = gc.GoogleCalendarEventsManager.getEventByID(self.main_class.get_credentials(), id)
+                self.events = gc.CalendarEventsManager.getEventByID(self.main_class.get_credentials(), id)
                 self.events_list_viewer_window()
                 self.main_class.write_log(self.log_box, f"Event obtained succesfully!")
                 return
@@ -721,7 +721,7 @@ class GetEventsFrame(ctk.CTkFrame):
         color_index = self.main_class.get_color_id(self.event_color, self.multi_selection.get())
         
         try: 
-            self.events = gc.GoogleCalendarEventsManager.getEvents(creds=self.main_class.get_credentials(), title=summary, start_date=date_from, end_date=date_to, color_id=color_index, description=description, time_zone=time_zone)
+            self.events = gc.CalendarEventsManager.getEvents(creds=self.main_class.get_credentials(), title=summary, start_date=date_from, end_date=date_to, color_id=color_index, description=description, time_zone=time_zone)
             if self.events == None or len(self.events) == 0:
                 self.main_class.write_log(self.log_box, f"No events obtained")
                 return
@@ -1145,15 +1145,20 @@ class MainFrame(ctk.CTkFrame):
         
         # main
         ctk.CTkLabel(self, text="", image=icon, fg_color="transparent").pack(padx=20, pady=(50, 20))
-        ctk.CTkLabel(self, text="Google Calendar Data Manager", font=title_font, text_color='#e06c29', fg_color="transparent").pack(padx=20, pady=50)
+        ctk.CTkLabel(self, text="Calendar Data Manager", font=title_font, text_color='#e06c29', fg_color="transparent").pack(padx=20, pady=50)
         #ctk.CTkLabel(self, text="Choose the action", fg_color="transparent", font=("Arial", 32)).pack(padx=20, pady=20)
         ctk.CTkButton(master=self, image=plus_image, text="New Events", command=self.go_to_new_events_frame).pack(padx=20, pady=10, anchor='center')
         ctk.CTkButton(master=self, image=edit_image, text="Edit Events", command=self.go_to_edit_events_frame).pack(padx=20, pady=10, anchor='center')
         ctk.CTkButton(master=self, image=list_image, text="Get Events", command=self.go_to_get_events_by_title_frame).pack(padx=20, pady=10, anchor='center')
         ctk.CTkButton(master=self, image=chart_image, text="Graph", command=self.go_to_graph_frame).pack(padx=20, pady=10, anchor='center')
         
-        ctk.CTkButton(master=self, image=github_image, fg_color="transparent", border_width=1, text="", width=32, height=32, command=lambda: webbrowser.open('https://github.com/DennisTurco/Google-Calendar-Data-Manager')).pack(padx=20, pady=10, anchor='sw')
-        ctk.CTkButton(master=self, image=donation_image, fg_color="transparent", border_width=1, text="", width=32, height=32, command=lambda: webbrowser.open('https://www.buymeacoffee.com/denno')).pack(padx=20, pady=10, anchor='sw')
+        github_btn = ctk.CTkButton(master=self, image=github_image, fg_color="transparent", border_width=1, text="", width=32, height=32, command=lambda: webbrowser.open('https://github.com/DennisTurco/Calendar-Data-Manager'))
+        github_btn.pack(padx=20, pady=10, anchor='sw')
+        donate_btn = ctk.CTkButton(master=self, image=donation_image, fg_color="transparent", border_width=1, text="", width=32, height=32, command=lambda: webbrowser.open('https://www.buymeacoffee.com/denno'))
+        donate_btn.pack(padx=20, pady=10, anchor='sw')
+        
+        CTkToolTip(github_btn, delay=0.3, message="Github page")
+        CTkToolTip(donate_btn, delay=0.3, message="Donate")
         
     def go_to_new_events_frame(self):
         self.main_class.show_frame(NewEventsFrame)
@@ -1187,9 +1192,9 @@ class SetupFrame(ctk.CTkFrame):
         # main content
         ctk.CTkLabel(self, text="Set Credentials", fg_color="transparent", font=("Arial", 32)).pack(padx=20, pady=20)
         ctk.CTkButton(master=self, image=google_image, text="Google Calendar", command=lambda: webbrowser.open('https://calendar.google.com/')).pack(padx=20, pady=10, anchor='center')
-        ctk.CTkButton(master=self, image=question_image, text="Tutorial Setup", command=lambda: webbrowser.open('https://github.com/DennisTurco/Google-Calendar-Data-Manager/blob/master/docs/GoogleCloudAPISetup.md')).pack(padx=20, pady=10, anchor='center')
+        ctk.CTkButton(master=self, image=question_image, text="Tutorial Setup", command=lambda: webbrowser.open('https://github.com/DennisTurco/Calendar-Data-Manager/blob/master/docs/GoogleCloudAPISetup.md')).pack(padx=20, pady=10, anchor='center')
         ctk.CTkButton(master=self, image=arrow_image, text="First Setup", command=lambda: self.setCredentialsPathFrame()).pack(padx=20, pady=10, anchor='center')
-    
+            
     def setCredentialsPathFrame(self):
         folder_image = tkinter.PhotoImage(file='./imgs/folder.png')
         
@@ -1230,7 +1235,8 @@ class SetupFrame(ctk.CTkFrame):
         
         try:
             # get credentials
-            credentials = gc.GoogleCalendarEventsManager.connectionSetup(credentials_path, gc.GoogleCalendarEventsManager.SCOPE, token_path)
+            credentials = gc.CalendarEventsManager.connectionSetup(credentials_path, gc.CalendarEventsManager.SCOPE, token_path)
+            self.updateUsernameMenuItem()
         except Exception as error:
             self.main_class.messagebox_exception(error)
             try: os.remove(token_path) # delete token.json 
@@ -1250,6 +1256,12 @@ class SetupFrame(ctk.CTkFrame):
             if response=="Yes":
                 self.setCredentialsPathFrame()
     
+    def updateUsernameMenuItem(self):
+        self.main_class.updateUsernameMenuItem()
+        
+    def setUsernameMenuItemToEmpty(self):
+        self.main_class.setUsernameMenuItemToEmpty()
+    
     def __getFilePath(self):
         file_path = filedialog.askopenfilename(title="Select credentials file", filetypes=(("JSON files", "*.json"), ("All files", "*.*")))
         self.file_path.delete("0", tkinter.END)
@@ -1262,6 +1274,7 @@ class App():
     credentials_path = None
     token_path = None
     credentials = None
+    menu = None
     
     app_width = 1100
     app_height = 900
@@ -1276,10 +1289,10 @@ class App():
             self.credentials_path = listRes["CredentialsPath"]
             self.token_path = listRes["TokenPath"]
             try: 
-                self.credentials = gc.GoogleCalendarEventsManager.connectionSetup(self.credentials_path, gc.GoogleCalendarEventsManager.SCOPE, self.token_path)
+                self.credentials = gc.CalendarEventsManager.connectionSetup(self.credentials_path, gc.CalendarEventsManager.SCOPE, self.token_path)
             except Exception as e:
-                print(f"Errore: {e}")
-                
+                print(f"Error: {e}")
+         
         self.init_window()
         self.init_menu()
         self.page_controller()
@@ -1338,7 +1351,7 @@ class App():
         button_close = ctk.CTkButton(self.toplevel_window, text="Close", command=self.toplevel_window.destroy)
         button_close.grid(row=1, column=0, padx=5, pady=(0, 10), sticky="nsew")
 
-        button_report = ctk.CTkButton(self.toplevel_window, text="Report Exception", command=lambda: webbrowser.open('https://github.com/DennisTurco/Google-Calendar-Data-Manager/issues'))
+        button_report = ctk.CTkButton(self.toplevel_window, text="Report Exception", command=lambda: webbrowser.open('https://github.com/DennisTurco/Calendar-Data-Manager/issues'))
         button_report.grid(row=1, column=1, padx=5, pady=(0, 10), sticky="nsew")
 
         # Insert text into the box
@@ -1355,7 +1368,7 @@ class App():
     def init_window(self):
         # configure window
         self.root.iconbitmap('./imgs/icon.ico')
-        self.root.title("Google Calendar Data Manager")
+        self.root.title("Calendar Data Manager")
         self.centerWindow()
         self.root.minsize(1100, 900)
 
@@ -1375,17 +1388,13 @@ class App():
             except: pass 
     
     def init_menu(self):
-        menu = CTkMenuBar(self.root)
-        button_1 = menu.add_cascade("File")
-        button_3 = menu.add_cascade("Settings")
-        button_4 = menu.add_cascade("About")
+        self.menu = CTkMenuBar(self.root) 
+        button_1 = self.menu.add_cascade("File")
+        button_3 = self.menu.add_cascade("Settings")
+        button_4 = self.menu.add_cascade("About")
         
         if self.credentials is not None:
-            (_, email) = gc.GoogleCalendarEventsManager.get_user_info(self.credentials)
-            button_5 = menu.add_cascade(str(email))
-            dropdown5 = CustomDropdownMenu(widget=button_5)
-            dropdown5.add_option(option="Google Calendar", command=lambda: webbrowser.open('https://calendar.google.com/'))
-            dropdown5.add_option(option="Log out", command=lambda: self.show_frame(SetupFrame))
+            self.updateUsernameMenuItem()
 
         dropdown1 = CustomDropdownMenu(widget=button_1)
         dropdown1.add_option(option="New Credentials", command=lambda: self.show_frame(SetupFrame))
@@ -1413,10 +1422,17 @@ class App():
         sub_menu4.add_option(option="Green", command=lambda: self.set_color_theme("green"))
 
         dropdown4 = CustomDropdownMenu(widget=button_4)
-        dropdown4.add_option(option="Share", command=lambda: webbrowser.open('https://github.com/DennisTurco/Google-Calendar-Data-Manager'))
-        dropdown4.add_option(option="Report a bug", command=lambda: webbrowser.open('https://github.com/DennisTurco/Google-Calendar-Data-Manager/issues'))
+        dropdown4.add_option(option="Share", command=lambda: webbrowser.open('https://github.com/DennisTurco/Calendar-Data-Manager'))
+        dropdown4.add_option(option="Report a bug", command=lambda: webbrowser.open('https://github.com/DennisTurco/Calendar-Data-Manager/issues'))
         dropdown4.add_option(option="Donate for this project", command=lambda: webbrowser.open('https://www.buymeacoffee.com/denno'))
-        
+    
+    def updateUsernameMenuItem(self):
+        (_, email) = gc.CalendarEventsManager.get_user_info(self.credentials)
+        button_5 = self.menu.add_cascade(str(email))
+        dropdown5 = CustomDropdownMenu(widget=button_5)
+        dropdown5.add_option(option="Google Calendar", command=lambda: webbrowser.open('https://calendar.google.com/'))
+        dropdown5.add_option(option="Log out", command=lambda: self.show_frame(SetupFrame))
+    
     def centerWindow(self):
         screen_width = self.root.winfo_screenwidth()
         screen_height = self.root.winfo_screenheight()
