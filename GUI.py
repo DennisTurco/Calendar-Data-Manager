@@ -1219,50 +1219,49 @@ class LoginFrame(ctk.CTkFrame):
         # Tooltips
         CTkToolTip(google_calendar, delay=0.3, message="View and manage your Google Calendar")
         CTkToolTip(google_login, delay=0.3, message="Login using your Google account")
-
+        
             
     def setCredentialsPathFrame(self):
-        folder_image = tkinter.PhotoImage(file='./imgs/folder.png')
+        self.__setCredentialsPath()
         
-        if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
-            self.toplevel_window = ctk.CTkToplevel()
-            self.toplevel_window.title('New Credentials')
+        # folder_image = tkinter.PhotoImage(file='./imgs/folder.png')
+        
+        # if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
+        #     self.toplevel_window = ctk.CTkToplevel()
+        #     self.toplevel_window.title('New Credentials')
 
-            # Create a grid inside the toplevel window
-            self.toplevel_window.grid_rowconfigure(0, weight=1)  # Allow row 0 to expand vertically
-            self.toplevel_window.grid_columnconfigure(0, weight=1)  # Allow column 0 to expand horizontally
-            self.toplevel_window.grid_columnconfigure(1, weight=1)  # Allow column 1 to expand horizontally
+        #     # Create a grid inside the toplevel window
+        #     self.toplevel_window.grid_rowconfigure(0, weight=1)  # Allow row 0 to expand vertically
+        #     self.toplevel_window.grid_columnconfigure(0, weight=1)  # Allow column 0 to expand horizontally
+        #     self.toplevel_window.grid_columnconfigure(1, weight=1)  # Allow column 1 to expand horizontally
 
-            text = ctk.CTkLabel(self.toplevel_window, text="Insert credentials path")
-            text.grid(row=0, column=0, columnspan=3, padx=20, pady=20)  # Increase columnspan to make space for button_file_path
-            self.file_path = ctk.CTkEntry(self.toplevel_window, placeholder_text="credentials file path")
-            self.file_path.grid(row=1, column=0, columnspan=2, padx=(15, 60), pady=10, sticky="nsew")
-            button_file_path = ctk.CTkButton(self.toplevel_window, text="", width=10, image=folder_image, command=self.__getFilePath)
-            button_file_path.grid(row=1, column=0, columnspan=2, padx=15, pady=10, sticky="e")
-            button_save = ctk.CTkButton(self.toplevel_window, text="OK", command=self.__setCredentialsPath)
-            button_save.grid(row=2, column=0, padx=15, pady=10, sticky="nsew")
-            button_cancel = ctk.CTkButton(self.toplevel_window, text="Cancel", command=self.toplevel_window.destroy)
-            button_cancel.grid(row=2, column=1, padx=15, pady=10, sticky="nsew")
+        #     text = ctk.CTkLabel(self.toplevel_window, text="Insert credentials path")
+        #     text.grid(row=0, column=0, columnspan=3, padx=20, pady=20)  # Increase columnspan to make space for button_file_path
+        #     self.file_path = ctk.CTkEntry(self.toplevel_window, placeholder_text="credentials file path")
+        #     self.file_path.grid(row=1, column=0, columnspan=2, padx=(15, 60), pady=10, sticky="nsew")
+        #     button_file_path = ctk.CTkButton(self.toplevel_window, text="", width=10, image=folder_image, command=self.__getFilePath)
+        #     button_file_path.grid(row=1, column=0, columnspan=2, padx=15, pady=10, sticky="e")
+        #     button_save = ctk.CTkButton(self.toplevel_window, text="OK", command=self.__setCredentialsPath)
+        #     button_save.grid(row=2, column=0, padx=15, pady=10, sticky="nsew")
+        #     button_cancel = ctk.CTkButton(self.toplevel_window, text="Cancel", command=self.toplevel_window.destroy)
+        #     button_cancel.grid(row=2, column=1, padx=15, pady=10, sticky="nsew")
     
-            self.toplevel_window.attributes("-topmost", True)
-            self.toplevel_window.resizable(False, False)
-        else:
-            self.toplevel_window.focus()  # if window exists focus it
+        #     self.toplevel_window.attributes("-topmost", True)
+        #     self.toplevel_window.resizable(False, False)
+        # else:
+        #     self.toplevel_window.focus()  # if window exists focus it
         
-        return self.toplevel_window
+        # return self.toplevel_window
     
     def __setCredentialsPath(self):
         # get response from dialog
-        credentials_path = self.file_path.get()
+        credentials_path = './settings/client.json'
         if len(credentials_path) == 0: return
         token_path = credentials_path.rsplit("/", 1)[0] + "/" + "token.json"
-        
-        self.toplevel_window.destroy()
-        
+                
         try:
             # get credentials
             credentials = gc.CalendarEventsManager.connectionSetup(credentials_path, gc.CalendarEventsManager.SCOPE, token_path)
-            self.updateUsernameMenuItem()
         except Exception as error:
             self.main_class.messagebox_exception(error)
             try: os.remove(token_path) # delete token.json 
@@ -1271,7 +1270,8 @@ class LoginFrame(ctk.CTkFrame):
         # response message box
         if credentials is not None:
             (user, _) = gc.CalendarEventsManager.get_user_info(credentials)
-            CTkMessagebox(message=f"Hello {user}! \nYou have logged in successfully.", icon="check", option_1="Ok")
+            CTkMessagebox(title='Login completed', message=f"Hello {user}! \nYou have logged in successfully.", icon="check", option_1="Ok")
+            self.updateUsernameMenuItem()
             
             # set credentials values to main class
             self.main_class.set_credentials(credentials, credentials_path, token_path)
@@ -1422,7 +1422,7 @@ class App():
             self.updateUsernameMenuItem()
 
         dropdown1 = CustomDropdownMenu(widget=button_1)
-        dropdown1.add_option(option="New Credentials", command=lambda: self.show_frame(LoginFrame))
+        dropdown1.add_option(option="Home", command=lambda: self.show_frame(MainFrame))
         dropdown1.add_option(option="Exit", command=lambda: exit())
 
         dropdown1.add_separator()
@@ -1455,11 +1455,34 @@ class App():
     
     def updateUsernameMenuItem(self):
         (_, email) = gc.CalendarEventsManager.get_user_info(self.credentials)
-        self.button_5 = self.menu.add_cascade(str(email))
-        dropdown5 = CustomDropdownMenu(widget=self.button_5)
-        dropdown5.add_option(option="Google Calendar", command=lambda: webbrowser.open(GOOGLE_CALENDAR_LINK))
-        dropdown5.add_option(option="Log out", command=lambda: self.show_frame(LoginFrame))
         
+        # Configure column 4 to expand (to align right).
+        self.menu.columnconfigure(4, weight=1)
+        
+        user_image = tkinter.PhotoImage(file='./imgs/user.png')
+        
+        if (self.button_5 is not None) and (self.credentials is not None):
+            self.button_5.configure(text=str(email))
+            self.button_5.grid(row=0, column=4, padx=10, pady=10, sticky="e")
+        elif self.credentials is not None:
+            self.button_5 = ctk.CTkButton(self.menu, text=str(email), fg_color="transparent", image=user_image, command=self.show_user_menu)
+            self.button_5.grid(row=0, column=4, padx=10, pady=10, sticky="e")
+            self.dropdown5 = CustomDropdownMenu(widget=self.button_5)
+            self.dropdown5.add_option(option="Google Calendar", command=lambda: webbrowser.open(GOOGLE_CALENDAR_LINK))
+            self.dropdown5.add_option(option="Log out", command=lambda: self.log_out())
+        elif self.credentials is None:
+            self.forgetUsernameMenuItem()
+
+    def show_user_menu(self):
+        self.dropdown5.show()
+    
+    def forgetUsernameMenuItem(self):
+        if self.button_5 is not None:
+            self.button_5.grid_forget()
+            
+    def log_out(self):
+        self.forgetUsernameMenuItem()
+        self.show_frame(LoginFrame)
     
     def centerWindow(self):
         screen_width = self.root.winfo_screenwidth()
