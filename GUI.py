@@ -6,7 +6,6 @@ import traceback
 import tempfile
 import pandas
 from datetime import datetime, timedelta
-from babel import numbers
 from googleapiclient.errors import HttpError
 from googleapiclient.discovery import build
 
@@ -33,10 +32,11 @@ GOOGLE_CALENDAR_LINK: Final[str] = 'https://calendar.google.com/'
 TUTORIAL_SETUP_LINK: Final[str] = 'https://github.com/DennisTurco/Calendar-Data-Manager/blob/master/docs/GoogleCloudAPISetup.md'
 GITHUB_ISSUES_LINK: Final[str] = 'https://github.com/DennisTurco/Calendar-Data-Manager/issues'
 GITHUB_PAGE_LINK: Final[str] = 'https://github.com/DennisTurco/Calendar-Data-Manager'
-DONATE_PAGE_LINK: Final[str] = 'https://www.buymeacoffee.com/denno'
+DONATE_BUYMEACOFFE_PAGE_LINK: Final[str] = 'https://www.buymeacoffee.com/denno'
+DONATE_PAYPAL_PAGE_LINK: Final[str] = 'https://www.paypal.com/donate/?hosted_button_id=M7CJXS929334U'
 
 DATE_FORMATTER: Final[str] = '%d-%m-%Y %H:%M'
-DAY_FORMATTER: Final[str] = "%d/%m/%Y"
+DAY_FORMATTER: Final[str] = "%d/%m/%y"
 
 #?###########################################################
 class NewEventsFrame(ctk.CTkFrame):
@@ -1151,7 +1151,8 @@ class MainFrame(ctk.CTkFrame):
         list_image = tkinter.PhotoImage(file='./imgs/list.png')
         edit_image = tkinter.PhotoImage(file='./imgs/edit.png')
         chart_image = tkinter.PhotoImage(file='./imgs/chart.png')
-        donation_image = tkinter.PhotoImage(file='./imgs/donation.png')
+        buymeacoffe_donation_image = tkinter.PhotoImage(file='./imgs/donation.png')
+        paypal_donation_image = tkinter.PhotoImage(file='./imgs/paypal.png')
         github_image = tkinter.PhotoImage(file='./imgs/github.png')
         icon = tkinter.PhotoImage(file='./imgs/icon.png')
     
@@ -1170,11 +1171,14 @@ class MainFrame(ctk.CTkFrame):
         
         github_btn = ctk.CTkButton(master=self, image=github_image, fg_color="transparent", border_width=1, text="", width=32, height=32, command=lambda: webbrowser.open(GITHUB_PAGE_LINK))
         github_btn.pack(padx=20, pady=10, anchor='sw')
-        donate_btn = ctk.CTkButton(master=self, image=donation_image, fg_color="transparent", border_width=1, text="", width=32, height=32, command=lambda: webbrowser.open(DONATE_PAGE_LINK))
-        donate_btn.pack(padx=20, pady=10, anchor='sw')
+        donate_buymeacoffe_btn = ctk.CTkButton(master=self, image=buymeacoffe_donation_image, fg_color="transparent", border_width=1, text="", width=32, height=32, command=lambda: webbrowser.open(DONATE_BUYMEACOFFE_PAGE_LINK))
+        donate_buymeacoffe_btn.pack(padx=20, pady=10, anchor='sw')
+        donate__paypal_btn = ctk.CTkButton(master=self, image=paypal_donation_image, fg_color="transparent", border_width=1, text="", width=32, height=32, command=lambda: webbrowser.open(DONATE_PAYPAL_PAGE_LINK))
+        donate__paypal_btn.pack(padx=20, pady=10, anchor='sw')
         
         CTkToolTip(github_btn, delay=0.3, message="Github page")
-        CTkToolTip(donate_btn, delay=0.3, message="Donate")
+        CTkToolTip(donate_buymeacoffe_btn, delay=0.3, message="Donate with \"buy me a coffe\"")
+        CTkToolTip(donate__paypal_btn, delay=0.3, message="Donate with \"Paypal\"")
         
     def go_to_new_events_frame(self):
         self.main_class.show_frame(NewEventsFrame)
@@ -1445,8 +1449,9 @@ class App():
         dropdown4 = CustomDropdownMenu(widget=button_4)
         dropdown4.add_option(option="Share", command=lambda: webbrowser.open(GITHUB_PAGE_LINK))
         dropdown4.add_option(option="Report a bug", command=lambda: webbrowser.open(GITHUB_ISSUES_LINK))
-        dropdown4.add_option(option="Donate for this project", command=lambda: webbrowser.open(DONATE_PAGE_LINK))
-
+        sub_menu4 = dropdown4.add_submenu("Support this project")
+        sub_menu4.add_option(option="Donate with \"Buy me a coffe\"", command=lambda: webbrowser.open(DONATE_BUYMEACOFFE_PAGE_LINK))
+        sub_menu4.add_option(option="Donate with \"Paypal\"", command=lambda: webbrowser.open(DONATE_PAYPAL_PAGE_LINK))
     
     def updateUsernameMenuItem(self):
         (_, email) = gc.CalendarEventsManager.get_user_info(self.credentials)
