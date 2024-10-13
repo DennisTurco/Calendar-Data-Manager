@@ -34,6 +34,7 @@ GITHUB_ISSUES_LINK: Final[str] = 'https://github.com/DennisTurco/Calendar-Data-M
 GITHUB_PAGE_LINK: Final[str] = 'https://github.com/DennisTurco/Calendar-Data-Manager'
 DONATE_BUYMEACOFFE_PAGE_LINK: Final[str] = 'https://www.buymeacoffee.com/denno'
 DONATE_PAYPAL_PAGE_LINK: Final[str] = 'https://www.paypal.com/donate/?hosted_button_id=M7CJXS929334U'
+VERSION: Final[str] = '1.0.3'
 
 DATE_FORMATTER: Final[str] = '%d-%m-%Y %H:%M'
 DAY_FORMATTER: Final[str] = "%d/%m/%y"
@@ -1169,12 +1170,18 @@ class MainFrame(ctk.CTkFrame):
         ctk.CTkButton(master=self, image=list_image, text="Get Events", command=self.go_to_get_events_by_title_frame).pack(padx=20, pady=10, anchor='center')
         ctk.CTkButton(master=self, image=chart_image, text="Graph", command=self.go_to_graph_frame).pack(padx=20, pady=10, anchor='center')
         
-        github_btn = ctk.CTkButton(master=self, image=github_image, fg_color="transparent", border_width=1, text="", width=32, height=32, command=lambda: webbrowser.open(GITHUB_PAGE_LINK))
-        github_btn.pack(padx=20, pady=10, anchor='sw')
-        donate_buymeacoffe_btn = ctk.CTkButton(master=self, image=buymeacoffe_donation_image, fg_color="transparent", border_width=1, text="", width=32, height=32, command=lambda: webbrowser.open(DONATE_BUYMEACOFFE_PAGE_LINK))
-        donate_buymeacoffe_btn.pack(padx=20, pady=10, anchor='sw')
-        donate__paypal_btn = ctk.CTkButton(master=self, image=paypal_donation_image, fg_color="transparent", border_width=1, text="", width=32, height=32, command=lambda: webbrowser.open(DONATE_PAYPAL_PAGE_LINK))
-        donate__paypal_btn.pack(padx=20, pady=10, anchor='sw')
+        button_frame = ctk.CTkFrame(master=self, fg_color="transparent")
+        button_frame.pack(side='bottom', anchor='sw', padx=20, pady=10)
+        
+        ctk.CTkLabel(self, text=f"Version {VERSION}", fg_color="transparent").place(relx=1.0, rely=1.0, anchor='se', x=-10, y=-10) # version
+        ctk.CTkLabel(button_frame, text="If you'd like to learn more about the project or support it:", fg_color="transparent", font=("Arial", 12, "italic")).pack(side='top', anchor='w', pady=(0, 10)) # description
+
+        github_btn = ctk.CTkButton(master=button_frame, image=github_image, fg_color="transparent", border_width=1, text="", width=32, height=32, command=lambda: webbrowser.open(GITHUB_PAGE_LINK))
+        github_btn.pack(side='left', padx=5)
+        donate_buymeacoffe_btn = ctk.CTkButton(master=button_frame, image=buymeacoffe_donation_image, fg_color="transparent", border_width=1, text="", width=32, height=32, command=lambda: webbrowser.open(DONATE_BUYMEACOFFE_PAGE_LINK))
+        donate_buymeacoffe_btn.pack(side='left', padx=5)
+        donate__paypal_btn = ctk.CTkButton(master=button_frame, image=paypal_donation_image, fg_color="transparent", border_width=1, text="", width=32, height=32, command=lambda: webbrowser.open(DONATE_PAYPAL_PAGE_LINK))
+        donate__paypal_btn.pack(side='left', padx=5)
         
         CTkToolTip(github_btn, delay=0.3, message="Github page")
         CTkToolTip(donate_buymeacoffe_btn, delay=0.3, message="Donate with \"buy me a coffe\"")
@@ -1223,35 +1230,6 @@ class LoginFrame(ctk.CTkFrame):
             
     def setCredentialsPathFrame(self):
         self.__setCredentialsPath()
-        
-        # folder_image = tkinter.PhotoImage(file='./imgs/folder.png')
-        
-        # if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
-        #     self.toplevel_window = ctk.CTkToplevel()
-        #     self.toplevel_window.title('New Credentials')
-
-        #     # Create a grid inside the toplevel window
-        #     self.toplevel_window.grid_rowconfigure(0, weight=1)  # Allow row 0 to expand vertically
-        #     self.toplevel_window.grid_columnconfigure(0, weight=1)  # Allow column 0 to expand horizontally
-        #     self.toplevel_window.grid_columnconfigure(1, weight=1)  # Allow column 1 to expand horizontally
-
-        #     text = ctk.CTkLabel(self.toplevel_window, text="Insert credentials path")
-        #     text.grid(row=0, column=0, columnspan=3, padx=20, pady=20)  # Increase columnspan to make space for button_file_path
-        #     self.file_path = ctk.CTkEntry(self.toplevel_window, placeholder_text="credentials file path")
-        #     self.file_path.grid(row=1, column=0, columnspan=2, padx=(15, 60), pady=10, sticky="nsew")
-        #     button_file_path = ctk.CTkButton(self.toplevel_window, text="", width=10, image=folder_image, command=self.__getFilePath)
-        #     button_file_path.grid(row=1, column=0, columnspan=2, padx=15, pady=10, sticky="e")
-        #     button_save = ctk.CTkButton(self.toplevel_window, text="OK", command=self.__setCredentialsPath)
-        #     button_save.grid(row=2, column=0, padx=15, pady=10, sticky="nsew")
-        #     button_cancel = ctk.CTkButton(self.toplevel_window, text="Cancel", command=self.toplevel_window.destroy)
-        #     button_cancel.grid(row=2, column=1, padx=15, pady=10, sticky="nsew")
-    
-        #     self.toplevel_window.attributes("-topmost", True)
-        #     self.toplevel_window.resizable(False, False)
-        # else:
-        #     self.toplevel_window.focus()  # if window exists focus it
-        
-        # return self.toplevel_window
     
     def __setCredentialsPath(self):
         # get response from dialog
@@ -1285,11 +1263,6 @@ class LoginFrame(ctk.CTkFrame):
     
     def updateUsernameMenuItem(self):
         self.main_class.updateUsernameMenuItem()
-    
-    def __getFilePath(self):
-        file_path = filedialog.askopenfilename(title="Select credentials file", filetypes=(("JSON files", "*.json"), ("All files", "*.*")))
-        self.file_path.delete("0", tkinter.END)
-        self.file_path.insert("0", file_path)
 #?###########################################################
 
 #*###########################################################
