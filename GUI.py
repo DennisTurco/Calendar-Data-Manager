@@ -1,4 +1,5 @@
 from ast import List
+import platform
 from typing import Final, List
 import webbrowser
 import os
@@ -488,6 +489,7 @@ class EditEventsFrame(ctk.CTkFrame):
         # Create a new window if it doesn't exist
         if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
             self.toplevel_window = ctk.CTkToplevel()
+            self.toplevel_window.after(200, lambda: self.toplevel_window.iconbitmap('./imgs/list.ico')) # i have to delay the icon because it' buggy on windows
             self.toplevel_window.title(f'{len(old_events)} Event(s) Found')
 
             # Configure grid layout
@@ -765,6 +767,7 @@ class GetEventsFrame(ctk.CTkFrame):
     def events_list_viewer_window(self):  
         if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
             self.toplevel_window = ctk.CTkToplevel()
+            self.toplevel_window.after(200, lambda: self.toplevel_window.iconbitmap('./imgs/list.ico')) # i have to delay the icon because it' buggy on windows
             self.toplevel_window.title(f'{len(self.events)} Event(s) obtained')
 
             # Create a grid inside the toplevel window
@@ -833,6 +836,7 @@ class GetEventsFrame(ctk.CTkFrame):
         if self.toplevel_entry_window is None or not self.toplevel_entry_window.winfo_exists():
             
             self.toplevel_entry_window = ctk.CTkToplevel()
+            self.toplevel_entry_window.after(200, lambda: self.toplevel_entry_window.iconbitmap('./imgs/folder.ico')) # i have to delay the icon because it' buggy on windows
             self.toplevel_entry_window.title('Select a file to save the results')
             self.toplevel_entry_window.geometry("350x50")
             entry = ctk.CTkEntry(self.toplevel_entry_window, width=250, placeholder_text="file path")
@@ -1336,6 +1340,7 @@ class App():
             return
 
         self.toplevel_window = ctk.CTkToplevel()
+        self.toplevel_window.after(200, lambda: self.toplevel_window.iconbitmap('./imgs/bug.ico')) # i have to delay the icon because it' buggy on windows
         self.toplevel_window.title(f'Exception traceback')
 
         # Create a grid inside the toplevel window
@@ -1527,6 +1532,8 @@ class App():
     def date_picker_window(self, type, toplevel_window, entry_date_from, entry_date_to, log_box):
         if toplevel_window is None or not toplevel_window.winfo_exists():
             toplevel_window = ctk.CTkToplevel() # create window if its None or destroyed
+            toplevel_window.after(200, lambda: toplevel_window.iconbitmap('./imgs/calendar.ico')) # i have to delay the icon because it' buggy on windows
+            
             calendar = Calendar(toplevel_window)
             calendar.grid(row=0, column=0, padx=10, pady=10, sticky="nsew") 
             hours = ctk.CTkLabel(toplevel_window, text="hours:")
@@ -1545,7 +1552,7 @@ class App():
             # calculate hour after one hour
             after_one_hour = now + timedelta(hours=1)
             hour_after_one_hour = after_one_hour.strftime("%H")
-                
+
             if type == 1:
                 toplevel_window.title("Date From")
                 confirm_button = ctk.CTkButton(toplevel_window, text="Confirm", command=lambda: self.get_date(1, toplevel_window, entry_date_from, entry_date_to, log_box, calendar, hours, minutes))
@@ -1615,6 +1622,7 @@ class App():
         if toplevel_window is None or not toplevel_window.winfo_exists():
             toplevel_window = ctk.CTkToplevel() # create window if its None or destroyed
             toplevel_window.title(filepath)
+            toplevel_window.after(200, lambda: toplevel_window.iconbitmap('./imgs/folder.ico')) # i have to delay the icon because it' buggy on windows
             file_viewer = ctk.CTkTextbox(toplevel_window)
             file_viewer.bind("<Key>", lambda e: "break")  # set the textbox readonly
             file_viewer.pack(fill=tkinter.BOTH, expand=True)   
