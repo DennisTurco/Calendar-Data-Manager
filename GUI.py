@@ -37,7 +37,7 @@ DONATE_PAYPAL_PAGE_LINK: Final[str] = 'https://www.paypal.com/donate/?hosted_but
 VERSION: Final[str] = '1.0.3'
 
 DATE_FORMATTER: Final[str] = '%d-%m-%Y %H:%M'
-DAY_FORMATTER: Final[str] = "%d/%m/%y"
+DAY_FORMATTER: Final[str] = "%m/%d/%y" # use this only for calendar picker
 
 #?###########################################################
 class NewEventsFrame(ctk.CTkFrame):
@@ -98,7 +98,7 @@ class NewEventsFrame(ctk.CTkFrame):
         self.label_color = ctk.CTkLabel(self.main_frame, text="Color:")
         self.label_color.grid(row=2, column=0, padx=10, pady=(10, 0), sticky="e")
         self.multi_selection = ctk.CTkComboBox(self.main_frame, state="readonly")
-        CTkScrollableDropdown(self.multi_selection, values=list(EVENT_COLOR.keys()), width=170, button_color="transparent", command=self.combobox_callback)
+        CTkScrollableDropdown(self.multi_selection, values=list(EVENT_COLOR.keys()), button_color="transparent", command=self.combobox_callback)
         self.multi_selection.configure(button_color=EVENT_COLOR.get("Light Blue"))
         self.multi_selection.set("Light Blue")
         self.multi_selection.grid(row=2, column=1, padx=0, pady=(10, 10), sticky="w")
@@ -277,7 +277,7 @@ class EditEventsFrame(ctk.CTkFrame):
         self.label_color_old = ctk.CTkLabel(self.old_values_frame, text="Color:")
         self.label_color_old.grid(row=3, column=0, padx=10, pady=5, sticky="e")
         self.multi_selection_old = ctk.CTkComboBox(self.old_values_frame, state="readonly")
-        CTkScrollableDropdown(self.multi_selection_old, values=list(self.event_color_from.keys()), width=170, button_color="transparent", command=self.combobox_callback_color1)
+        CTkScrollableDropdown(self.multi_selection_old, values=list(self.event_color_from.keys()), button_color="transparent", command=self.combobox_callback_color1)
         self.multi_selection_old.configure(button_color=EVENT_COLOR.get("No Color Filtering"))
         self.multi_selection_old.set("No Color Filtering")
         self.multi_selection_old.grid(row=3, column=1, padx=0, pady=5, sticky="w")
@@ -302,7 +302,7 @@ class EditEventsFrame(ctk.CTkFrame):
         self.label_color_new = ctk.CTkLabel(self.new_values_frame, text="Color:")
         self.label_color_new.grid(row=3, column=0, padx=10, pady=5, sticky="e")
         self.multi_selection_new = ctk.CTkComboBox(self.new_values_frame, state="readonly")
-        CTkScrollableDropdown(self.multi_selection_new, values=list(self.event_color_to.keys()), width=170, button_color="transparent", command=self.combobox_callback_color2)
+        CTkScrollableDropdown(self.multi_selection_new, values=list(self.event_color_to.keys()), button_color="transparent", command=self.combobox_callback_color2)
         self.multi_selection_new.configure(button_color=EVENT_COLOR.get("Light Blue"))
         self.multi_selection_new.set("Light Blue")
         self.multi_selection_new.grid(row=3, column=1, padx=0, pady=5, sticky="w")
@@ -627,7 +627,7 @@ class GetEventsFrame(ctk.CTkFrame):
         self.label_color = ctk.CTkLabel(self.main_frame, text="Color:")
         self.label_color.grid(row=3, column=0, padx=10, pady=5, sticky="e")
         self.multi_selection = ctk.CTkComboBox(self.main_frame, state="readonly")
-        CTkScrollableDropdown(self.multi_selection, values=list(EVENT_COLOR.keys()), width=170, button_color="transparent", command=self.combobox_callback)
+        CTkScrollableDropdown(self.multi_selection, values=list(EVENT_COLOR.keys()), button_color="transparent", command=self.combobox_callback)
         self.multi_selection.configure(button_color=EVENT_COLOR.get("No Color Filtering"))
         self.multi_selection.set("No Color Filtering")
         self.multi_selection.grid(row=3, column=1, padx=0, pady=5, sticky="w")
