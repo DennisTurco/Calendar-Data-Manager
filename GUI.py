@@ -1,4 +1,5 @@
 from ast import List
+from io import BytesIO
 from typing import Final, List
 import webbrowser
 import os
@@ -8,6 +9,8 @@ import pandas
 from datetime import datetime, timedelta
 from googleapiclient.errors import HttpError
 from googleapiclient.discovery import build
+import requests
+from PIL import Image as pilImage, ImageTk, ImageDraw
 
 import JSONSettings as js
 import CalendarEventsManager as gc
@@ -15,7 +18,7 @@ import Plotter
 from DataEditor import DataCSV
 
 import tkinter
-from tkinter import filedialog
+from tkinter import Image, filedialog
 import customtkinter as ctk
 from CTkMenuBar import *
 from CTkMessagebox import *
@@ -1251,7 +1254,7 @@ class LoginFrame(ctk.CTkFrame):
         
         # response message box
         if credentials is not None:
-            (user, _) = gc.CalendarEventsManager.get_user_info(credentials)
+            (user, _, _) = gc.CalendarEventsManager.get_user_info(credentials)
             CTkMessagebox(title='Login completed', message=f"Hello {user}! \nYou have logged in successfully.", icon="check", option_1="Ok")
             self.updateUsernameMenuItem()
             
@@ -1395,7 +1398,7 @@ class App():
         button_1 = self.menu.add_cascade("File")
         button_3 = self.menu.add_cascade("Settings")
         button_4 = self.menu.add_cascade("About")
-        
+                        
         if self.credentials is not None:
             self.updateUsernameMenuItem()
 
@@ -1432,24 +1435,58 @@ class App():
         sub_menu4.add_option(option="Donate with \"Paypal\"", command=lambda: webbrowser.open(DONATE_PAYPAL_PAGE_LINK))
     
     def updateUsernameMenuItem(self):
-        (_, email) = gc.CalendarEventsManager.get_user_info(self.credentials)
+        (_, email, picture_url) = gc.CalendarEventsManager.get_user_info(self.credentials)
         
         # Configure column 4 to expand (to align right).
         self.menu.columnconfigure(4, weight=1)
         
-        user_image = tkinter.PhotoImage(file='./imgs/user.png')
+        default_user_image = tkinter.PhotoImage(file='./imgs/user.png')
         
-        if (self.button_5 is not None) and (self.credentials is not None):
-            self.button_5.configure(text=str(email))
-            self.button_5.grid(row=0, column=4, padx=10, pady=10, sticky="e")
-        elif self.credentials is not None:
-            self.button_5 = ctk.CTkButton(self.menu, text=str(email), fg_color="transparent", image=user_image, command=self.show_user_menu)
-            self.button_5.grid(row=0, column=4, padx=10, pady=10, sticky="e")
-            self.dropdown5 = CustomDropdownMenu(widget=self.button_5)
-            self.dropdown5.add_option(option="Google Calendar", command=lambda: webbrowser.open(GOOGLE_CALENDAR_LINK))
-            self.dropdown5.add_option(option="Log out", command=lambda: self.log_out())
-        elif self.credentials is None:
+        if self.credentials is not None:
+            # Try to load the profile image from URL
+            res = self.get_user_image_from_url(picture_url)
+            if picture_url and res is not None:
+                user_image = res
+            else:
+                # Fallback to default image
+                user_image = default_user_image
+
+            if self.button_5 is not None:
+                self.button_5.configure(text=str(email), image=user_image)
+                self.button_5.grid(row=0, column=4, padx=10, pady=10, sticky="e")
+            else:
+                self.button_5 = ctk.CTkButton(self.menu, text=str(email), fg_color="transparent", image=user_image, command=self.show_user_menu)
+                self.button_5.grid(row=0, column=4, padx=10, pady=10, sticky="e")
+                self.dropdown5 = CustomDropdownMenu(widget=self.button_5)
+                self.dropdown5.add_option(option="Google Calendar", command=lambda: webbrowser.open(GOOGLE_CALENDAR_LINK))
+                self.dropdown5.add_option(option="Log out", command=lambda: self.log_out())
+        else:
             self.forgetUsernameMenuItem()
+            
+    def get_user_image_from_url(self, url):
+        try:
+            # get the image
+            response = requests.get(url)
+            response.raise_for_status()  # check if the request is correct
+            img_data = response.content
+            
+            # load the image
+            image = pilImage.open(BytesIO(img_data))
+            image = image.resize((32, 32), pilImage.LANCZOS)
+
+            # create a mask for the image
+            mask = pilImage.new('L', (32, 32), 0)
+            draw = ImageDraw.Draw(mask)
+            draw.ellipse((0, 0, 32, 32), fill=255)
+            
+            # apply the mask
+            image = image.convert("RGBA")
+            image.putalpha(mask) 
+
+            return ImageTk.PhotoImage(image)
+        except Exception as e:
+            print(f"Error loading image: {e}")
+            return None
 
     def show_user_menu(self):
         self.dropdown5.show()
@@ -1651,7 +1688,7 @@ class App():
 
     def get_credentials(self):
         return self.credentials
-    
+
 #*###########################################################
 
 if __name__ == "__main__":

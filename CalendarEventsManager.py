@@ -23,7 +23,11 @@ class CalendarEventsManager:
         user_info_service = build('oauth2', 'v2', credentials=credentials_path)
         user_info = user_info_service.userinfo().get().execute()
 
-        return user_info.get('name'), user_info.get('email')
+        name = user_info.get('name')
+        email = user_info.get('email')
+        picture_url = user_info.get('picture') 
+
+        return name, email, picture_url
     
     @staticmethod
     def connectionSetup(credentials_path: str, scopes: str, token_path: str) -> Credentials:
