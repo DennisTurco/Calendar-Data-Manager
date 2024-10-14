@@ -1,5 +1,4 @@
 from ast import List
-import platform
 from typing import Final, List
 import webbrowser
 import os
@@ -24,6 +23,7 @@ from tkcalendar import *
 from tkcalendar import *
 from CTkToolTip import *
 from CTkScrollableDropdown import *
+import CustomSpinbox
 
 # consts
 EVENT_COLOR: Final[dict] = {"Light Blue": "#7986cb", "Green": "#33b679", "Purple": "#8e24aa", "Pink": "#e67c73", "Yellow": "#f6bf26", "Orange": "#f4511e", "Blue": "#039be5", "Grey": "#616161", "Dark Blue": "#3f51b5", "Dark Green": "#0b8043", "Red": "#d50000"}
@@ -1535,15 +1535,18 @@ class App():
             toplevel_window.after(200, lambda: toplevel_window.iconbitmap('./imgs/calendar.ico')) # i have to delay the icon because it' buggy on windows
             
             calendar = Calendar(toplevel_window)
-            calendar.grid(row=0, column=0, padx=10, pady=10, sticky="nsew") 
-            hours = ctk.CTkLabel(toplevel_window, text="hours:")
-            hours.grid(row=1, column=0, padx=10, pady=10, sticky="w")
-            hours = ctk.CTkEntry(toplevel_window, placeholder_text="hh")
-            hours.grid(row=1, column=0, padx=(70, 0), pady=10, sticky="w")
-            minutes = ctk.CTkLabel(toplevel_window, text="minutes: ")
-            minutes.grid(row=2, column=0, padx=10, pady=10, sticky="w")
-            minutes = ctk.CTkEntry(toplevel_window, placeholder_text="mm")
-            minutes.grid(row=2, column=0, padx=(70, 0), pady=10, sticky="w")
+            calendar.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
+            hours_label = ctk.CTkLabel(toplevel_window, text="hours:")
+            hours_label.grid(row=1, column=0, padx=10, pady=10, sticky="w")
+
+            minutes_label = ctk.CTkLabel(toplevel_window, text="minutes: ")
+            minutes_label.grid(row=2, column=0, padx=10, pady=10, sticky="w")
+            
+            spinbox_hours = CustomSpinbox.CustomSpinbox(toplevel_window, width=105, step_size=1, min_value=0, max_value=23)
+            spinbox_hours.grid(row=1, column=0, padx=(70, 0), pady=10, sticky="w")
+            
+            spinbox_minutes = CustomSpinbox.CustomSpinbox(toplevel_window, width=105, step_size=1, min_value=0, max_value=59)
+            spinbox_minutes.grid(row=2, column=0, padx=(70, 0), pady=10, sticky="w")
             
             # get current hour
             now = datetime.now()
@@ -1555,20 +1558,18 @@ class App():
 
             if type == 1:
                 toplevel_window.title("Date From")
-                confirm_button = ctk.CTkButton(toplevel_window, text="Confirm", command=lambda: self.get_date(1, toplevel_window, entry_date_from, entry_date_to, log_box, calendar, hours, minutes))
+                confirm_button = ctk.CTkButton(toplevel_window, text="Confirm", command=lambda: self.get_date(1, toplevel_window, entry_date_from, entry_date_to, log_box, calendar, spinbox_hours.get(), spinbox_minutes.get()))
                 # set default hour
-                hours.delete("0", tkinter.END)
-                hours.insert("0", current_hour)
+                spinbox_hours.set(int(current_hour))
             elif type == 2:
                 toplevel_window.title("Date To")
-                confirm_button = ctk.CTkButton(toplevel_window, text="Confirm", command=lambda: self.get_date(2, toplevel_window, entry_date_from, entry_date_to, log_box, calendar, hours, minutes))
+                confirm_button = ctk.CTkButton(toplevel_window, text="Confirm", command=lambda: self.get_date(2, toplevel_window, entry_date_from, entry_date_to, log_box, calendar, spinbox_hours.get(), spinbox_minutes.get()))
                 # set default hour
-                hours.delete("0", tkinter.END)
-                hours.insert("0", hour_after_one_hour)
+                spinbox_hours.set(int(hour_after_one_hour))
             else:
                 raise Exception("type option doesn't exists")
             
-            confirm_button.grid(row=3, column=0, padx=10, pady=10, sticky="nsew") 
+            confirm_button.grid(row=3, column=0, padx=10, pady=10, sticky="nsew")
             
             toplevel_window.attributes("-topmost", True) # focus to this windows
             toplevel_window.resizable(False, False)
@@ -1581,19 +1582,15 @@ class App():
         date = calendar.get_date() # get the date from the calendar
         
         try:
-            if len(hours.get()) == 0: hour = 0
-            else: hour = int(hours.get())
-            if len(minutes.get()) == 0: minute = 0
-            else: minute =  int(minutes.get())
-    
-            if hour > 23 or hour < 0 or minute > 59 or minute < 0: return
+            if hours > 23 or hours < 0 or minutes > 59 or minutes < 0:
+                return
         except ValueError:
             return
         
         # Format the datetime object as a string in DATE_FORMATTER
-        date = datetime.strptime(date, DAY_FORMATTER)  
-        full_date = datetime(date.year, date.month, date.day, hour, minute)
-        full_date_str = full_date.strftime(DATE_FORMATTER)  
+        date = datetime.strptime(date, DAY_FORMATTER)
+        full_date = datetime(date.year, date.month, date.day, hours, minutes)
+        full_date_str = full_date.strftime(DATE_FORMATTER)
         
         if type == 1:
             self.write_log(log_box, "Date Selected From: " + full_date_str)
@@ -1606,7 +1603,7 @@ class App():
         else:
             raise Exception("type option doesn't exists")
         
-        toplevel_window.destroy() 
+        toplevel_window.destroy()
     
     def get_file_path(self, logbox, entry):
         file_path = filedialog.askopenfilename(title="Select file where do you want to save data", filetypes=(("CSV files", "*.csv"), ("TXT files", "*.txt"), ("All files", "*.*")))
@@ -1625,14 +1622,14 @@ class App():
             toplevel_window.after(200, lambda: toplevel_window.iconbitmap('./imgs/folder.ico')) # i have to delay the icon because it' buggy on windows
             file_viewer = ctk.CTkTextbox(toplevel_window)
             file_viewer.bind("<Key>", lambda e: "break")  # set the textbox readonly
-            file_viewer.pack(fill=tkinter.BOTH, expand=True)   
+            file_viewer.pack(fill=tkinter.BOTH, expand=True)
             
             #insert text into box
             with open(filepath, 'r', encoding='utf-8') as file:
                 file_content = file.read()
                 file_viewer.delete(1.0, tkinter.END)
                 file_viewer.insert(tkinter.END, file_content)
-        
+
             toplevel_window.attributes("-topmost", True) # focus to this windows
             self.write_log(log_box, f"file '{filepath}' opened")
         else:
@@ -1645,7 +1642,7 @@ class App():
             self.write_log(log_box, f"ERROR: file path is missing")
             return True
         
-        if not os.path.exists(filepath): 
+        if not os.path.exists(filepath):
             self.write_log(log_box, f"ERROR: file '{filepath}' doesn't found")
             return True
     
@@ -1653,8 +1650,8 @@ class App():
         log_box.insert("0.0", "\n" + str(datetime.now()) + ": " + message)
 
     def get_credentials(self):
-        return self.credentials 
-
+        return self.credentials
+    
 #*###########################################################
 
 if __name__ == "__main__":
