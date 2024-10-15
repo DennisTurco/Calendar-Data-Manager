@@ -18,14 +18,16 @@ import Plotter
 from DataEditor import DataCSV
 
 import tkinter
-from tkinter import Image, filedialog
+from tkinter import filedialog
 import customtkinter as ctk
 from CTkMenuBar import *
 from CTkMessagebox import *
 from tkcalendar import *
 from tkcalendar import *
 from CTkToolTip import *
+from CTkTable import *
 from CTkScrollableDropdown import *
+from CTkXYFrame import *
 import CustomSpinbox
 
 # consts
@@ -570,6 +572,7 @@ class GetEventsFrame(ctk.CTkFrame):
     toplevel_entry_window = None
     date_picker_window = None
     file_viewer_window = None
+    events_preview_in_table = None
     data = None
     events = None
     
@@ -585,6 +588,7 @@ class GetEventsFrame(ctk.CTkFrame):
         edit_image = tkinter.PhotoImage(file='./imgs/edit.png')
         self.folder_image = tkinter.PhotoImage(file='./imgs/folder.png')
         file_image = tkinter.PhotoImage(file='./imgs/file.png')
+        table_image = tkinter.PhotoImage(file='./imgs/table.png')
         chart_image = tkinter.PhotoImage(file='./imgs/chart.png')
         
         # configure grid layout (4x4)
@@ -672,7 +676,9 @@ class GetEventsFrame(ctk.CTkFrame):
         self.overwrite_mode = ctk.CTkCheckBox(self.file_output_frame, text="Overwrite file", onvalue="on", offvalue="off")
         self.overwrite_mode.grid(row=1, column=1, padx=0, pady=10, sticky="ew")
         self.button_open_file = ctk.CTkButton(master=self.file_output_frame, image=file_image, text="open", command=self.open_file)
-        self.button_open_file.grid(row=2, column=0, columnspan=3, padx=10, pady=10, sticky="s")
+        self.button_open_file.grid(row=2, column=0, columnspan=2, padx=10, pady=10, sticky="s")
+        self.button_open_events_table_preview = ctk.CTkButton(master=self.file_output_frame, image=table_image, text="table preview", command=self.events_table_preview)
+        self.button_open_events_table_preview.grid(row=2, column=1, columnspan=3, padx=10, pady=10, sticky="s")
 
         # get list button
         self.get_button = ctk.CTkButton(self, image=list_image, text="Get", border_width=2, command=self.get_events)
@@ -689,6 +695,7 @@ class GetEventsFrame(ctk.CTkFrame):
         CTkToolTip(self.file_path, delay=0.3, message="(Optional) Enter the path to the file;\n if you want to save the results to a specific file (.csv, .txt)")
         CTkToolTip(self.overwrite_mode, delay=0.3, message="If it is enabled, it overwrites the contents of the file with the newly obtained events.\n Otherwise, it adds the newly obtained events without deleting anything.")
         CTkToolTip(self.button_open_file, delay=0.3, message="Open file preview")
+        CTkToolTip(self.button_open_events_table_preview, delay=0.3, message="Open file preview in table")
         CTkToolTip(self.get_button, delay=0.3, message="Get events")
         
         # create log textbox
@@ -940,6 +947,9 @@ class GetEventsFrame(ctk.CTkFrame):
     def open_file(self):
         self.file_viewer_window = self.main_class.file_viewer_window(self.file_viewer_window, self.file_path.get(), self.log_box)
     
+    def events_table_preview(self):
+        self.events_preview_in_table = self.main_class.events_preview_in_table(self.events_preview_in_table, self.file_path.get(), self.log_box)
+    
     def date_picker(self, type):
         self.date_picker_window = self.main_class.date_picker_window(type, self.date_picker_window, self.entry_date_from, self.entry_date_to, self.log_box)
 
@@ -961,6 +971,7 @@ class GraphFrame(ctk.CTkFrame):
     main_class = None
     date_picker_window = None
     file_viewer_window = None
+    events_preview_in_table = None
     
     def __init__(self, parent, main_class):
         ctk.CTkFrame.__init__(self, parent)
@@ -973,6 +984,7 @@ class GraphFrame(ctk.CTkFrame):
         edit_image = tkinter.PhotoImage(file='./imgs/edit.png')
         folder_image = tkinter.PhotoImage(file='./imgs/folder.png')
         file_image = tkinter.PhotoImage(file='./imgs/file.png')
+        table_image = tkinter.PhotoImage(file='./imgs/table.png')
         chart_image = tkinter.PhotoImage(file='./imgs/chart.png')
         square_image = tkinter.PhotoImage(file='./imgs/square.png')
         square_check_image = tkinter.PhotoImage(file='./imgs/square-check.png')
@@ -1013,7 +1025,9 @@ class GraphFrame(ctk.CTkFrame):
         self.button_file_path = ctk.CTkButton(self.file_output_frame, text="", width=10, image=folder_image, command=self.get_file_path)
         self.button_file_path.grid(row=0, column=2, padx=0, pady=10, sticky="w")
         self.button_open_file = ctk.CTkButton(master=self.file_output_frame, image=file_image, text="open", command=self.open_file)
-        self.button_open_file.grid(row=1, column=0, columnspan=3, padx=10, pady=10, sticky="n")
+        self.button_open_file.grid(row=1, column=0, columnspan=2, padx=10, pady=10, sticky="e")
+        self.button_open_events_table_preview = ctk.CTkButton(master=self.file_output_frame, image=table_image, text="table preview", command=self.events_table_preview)
+        self.button_open_events_table_preview.grid(row=1, column=1, columnspan=3, padx=10, pady=10, sticky="w")
         
         # Graph types
         self.graph_types_frame = ctk.CTkScrollableFrame(self, label_text="Set Graph Types")
@@ -1048,6 +1062,7 @@ class GraphFrame(ctk.CTkFrame):
         # Tooltips
         CTkToolTip(self.file_path, delay=0.3, message="(Required) Enter the path to the file you generated from the 'Get Events List' section.")
         CTkToolTip(self.button_open_file, delay=0.3, message="Open file preview")
+        CTkToolTip(self.button_open_events_table_preview, delay=0.3, message="Open file preview in table")
         CTkToolTip(self.graph_button, delay=0.3, message="Generate graphs")
         CTkToolTip(self.button_select_all, delay=0.3, message="Select all types")
         CTkToolTip(self.button_deselect_all, delay=0.3, message="Deselect all types")
@@ -1074,7 +1089,10 @@ class GraphFrame(ctk.CTkFrame):
     
     def open_file(self):
         self.file_viewer_window = self.main_class.file_viewer_window(self.file_viewer_window, self.file_path.get(), self.log_box)
-    
+
+    def events_table_preview(self):
+        self.events_preview_in_table = self.main_class.events_preview_in_table(self.events_preview_in_table, self.file_path.get(), self.log_box)
+
     def select_all(self):
         self.total_hours_per_year.select()
         self.total_hours_per_month.select()
@@ -1274,7 +1292,7 @@ class LoginFrame(ctk.CTkFrame):
 
 #*###########################################################
 class App(): 
-    root = None
+    root: ctk.CTk
     credentials_path = None
     token_path = None
     credentials = None
@@ -1656,7 +1674,7 @@ class App():
         if toplevel_window is None or not toplevel_window.winfo_exists():
             toplevel_window = ctk.CTkToplevel() # create window if its None or destroyed
             toplevel_window.title(filepath)
-            toplevel_window.after(200, lambda: toplevel_window.iconbitmap('./imgs/folder.ico')) # i have to delay the icon because it' buggy on windows
+            toplevel_window.after(200, lambda: toplevel_window.iconbitmap('./imgs/list.ico')) # i have to delay the icon because it' buggy on windows
             file_viewer = ctk.CTkTextbox(toplevel_window)
             file_viewer.bind("<Key>", lambda e: "break")  # set the textbox readonly
             file_viewer.pack(fill=tkinter.BOTH, expand=True)
@@ -1673,6 +1691,45 @@ class App():
             toplevel_window.focus()  # if window exists focus it
         
         return toplevel_window
+    
+    def events_preview_in_table(self, toplevel_window, filepath, log_box):
+        if self.check_file_path_errors(log_box, filepath):
+            return
+
+        if toplevel_window is None or not toplevel_window.winfo_exists():
+            toplevel_window = ctk.CTkToplevel()  # create window if it's None or destroyed
+            toplevel_window.title(filepath)
+            toplevel_window.after(200, lambda: toplevel_window.iconbitmap('./imgs/folder.ico'))  # delay the icon
+
+            events = []
+
+            with open(filepath, 'r', encoding='utf-8') as file:
+                counter = 1
+                for line in file:
+                    event_details = line.strip().split('|')
+                    if len(event_details) > 0:
+                        event_details.insert(0, str(counter))
+                        events.append(event_details)
+                        counter += 1
+            
+            if len(events) == 0:
+                self.write_log(log_box, f"file '{filepath}' is empty")
+                return
+
+            frame = CTkXYFrame(toplevel_window)
+            frame.pack(fill="both", expand=True, padx=10, pady=10)
+
+            table = CTkTable(frame, row=len(events), column=len(events[0]), values=events)
+            table.pack()
+
+            toplevel_window.attributes("-topmost", True)  # focus to this window
+            self.write_log(log_box, f"file '{filepath}' opened")
+            
+        else:
+            toplevel_window.focus()  # if window exists, focus it
+
+        return toplevel_window
+
     
     def check_file_path_errors(self, log_box, filepath):
         if filepath is None or len(filepath) == 0:
