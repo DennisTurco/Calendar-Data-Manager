@@ -613,25 +613,30 @@ class GetEventsFrame(ctk.CTkFrame):
         self.google_calendar_link = ctk.CTkButton(self.sidebar_frame, image=google_image, text="Google Calendar", command=lambda: webbrowser.open(GOOGLE_CALENDAR_LINK))
         self.google_calendar_link.grid(row=6, column=0, padx=20, pady=(10, 10))
         
-        # create main panel
+        # create main panel title
         self.title_label_main = ctk.CTkLabel(self, text="Get Events List", font=ctk.CTkFont(size=20, weight="bold"))
-        self.title_label_main.grid(row=0, column=1, padx=20, pady=(20, 10), sticky="nsew")
-        
-        # main entry
-        self.main_frame = ctk.CTkScrollableFrame(self, label_text="Event Information")
-        self.main_frame.grid(row=1, column=1, padx=(50, 50), pady=10, sticky="ew")
-        self.main_frame.grid_columnconfigure((0, 1, 2), weight=1)
+        self.title_label_main.grid(row=0, column=1, padx=20, pady=20, sticky="nsew")
+
+        # create a container frame for the two scrollable frames
+        self.container_frame = ctk.CTkFrame(self, fg_color="transparent")
+        self.container_frame.grid(row=1, column=1, padx=(50, 50), pady=10, sticky="nsew") 
+        self.container_frame.grid_columnconfigure((0, 1), weight=1)  # 2 Columns for main_frame and date_frame
+
+        # Column 1: main_frame (Event Information)
+        self.main_frame = ctk.CTkScrollableFrame(self.container_frame, label_text="Event Information")
+        self.main_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
+        self.main_frame.grid_columnconfigure(1, weight=1)  # Setup columns for fields
         self.label_id = ctk.CTkLabel(self.main_frame, text="ID:")
         self.label_id.grid(row=0, column=0, padx=10, pady=5, sticky="e")
         self.entry_id = ctk.CTkEntry(self.main_frame, placeholder_text="id")
-        self.entry_id.grid(row=0, column=1, columnspan=2, padx=(10, 10), pady=5, sticky="w")
+        self.entry_id.grid(row=0, column=1, padx=(10, 10), pady=5, sticky="w")
         self.label_summary = ctk.CTkLabel(self.main_frame, text="Summary:")
         self.label_summary.grid(row=1, column=0, padx=10, pady=5, sticky="e")
         self.entry_summary = ctk.CTkEntry(self.main_frame, placeholder_text="summary")
-        self.entry_summary.grid(row=1, column=1, columnspan=2, padx=(10, 10), pady=5, sticky="w")
+        self.entry_summary.grid(row=1, column=1, padx=(10, 10), pady=5, sticky="w")
         self.label_description = ctk.CTkLabel(self.main_frame, text="Description:")
         self.label_description.grid(row=2, column=0, padx=10, pady=5, sticky="e")
-        self.entry_description = ctk.CTkTextbox(self.main_frame, width=250, height=100)
+        self.entry_description = ctk.CTkTextbox(self.main_frame, width=150, height=100)
         self.entry_description.grid(row=2, column=1, padx=(0, 0), pady=5, sticky="ew")
         self.label_color = ctk.CTkLabel(self.main_frame, text="Color:")
         self.label_color.grid(row=3, column=0, padx=10, pady=5, sticky="e")
@@ -641,11 +646,10 @@ class GetEventsFrame(ctk.CTkFrame):
         self.multi_selection.set("No Color Filtering")
         self.multi_selection.grid(row=3, column=1, padx=0, pady=5, sticky="w")
         
-        # date
-        self.date_frame = ctk.CTkScrollableFrame(self, label_text="Date Interval")
-        self.date_frame.grid(row=2, column=1, padx=(50, 50), pady=10, sticky="ew")
-        self.date_frame.grid_columnconfigure((0, 1, 2), weight=1)
-        self.date_frame.grid_rowconfigure((0, 1), weight=0)
+        # Column 2: date_frame (Date Interval)
+        self.date_frame = ctk.CTkScrollableFrame(self.container_frame, label_text="Date Interval")
+        self.date_frame.grid(row=0, column=1, padx=10, pady=10, sticky="nsew")
+        self.date_frame.grid_columnconfigure(1, weight=1)
         self.label_date_from = ctk.CTkLabel(self.date_frame, text="From:")
         self.label_date_from.grid(row=0, column=0, padx=10, pady=10, sticky="e")
         self.entry_date_from = ctk.CTkEntry(self.date_frame, placeholder_text="dd-mm-yyyy hh:mm")
@@ -668,21 +672,34 @@ class GetEventsFrame(ctk.CTkFrame):
         # file output
         self.file_output_frame = ctk.CTkScrollableFrame(self, label_text="Save results to file")
         self.file_output_frame.grid(row=3, column=1, padx=(50, 50), pady=10, sticky="ew")
-        self.file_output_frame.grid_columnconfigure((0, 1, 2), weight=1)
-        self.file_path = ctk.CTkEntry(master=self.file_output_frame, placeholder_text="file path")
-        self.file_path.grid(row=0, column=1, padx=0, pady=10, sticky="ew")
-        self.button_file_path = ctk.CTkButton(self.file_output_frame, text="", width=10, image=self.folder_image, command=lambda: self.get_file_path(self.file_path))
-        self.button_file_path.grid(row=0, column=2, padx=0, pady=10, sticky="w")
-        self.overwrite_mode = ctk.CTkCheckBox(self.file_output_frame, text="Overwrite file", onvalue="on", offvalue="off")
-        self.overwrite_mode.grid(row=1, column=1, padx=0, pady=10, sticky="ew")
-        self.button_open_file = ctk.CTkButton(master=self.file_output_frame, image=file_image, text="open", command=self.open_file)
-        self.button_open_file.grid(row=2, column=0, columnspan=2, padx=10, pady=10, sticky="s")
-        self.button_open_events_table_preview = ctk.CTkButton(master=self.file_output_frame, image=table_image, text="table preview", command=self.events_table_preview)
-        self.button_open_events_table_preview.grid(row=2, column=1, columnspan=3, padx=10, pady=10, sticky="s")
+        self.file_output_frame.grid_columnconfigure(0, weight=1)
+        self.first_row_frame = ctk.CTkFrame(self.file_output_frame)  # first row
+        self.first_row_frame.grid(row=0, column=0, padx=0, pady=0, sticky="nsew")
+        self.first_row_frame.grid_columnconfigure((0, 1, 2), weight=1)
+        self.file_path = ctk.CTkEntry(master=self.first_row_frame, placeholder_text="file path")
+        self.file_path.grid(row=0, column=1, padx=10, pady=10, sticky="ew")
+        self.button_file_path = ctk.CTkButton(self.first_row_frame, text="", width=10, image=self.folder_image, command=lambda: self.get_file_path(self.file_path))
+        self.button_file_path.grid(row=0, column=2, padx=10, pady=10, sticky="w")
+        self.overwrite_mode = ctk.CTkCheckBox(self.first_row_frame, text="Overwrite file", onvalue="on", offvalue="off") # second row
+        self.overwrite_mode.grid(row=1, column=1, padx=10, pady=10, sticky="ew")
+        self.third_row_frame = ctk.CTkFrame(self.file_output_frame)  # third row
+        self.third_row_frame.grid(row=2, column=0, padx=0, pady=0, sticky="ew")
+        self.third_row_frame.grid_columnconfigure((0, 1), weight=1)
+        self.button_open_file = ctk.CTkButton(master=self.third_row_frame, image=file_image, text="open", command=self.open_file)
+        self.button_open_file.grid(row=0, column=0, padx=10, pady=10, sticky="e")
+        self.button_open_events_table_preview = ctk.CTkButton(master=self.third_row_frame, image=table_image, text="table preview", command=self.events_table_preview)
+        self.button_open_events_table_preview.grid(row=0, column=1, padx=10, pady=10, sticky="w")
+
+        # create a container frame for the buttons
+        self.container_frame2 = ctk.CTkFrame(self, fg_color="transparent")
+        self.container_frame2.grid(row=4, column=1, padx=(50, 50), pady=10, sticky="nsew") 
+        self.container_frame2.grid_columnconfigure((0, 1), weight=1)  # 2 Columns for main_frame and date_frame
 
         # get list button
-        self.get_button = ctk.CTkButton(self, image=list_image, text="Get", border_width=2, command=self.get_events)
-        self.get_button.grid(row=4, column=1, padx=20, pady=20)
+        self.get_button = ctk.CTkButton(self.container_frame2, image=list_image, text="Get", border_width=2, command=self.get_events)
+        self.get_button.grid(row=0, column=0, padx=5, pady=10, sticky="e")
+        self.get_button = ctk.CTkButton(self.container_frame2, image=list_image, text="Get", border_width=2, command=self.get_events)
+        self.get_button.grid(row=0, column=1, padx=5, pady=10, sticky="w")
         
         # Tooltips
         CTkToolTip(self.entry_id, delay=0.3, message="(Optional) Enter event id This is a very specific field;\n if you want to get a specific event and you know the specific event id, you can enter it and ignore the fields below.\n Otherwise you can ignore it and proceed to fill in the other fields.")
@@ -1014,20 +1031,23 @@ class GraphFrame(ctk.CTkFrame):
         # create main panel
         self.title_label_main = ctk.CTkLabel(self, text="Create Graph", font=ctk.CTkFont(size=20, weight="bold"))
         self.title_label_main.grid(row=0, column=1, padx=20, pady=(20, 10), sticky="nsew")
-        
-        # file output
         self.file_output_frame = ctk.CTkScrollableFrame(self, label_text="Set File Path")
         self.file_output_frame.grid(row=1, column=1, padx=(50, 50), pady=10, sticky="ew")
-        self.file_output_frame.grid_columnconfigure((0, 1, 2), weight=1)
-        self.file_output_frame.grid_rowconfigure((0, 1), weight=1)
-        self.file_path = ctk.CTkEntry(master=self.file_output_frame, placeholder_text="file path")
-        self.file_path.grid(row=0, column=1, padx=0, pady=10, sticky="ew")
-        self.button_file_path = ctk.CTkButton(self.file_output_frame, text="", width=10, image=folder_image, command=self.get_file_path)
-        self.button_file_path.grid(row=0, column=2, padx=0, pady=10, sticky="w")
-        self.button_open_file = ctk.CTkButton(master=self.file_output_frame, image=file_image, text="open", command=self.open_file)
-        self.button_open_file.grid(row=1, column=0, columnspan=2, padx=10, pady=10, sticky="e")
-        self.button_open_events_table_preview = ctk.CTkButton(master=self.file_output_frame, image=table_image, text="table preview", command=self.events_table_preview)
-        self.button_open_events_table_preview.grid(row=1, column=1, columnspan=3, padx=10, pady=10, sticky="w")
+        self.file_output_frame.grid_columnconfigure(0, weight=1)
+        self.first_row_frame = ctk.CTkFrame(self.file_output_frame) # first row
+        self.first_row_frame.grid(row=0, column=0, padx=0, pady=0, sticky="ew")
+        self.first_row_frame.grid_columnconfigure((0, 1, 2), weight=1)
+        self.file_path = ctk.CTkEntry(master=self.first_row_frame, placeholder_text="file path")
+        self.file_path.grid(row=0, column=1, padx=10, pady=10, sticky="ew")
+        self.button_file_path = ctk.CTkButton(self.first_row_frame, text="", width=10, image=folder_image, command=self.get_file_path)
+        self.button_file_path.grid(row=0, column=2, padx=10, pady=10, sticky="w")
+        self.second_row_frame = ctk.CTkFrame(self.file_output_frame) # second row
+        self.second_row_frame.grid(row=1, column=0, padx=0, pady=0, sticky="ew")
+        self.second_row_frame.grid_columnconfigure((0, 1), weight=1)
+        self.button_open_file = ctk.CTkButton(master=self.second_row_frame, image=file_image, text="open", command=self.open_file)
+        self.button_open_file.grid(row=0, column=0, padx=10, pady=10, sticky="e")
+        self.button_open_events_table_preview = ctk.CTkButton(master=self.second_row_frame, image=table_image, text="table preview", command=self.events_table_preview)
+        self.button_open_events_table_preview.grid(row=0, column=1, padx=10, pady=10, sticky="w") 
         
         # Graph types
         self.graph_types_frame = ctk.CTkScrollableFrame(self, label_text="Set Graph Types")
@@ -1699,7 +1719,7 @@ class App():
         if toplevel_window is None or not toplevel_window.winfo_exists():
             toplevel_window = ctk.CTkToplevel()  # create window if it's None or destroyed
             toplevel_window.title(filepath)
-            toplevel_window.after(200, lambda: toplevel_window.iconbitmap('./imgs/folder.ico'))  # delay the icon
+            toplevel_window.after(200, lambda: toplevel_window.iconbitmap('./imgs/list.ico'))  # delay the icon
 
             events = []
 
