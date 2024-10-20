@@ -19,8 +19,8 @@ class CalendarEventsManager:
     ]
     
     @staticmethod
-    def get_user_info(credentials_path: str):
-        user_info_service = build('oauth2', 'v2', credentials=credentials_path)
+    def get_user_info(credentials: Credentials):
+        user_info_service = build('oauth2', 'v2', credentials=credentials)
         user_info = user_info_service.userinfo().get().execute()
 
         name = user_info.get('name')

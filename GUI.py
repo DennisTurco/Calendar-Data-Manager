@@ -1,12 +1,10 @@
 from ast import List
+from datetime import datetime
 from io import BytesIO
 from typing import Final, List
 import webbrowser
 import os
-import traceback
-import tempfile
-import pandas
-from datetime import datetime, timedelta
+
 from googleapiclient.errors import HttpError
 from googleapiclient.discovery import build
 import requests
@@ -16,6 +14,7 @@ import JSONSettings as js
 import CalendarEventsManager as gc
 import Plotter
 from DataEditor import DataCSV
+import pandas as pandas
 
 import tkinter
 from tkinter import filedialog
@@ -23,12 +22,15 @@ import customtkinter as ctk
 from CTkMenuBar import *
 from CTkMessagebox import *
 from tkcalendar import *
-from tkcalendar import *
 from CTkToolTip import *
 from CTkTable import *
 from CTkScrollableDropdown import *
 from CTkXYFrame import *
-import CustomSpinbox
+
+
+from CommonOperations import CommonOperations 
+#from FrameController import FrameController
+#from MenuController import MenuController
 
 # consts
 EVENT_COLOR: Final[dict] = {"Light Blue": "#7986cb", "Green": "#33b679", "Purple": "#8e24aa", "Pink": "#e67c73", "Yellow": "#f6bf26", "Orange": "#f4511e", "Blue": "#039be5", "Grey": "#616161", "Dark Blue": "#3f51b5", "Dark Green": "#0b8043", "Red": "#d50000"}
@@ -49,6 +51,7 @@ DAY_FORMATTER: Final[str] = "%m/%d/%y" # use this only for calendar picker
 class NewEventsFrame(ctk.CTkFrame):
     main_class = None
     toplevel_window = None
+    _common = CommonOperations()
     
     def __init__(self, parent, main_class):
         ctk.CTkFrame.__init__(self, parent)
@@ -129,7 +132,7 @@ class NewEventsFrame(ctk.CTkFrame):
         self.label_timezone.grid(row=2, column=0, padx=10, pady=10, sticky="e")
         self.timezone_selection = ctk.CTkComboBox(self.date_frame, state="readonly")
         CTkScrollableDropdown(self.timezone_selection, values=list(TIMEZONE), justify="left", button_color="transparent")
-        self.timezone_selection.set(self.main_class.get_timezone())
+        self.timezone_selection.set(CommonOperations.get_timezone())
         self.timezone_selection.grid(row=2, column=1, padx=0, pady=(10, 10), sticky="nsew")
         
         # create button
@@ -157,47 +160,47 @@ class NewEventsFrame(ctk.CTkFrame):
         time_zone = self.timezone_selection.get()
         
         # update preferred TimeZone
-        self.main_class.set_timezone(time_zone)
+        self._common.set_timezone(time_zone)
         
         if len(summary.replace(" ", "")) == 0:
-            self.main_class.write_log(self.log_box, f"Error on creating event: summary is missing")
+            self._common.write_log(self.log_box, f"Error on creating event: summary is missing")
             return
         if len(date_from.replace(" ", "")) == 0 or len(date_to.replace(" ", "")) == 0:
-            self.main_class.write_log(self.log_box, f"Error on creating event: date is missing")
+            self._common.write_log(self.log_box, f"Error on creating event: date is missing")
             return
         try:
             date_from = datetime.strptime(date_from, DATE_FORMATTER)
             date_to = datetime.strptime(date_to, DATE_FORMATTER)
         except ValueError:
-            self.main_class.write_log(self.log_box, f"Error on creating event: date format is not correct")
+            self._common.write_log(self.log_box, f"Error on creating event: date format is not correct")
             return
         
         # get color index
-        color_index = self.main_class.get_color_id(EVENT_COLOR, self.multi_selection.get())
+        color_index = self._common.get_color_id(EVENT_COLOR, self.multi_selection.get())
         
         try: 
-            gc.CalendarEventsManager.createEvent(self.main_class.get_credentials(), summary, self.entry_description.get("0.0", tkinter.END), date_from, date_to, color_index, timeZone=time_zone)
-            self.main_class.write_log(self.log_box, f"Event '{summary}' created succesfully!")
+            gc.CalendarEventsManager.createEvent(self._common.get_credentials(), summary, self.entry_description.get("0.0", tkinter.END), date_from, date_to, color_index, timeZone=time_zone)
+            self._common.write_log(self.log_box, f"Event '{summary}' created succesfully!")
         except FileNotFoundError as file_not_found_error:
-            self.main_class.messagebox_exception(file_not_found_error)
-            self.main_class.write_log(self.log_box, f"File not found error: {str(file_not_found_error)}")
+            self._common.messagebox_exception(file_not_found_error)
+            self._common.write_log(self.log_box, f"File not found error: {str(file_not_found_error)}")
         except PermissionError as permission_error:
-            self.main_class.messagebox_exception(permission_error)
-            self.main_class.write_log(self.log_box, f"Permission error: {str(permission_error)}")
+            self._common.messagebox_exception(permission_error)
+            self._common.write_log(self.log_box, f"Permission error: {str(permission_error)}")
         except HttpError as http_error:
-            self.main_class.messagebox_exception(http_error)
-            self.main_class.write_log(self.log_box, f"HTTP error: {str(http_error)}")
+            self._common.messagebox_exception(http_error)
+            self._common.write_log(self.log_box, f"HTTP error: {str(http_error)}")
         except Exception as error:
-            self.main_class.messagebox_exception(error)
-            self.main_class.write_log(self.log_box, f"Generic error: {str(error)}")   
+            self._common.messagebox_exception(error)
+            self._common.write_log(self.log_box, f"Generic error: {str(error)}")   
         
     def combobox_callback(self, color):
         self.multi_selection.configure(button_color=EVENT_COLOR.get(color))
         self.multi_selection.set(color)
-        self.main_class.write_log(self.log_box, f"color '{color}' selected")
+        self._common.write_log(self.log_box, f"color '{color}' selected")
     
     def date_picker(self, type):
-        self.toplevel_window = self.main_class.date_picker_window(type, self.toplevel_window, self.entry_date_from, self.entry_date_to, self.log_box)
+        self.toplevel_window = self._common.date_picker_window(type, self.toplevel_window, self.entry_date_from, self.entry_date_to, self.log_box)
     
     def go_to_new_events_frame(self):
         self.main_class.show_frame(NewEventsFrame)
@@ -215,7 +218,7 @@ class NewEventsFrame(ctk.CTkFrame):
 #?###########################################################
 class EditEventsFrame(ctk.CTkFrame):
     main_class = None
-    toplevel_window = None
+    toplevel_window: ctk.CTkToplevel
     date_picker_window = None
     event_color_from = EVENT_COLOR
     event_color_to = EVENT_COLOR
@@ -334,7 +337,7 @@ class EditEventsFrame(ctk.CTkFrame):
         self.label_timezone.grid(row=2, column=0, padx=10, pady=10, sticky="e")
         self.timezone_selection = ctk.CTkComboBox(self.date_frame, state="readonly")
         CTkScrollableDropdown(self.timezone_selection, values=list(TIMEZONE), justify="left", button_color="transparent")
-        self.timezone_selection.set(self.main_class.get_timezone())
+        self.timezone_selection.set(CommonOperations.get_timezone())
         self.timezone_selection.grid(row=2, column=1, padx=0, pady=(10, 10), sticky="nsew")
         
         # edit button
@@ -359,25 +362,25 @@ class EditEventsFrame(ctk.CTkFrame):
         self.log_box.grid(row=4, column=1, columnspan=2, padx=(0, 0), pady=(20, 0), sticky="nsew")
     
     def date_picker(self, type):
-        self.date_picker_window = self.main_class.date_picker_window(type, self.date_picker_window, self.entry_date_from, self.entry_date_to, self.log_box)
+        self.date_picker_window = CommonOperations.date_picker_window(type, self.date_picker_window, self.entry_date_from, self.entry_date_to, self.log_box)
     
     def edit_events(self):        
         # Get OLD values
         summary_old = self.entry_summary_old.get()
         description_old = self.entry_description_old.get('0.0', tkinter.END)
-        color_index_old = self.main_class.get_color_id(self.event_color_from, self.multi_selection_old.get())  # Get color index for old events
+        color_index_old = CommonOperations.get_color_id(self.event_color_from, self.multi_selection_old.get())  # Get color index for old events
         
         # Get NEW values
         summary_new = self.entry_summary_new.get()
         description_new = self.entry_description_new.get('0.0', tkinter.END)
-        color_index_new = self.main_class.get_color_id(self.event_color_to, self.multi_selection_new.get())  # Get color index for new events
+        color_index_new = CommonOperations.get_color_id(self.event_color_to, self.multi_selection_new.get())  # Get color index for new events
         
         # Validate input data
         if not summary_old:
-            self.main_class.write_log(self.log_box, "ERROR: Missing old summary")
+            CommonOperations.write_log(self.log_box, "ERROR: Missing old summary")
             return
         if not summary_new:
-            self.main_class.write_log(self.log_box, "ERROR: Missing new summary")
+            CommonOperations.write_log(self.log_box, "ERROR: Missing new summary")
             return
         
         # Get date range
@@ -391,14 +394,14 @@ class EditEventsFrame(ctk.CTkFrame):
             if date_to:
                 date_to = datetime.strptime(date_to, DATE_FORMATTER)
         except ValueError:
-            self.main_class.write_log(self.log_box, "ERROR: Invalid date format")
+            CommonOperations.write_log(self.log_box, "ERROR: Invalid date format")
             return
         
         # Get timezone
         time_zone = self.timezone_selection.get()
         
         # Update preferred timezone
-        self.main_class.set_timezone(time_zone)
+        CommonOperations.set_timezone(time_zone)
 
         try:
             # Retrieve events to edit
@@ -413,7 +416,7 @@ class EditEventsFrame(ctk.CTkFrame):
             )
             
             if not old_events:
-                self.main_class.write_log(self.log_box, "No events found")
+                CommonOperations.write_log(self.log_box, "No events found")
             else:
                 # Simulate event updates without applying them
                 new_events = gc.CalendarEventsManager.simulateEventUpdates(
@@ -432,31 +435,26 @@ class EditEventsFrame(ctk.CTkFrame):
         # Handle various exceptions
         except FileNotFoundError as e:
             self.main_class.messagebox_exception(e)
-            self.main_class.write_log(self.log_box, f"File not found error: {str(e)}")
+            CommonOperations.write_log(self.log_box, f"File not found error: {str(e)}")
         except PermissionError as e:
             self.main_class.messagebox_exception(e)
-            self.main_class.write_log(self.log_box, f"Permission error: {str(e)}")
+            CommonOperations.write_log(self.log_box, f"Permission error: {str(e)}")
         except ValueError as e:
             self.main_class.messagebox_exception(e)
-            self.main_class.write_log(self.log_box, f"Value error: {str(e)}")
+            CommonOperations.write_log(self.log_box, f"Value error: {str(e)}")
         except Exception as e:
             self.main_class.messagebox_exception(e)
-            self.main_class.write_log(self.log_box, f"Generic error: {str(e)}")       
+            CommonOperations.write_log(self.log_box, f"Generic error: {str(e)}")       
     
-    def combobox_callback(self, color):
-        self.multi_selection.configure(button_color=EVENT_COLOR.get(color))
-        self.multi_selection.set(color)
-        self.main_class.write_log(self.log_box, f"color '{color}' selected")
-        
     def combobox_callback_color1(self, color):
         self.multi_selection_old.configure(button_color=self.event_color_from.get(color))
         self.multi_selection_old.set(color)
-        self.main_class.write_log(self.log_box, f"color '{color}' selected")
+        CommonOperations.write_log(self.log_box, f"color '{color}' selected")
     
     def combobox_callback_color2(self, color):
         self.multi_selection_new.configure(button_color=self.event_color_to.get(color))
         self.multi_selection_new.set(color)
-        self.main_class.write_log(self.log_box, f"color '{color}' selected")
+        CommonOperations.write_log(self.log_box, f"color '{color}' selected")
     
     def go_to_new_events_frame(self):
         self.main_class.show_frame(NewEventsFrame)
@@ -484,7 +482,9 @@ class EditEventsFrame(ctk.CTkFrame):
                 date_to,
                 time_zone
             )
-            self.main_class.write_log(self.log_box, f"{len(updated_events)} event(s) successfully updated!")
+            if updated_events is None: return
+            
+            CommonOperations.write_log(self.log_box, f"{len(updated_events)} event(s) successfully updated!")
             self.close_top_frame_window()
     
     def close_top_frame_window(self):
@@ -575,6 +575,7 @@ class GetEventsFrame(ctk.CTkFrame):
     events_preview_in_table = None
     data = None
     events = None
+    _common = CommonOperations()
     
     def __init__(self, parent, main_class):
         ctk.CTkFrame.__init__(self, parent)
@@ -666,7 +667,7 @@ class GetEventsFrame(ctk.CTkFrame):
         self.label_timezone.grid(row=2, column=0, padx=10, pady=10, sticky="e")
         self.timezone_selection = ctk.CTkComboBox(self.date_frame, state="readonly")
         CTkScrollableDropdown(self.timezone_selection, values=list(TIMEZONE), justify="left", button_color="transparent")
-        self.timezone_selection.set(self.main_class.get_timezone())
+        self.timezone_selection.set(CommonOperations.get_timezone())
         self.timezone_selection.grid(row=2, column=1, padx=0, pady=(10, 10), sticky="nsew")
 
         # file output
@@ -696,9 +697,9 @@ class GetEventsFrame(ctk.CTkFrame):
         self.container_frame2.grid_columnconfigure((0, 1), weight=1)  # 2 Columns for main_frame and date_frame
 
         # get list button
-        self.get_button = ctk.CTkButton(self.container_frame2, image=list_image, text="Get", border_width=2, command=self.get_events)
+        self.get_button = ctk.CTkButton(self.container_frame2, image=list_image, text="Get", border_width=2, command=self.get_and_preview)
         self.get_button.grid(row=0, column=0, padx=5, pady=10, sticky="e")
-        self.get_button = ctk.CTkButton(self.container_frame2, image=list_image, text="Get", border_width=2, command=self.get_events)
+        self.get_button = ctk.CTkButton(self.container_frame2, image=chart_image, text="Get and plot", border_width=2, command=self.get_and_plot)
         self.get_button.grid(row=0, column=1, padx=5, pady=10, sticky="w")
         
         # Tooltips
@@ -719,29 +720,29 @@ class GetEventsFrame(ctk.CTkFrame):
         self.log_box = ctk.CTkTextbox(self, width=250, height=100)
         self.log_box.bind("<Key>", lambda e: "break")  # set the textbox readonly
         self.log_box.grid(row=5, column=1, columnspan=2, padx=(0, 0), pady=(20, 0), sticky="nsew")
-    
+
     def get_events(self):
         self.events = None
         
         id = self.entry_id.get()
         if len(id) != 0:
             try: 
-                self.events = gc.CalendarEventsManager.getEventByID(self.main_class.get_credentials(), id)
-                self.events_list_viewer_window()
-                self.main_class.write_log(self.log_box, f"Event obtained succesfully!")
+                self.events = gc.CalendarEventsManager.getEventByID(self._common.get_credentials(), id)
+                #self.events_list_viewer_window()
+                self._common.write_log(self.log_box, f"Event obtained succesfully!")
                 return
             except FileNotFoundError as file_not_found_error:
-                self.main_class.messagebox_exception(file_not_found_error)
-                self.main_class.write_log(self.log_box, f"File not found error: {str(file_not_found_error)}")
+                self._common.messagebox_exception(file_not_found_error)
+                self._common.write_log(self.log_box, f"File not found error: {str(file_not_found_error)}")
             except PermissionError as permission_error:
-                self.main_class.messagebox_exception(permission_error)
-                self.main_class.write_log(self.log_box, f"Permission error: {str(permission_error)}")
+                self._common.messagebox_exception(permission_error)
+                self._common.write_log(self.log_box, f"Permission error: {str(permission_error)}")
             except ValueError as value_error:
-                self.main_class.messagebox_exception(value_error)
-                self.main_class.write_log(self.log_box, f"Value error: {str(value_error)}")
+                self._common.messagebox_exception(value_error)
+                self._common.write_log(self.log_box, f"Value error: {str(value_error)}")
             except Exception as error:
-                self.main_class.messagebox_exception(error)
-                self.main_class.write_log(self.log_box, f"Generic error: {str(error)}")
+                self._common.messagebox_exception(error)
+                self._common.write_log(self.log_box, f"Generic error: {str(error)}")
         
         summary = self.entry_summary.get()
         date_from = self.entry_date_from.get()
@@ -750,7 +751,7 @@ class GetEventsFrame(ctk.CTkFrame):
         time_zone = self.timezone_selection.get()
         
         # update preferred TimeZone
-        self.main_class.set_timezone(time_zone)
+        self._common.set_timezone(time_zone)
          
         try:
             if len(date_from) != 0:
@@ -758,38 +759,47 @@ class GetEventsFrame(ctk.CTkFrame):
             if len(date_to) != 0:
                 date_to = datetime.strptime(date_to, DATE_FORMATTER)
         except ValueError:
-            self.main_class.write_log(self.log_box, f"Error on creating event: date format is not correct")
+            self._common.write_log(self.log_box, f"Error on creating event: date format is not correct")
             return
         
         # get color index
-        color_index = self.main_class.get_color_id(EVENT_COLOR, self.multi_selection.get())
+        color_index = self._common.get_color_id(EVENT_COLOR, self.multi_selection.get())
         
         try: 
-            self.events = gc.CalendarEventsManager.getEvents(creds=self.main_class.get_credentials(), title=summary, start_date=date_from, end_date=date_to, color_id=color_index, description=description, time_zone=time_zone)
+            self.events = gc.CalendarEventsManager.getEvents(creds=self._common.get_credentials(), title=summary, start_date=date_from, end_date=date_to, color_id=color_index, description=description, time_zone=time_zone)
             if self.events == None or len(self.events) == 0:
-                self.main_class.write_log(self.log_box, f"No events obtained")
+                self._common.write_log(self.log_box, f"No events obtained")
                 return
             
-            self.events_list_viewer_window() # i have to truncate the list for performances reason
-            self.main_class.write_log(self.log_box, f"{len(self.events)} Event(s) obtained succesfully!")
+            #self.events_list_viewer_window() # i have to truncate the list for performances reason
+            self._common.write_log(self.log_box, f"{len(self.events)} Event(s) obtained succesfully!")
         except FileNotFoundError as file_not_found_error:
-            self.main_class.messagebox_exception(file_not_found_error)
-            self.main_class.write_log(self.log_box, f"File not found error: {str(file_not_found_error)}")
+            self._common.messagebox_exception(file_not_found_error)
+            self._common.write_log(self.log_box, f"File not found error: {str(file_not_found_error)}")
         except PermissionError as permission_error:
-            self.main_class.messagebox_exception(permission_error)
-            self.main_class.write_log(self.log_box, f"Permission error: {str(permission_error)}")
+            self._common.messagebox_exception(permission_error)
+            self._common.write_log(self.log_box, f"Permission error: {str(permission_error)}")
         except ValueError as value_error:
-            self.main_class.messagebox_exception(value_error)
-            self.main_class.write_log(self.log_box, f"Value error: {str(value_error)}")
+            self._common.messagebox_exception(value_error)
+            self._common.write_log(self.log_box, f"Value error: {str(value_error)}")
         # except GoogleCalendarConnectionError as connection_error:
-        #     self.main_class.messagebox_exception(connection_error)
-        #     self.main_class.write_log(self.log_box, f"Connection error: {str(connection_error)}")
+        #     self._common.messagebox_exception(connection_error)
+        #     CommonOperations.write_log(self.log_box, f"Connection error: {str(connection_error)}")
         # except GoogleCalendarAPIError as api_error:
-        #     self.main_class.messagebox_exception(api_error)
-        #     self.main_class.write_log(self.log_box, f"Google Calendar API error: {str(api_error)}")
+        #     self._common.messagebox_exception(api_error)
+        #     CommonOperations.write_log(self.log_box, f"Google Calendar API error: {str(api_error)}")
         except Exception as error:
-            self.main_class.messagebox_exception(error)
-            self.main_class.write_log(self.log_box, f"Generic error: {str(error)}")
+            self._common.messagebox_exception(error)
+            self._common.write_log(self.log_box, f"Generic error: {str(error)}")
+
+    def get_and_preview(self):
+        self.get_events()
+        self.events_list_viewer_window()
+
+    def get_and_plot(self):
+        self.get_events()
+        self.events_list_viewer_window()
+        self.go_to_graph_frame()
     
     def events_list_viewer_window(self):  
         if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
@@ -861,7 +871,6 @@ class GetEventsFrame(ctk.CTkFrame):
             return
         
         if self.toplevel_entry_window is None or not self.toplevel_entry_window.winfo_exists():
-            
             self.toplevel_entry_window = ctk.CTkToplevel()
             self.toplevel_entry_window.after(200, lambda: self.toplevel_entry_window.iconbitmap('./imgs/folder.ico')) # i have to delay the icon because it' buggy on windows
             self.toplevel_entry_window.title('Select a file to save the results')
@@ -919,23 +928,23 @@ class GetEventsFrame(ctk.CTkFrame):
             # save all into data
             DataCSV.saveDataToFile(self.data, self.file_path.get(), '|', 'utf-8')     
             
-            self.main_class.write_log(self.log_box, f"{counter} event(s) added to file {self.file_path.get()}")
+            self._common.write_log(self.log_box, f"{counter} event(s) added to file {self.file_path.get()}")
             
         except FileNotFoundError as file_not_found_error:
-            self.main_class.messagebox_exception(file_not_found_error)
-            self.main_class.write_log(self.log_box, f"File not found error: {str(file_not_found_error)}")
+            self._common.messagebox_exception(file_not_found_error)
+            self._common.write_log(self.log_box, f"File not found error: {str(file_not_found_error)}")
         except PermissionError as permission_error:
-            self.main_class.messagebox_exception(permission_error)
-            self.main_class.write_log(self.log_box, f"Permission error: {str(permission_error)}")
+            self._common.messagebox_exception(permission_error)
+            self._common.write_log(self.log_box, f"Permission error: {str(permission_error)}")
         except ValueError as value_error:
-            self.main_class.messagebox_exception(value_error)
-            self.main_class.write_log(self.log_box, f"Value error: {str(value_error)}")
+            self._common.messagebox_exception(value_error)
+            self._common.write_log(self.log_box, f"Value error: {str(value_error)}")
         except KeyError as key_error:
-            self.main_class.messagebox_exception(key_error)
-            self.main_class.write_log(self.log_box, f"Key error: {str(key_error)}")
+            self._common.messagebox_exception(key_error)
+            self._common.write_log(self.log_box, f"Key error: {str(key_error)}")
         except Exception as error:
-            self.main_class.messagebox_exception(error)
-            self.main_class.write_log(self.log_box, f"Generic error: {str(error)}")
+            self._common.messagebox_exception(error)
+            self._common.write_log(self.log_box, f"Generic error: {str(error)}")
     
     def save_results_to_file2(self, entry):
         self.file_path.delete("0", tkinter.END)
@@ -952,23 +961,23 @@ class GetEventsFrame(ctk.CTkFrame):
     def combobox_callback(self, color):
         self.multi_selection.configure(button_color=EVENT_COLOR.get(color))
         self.multi_selection.set(color)
-        self.main_class.write_log(self.log_box, f"color '{color}' selected")
+        CommonOperations.write_log(log_box=self.log_box, message=f"color '{color}' selected")
     
     def get_file_path(self, entry):
-        self.main_class.get_file_path(self.log_box, entry)
+        self._common.get_file_path(self.log_box, entry)
     
     def set_logbox_text(self, text):
         self.log_box.delete("0.0", tkinter.END)
         self.log_box.insert("0.0", text)
     
     def open_file(self):
-        self.file_viewer_window = self.main_class.file_viewer_window(self.file_viewer_window, self.file_path.get(), self.log_box)
+        self.file_viewer_window = self._common.file_viewer_window(self.file_viewer_window, self.file_path.get(), self.log_box)
     
     def events_table_preview(self):
-        self.events_preview_in_table = self.main_class.events_preview_in_table(self.events_preview_in_table, self.file_path.get(), self.log_box)
+        self.events_preview_in_table = self._common.events_preview_in_table(self.events_preview_in_table, self.file_path.get(), self.log_box)
     
     def date_picker(self, type):
-        self.date_picker_window = self.main_class.date_picker_window(type, self.date_picker_window, self.entry_date_from, self.entry_date_to, self.log_box)
+        self.date_picker_window = self._common.date_picker_window(type, self.date_picker_window, self.entry_date_from, self.entry_date_to, self.log_box)
 
     def go_to_new_events_frame(self):
         self.main_class.show_frame(NewEventsFrame)
@@ -986,9 +995,9 @@ class GetEventsFrame(ctk.CTkFrame):
 #?###########################################################
 class GraphFrame(ctk.CTkFrame):
     main_class = None
-    date_picker_window = None
     file_viewer_window = None
     events_preview_in_table = None
+    _common = CommonOperations()
     
     def __init__(self, parent, main_class):
         ctk.CTkFrame.__init__(self, parent)
@@ -1092,26 +1101,21 @@ class GraphFrame(ctk.CTkFrame):
         self.log_box.bind("<Key>", lambda e: "break")  # set the textbox readonly
         self.log_box.grid(row=5, column=1, columnspan=2, padx=(0, 0), pady=(20, 0), sticky="nsew")
     
-    def combobox_callback(self, color):
-        self.multi_selection.configure(button_color=EVENT_COLOR.get(color))
-        self.multi_selection.set(color)
-        self.main_class.write_log(self.log_box, f"color '{color}' selected")
-    
     def get_file_path(self):
         file_path = filedialog.askopenfilename(title="Select file where do you want to save data", filetypes=(("CSV files", "*.csv"), ("TXT files", "*.txt"), ("All files", "*.*")))
         self.file_path.delete("0", tkinter.END)
         self.file_path.insert("0", file_path)
-        self.main_class.write_log(self.log_box, f"file '{file_path}' selected")
+        self._common.write_log(self.log_box, f"file '{file_path}' selected")
     
     def set_logbox_text(self, text):
         self.log_box.delete("0.0", tkinter.END)
         self.log_box.insert("0.0", text)
     
     def open_file(self):
-        self.file_viewer_window = self.main_class.file_viewer_window(self.file_viewer_window, self.file_path.get(), self.log_box)
+        self.file_viewer_window = self._common.file_viewer_window(self.file_viewer_window, self.file_path.get(), self.log_box)
 
     def events_table_preview(self):
-        self.events_preview_in_table = self.main_class.events_preview_in_table(self.events_preview_in_table, self.file_path.get(), self.log_box)
+        self.events_preview_in_table = self._common.events_preview_in_table(self.events_preview_in_table, self.file_path.get(), self.log_box)
 
     def select_all(self):
         self.total_hours_per_year.select()
@@ -1120,7 +1124,7 @@ class GraphFrame(ctk.CTkFrame):
         self.total_hours_by_summary2.select()
         self.total_hours_per_year_by_summary.select()
         self.total_hours_per_month_by_summary.select()
-        self.main_class.write_log(self.log_box, f"all chart types selected")
+        self._common.write_log(self.log_box, f"all chart types selected")
         
     def deselect_all(self):
         self.total_hours_per_year.deselect()
@@ -1129,16 +1133,13 @@ class GraphFrame(ctk.CTkFrame):
         self.total_hours_by_summary2.deselect()
         self.total_hours_per_year_by_summary.deselect()
         self.total_hours_per_month_by_summary.deselect()
-        self.main_class.write_log(self.log_box, f"all chart types deselected")
-    
-    def date_picker(self, type):
-        self.date_picker_window = self.main_class.date_picker_window(type, self.date_picker_window, self.entry_date_from, self.entry_date_to, self.log_box)
+        self._common.write_log(self.log_box, f"all chart types deselected")
     
     def generate_graph(self):
-        if self.main_class.check_file_path_errors(self.log_box, self.file_path.get()): return  
+        if self._common.check_file_path_errors(self.log_box, self.file_path.get()): return  
         
         try:
-            self.main_class.write_log(self.log_box, "Generating chart")
+            self._common.write_log(self.log_box, "Generating chart")
             data = Plotter.Plotter.loadData(self.file_path.get())
             
             Plotter.Plotter.allStats(data) 
@@ -1151,24 +1152,24 @@ class GraphFrame(ctk.CTkFrame):
             if self.total_hours_per_month_by_summary.get() == "on": Plotter.Plotter.chart_TotalHoursPerMonthBySummary(data)
                
         except FileNotFoundError:
-            self.main_class.write_log(self.log_box, f"Error, the file '{self.file_path.get()}' doesn't exist")
+            self._common.write_log(self.log_box, f"Error, the file '{self.file_path.get()}' doesn't exist")
             return
         except pandas.errors.EmptyDataError:
-            self.main_class.write_log(self.log_box, f"Error, the file '{self.file_path.get()}' is empty")
+            self._common.write_log(self.log_box, f"Error, the file '{self.file_path.get()}' is empty")
             return
         except PermissionError as permission_error:
-            self.main_class.messagebox_exception(permission_error)
-            self.main_class.write_log(self.log_box, f"Permission error: {str(permission_error)}")
+            self._common.messagebox_exception(permission_error)
+            self._common.write_log(self.log_box, f"Permission error: {str(permission_error)}")
         except ValueError as value_error:
-            self.main_class.messagebox_exception(value_error)
-            self.main_class.write_log(self.log_box, f"Value error: {str(value_error)}")
+            self._common.messagebox_exception(value_error)
+            self._common.write_log(self.log_box, f"Value error: {str(value_error)}")
         # except Plotter.PlotterError as plotter_error:
         #     # Replace 'PlotterError' with the actual custom exception class from your Plotter module
-        #     self.main_class.messagebox_exception(plotter_error)
-        #     self.main_class.write_log(self.log_box, f"Plotter error: {str(plotter_error)}")
+        #     self._common.messagebox_exception(plotter_error)
+        #     self._common.write_log(self.log_box, f"Plotter error: {str(plotter_error)}")
         except Exception as error:
-            self.main_class.messagebox_exception(error)
-            self.main_class.write_log(self.log_box, f"Generic error: {str(error)}")
+            self._common.messagebox_exception(error)
+            self._common.write_log(self.log_box, f"Generic error: {str(error)}")
     
     def go_to_new_events_frame(self):
         self.main_class.show_frame(NewEventsFrame)
@@ -1251,6 +1252,7 @@ class LoginFrame(ctk.CTkFrame):
     height = 600
     main_class = None
     toplevel_window = None
+    _common = CommonOperations()
     
     def __init__(self, parent, main_class):
         ctk.CTkFrame.__init__(self, parent)
@@ -1286,18 +1288,19 @@ class LoginFrame(ctk.CTkFrame):
             # get credentials
             credentials = gc.CalendarEventsManager.connectionSetup(credentials_path, gc.CalendarEventsManager.SCOPE, token_path)
         except Exception as error:
-            self.main_class.messagebox_exception(error)
+            self._common.messagebox_exception(error)
+            credentials = None
             try: os.remove(token_path) # delete token.json 
             except: pass
         
         # response message box
         if credentials is not None:
             (user, _, _) = gc.CalendarEventsManager.get_user_info(credentials)
-            CTkMessagebox(title='Login completed', message=f"Hello {user}! \nYou have logged in successfully.", icon="check", option_1="Ok")
-            self.updateUsernameMenuItem()
             
             # set credentials values to main class
-            self.main_class.set_credentials(credentials, credentials_path, token_path)
+            self._common.set_credentials(credentials, credentials_path, token_path)
+            
+            self.updateUsernameMenuItem()
             
             self.main_class.show_frame(MainFrame)
         else:
@@ -1313,11 +1316,9 @@ class LoginFrame(ctk.CTkFrame):
 #*###########################################################
 class App(): 
     root: ctk.CTk
-    credentials_path = None
-    token_path = None
-    credentials = None
-    menu = None
-    button_5 = None
+    _menu: CTkMenuBar
+    _button_5: ctk.CTkButton
+    _common = CommonOperations()
     
     app_width = 1100
     app_height = 900
@@ -1325,6 +1326,8 @@ class App():
     def __init__(self):
         root = ctk.CTk()
         self.root = root
+        self._menu = None
+        self._button_5 = None
         
         # read data from json to get path from last session
         listRes = js.JSONSettings.ReadFromJSON()
@@ -1342,73 +1345,6 @@ class App():
         
         self.root.mainloop()
     
-    def change_scaling_event(self, new_scaling: str):
-        if new_scaling == None: return
-        new_scaling_float = int(new_scaling) / 100
-        ctk.set_widget_scaling(new_scaling_float)
-        js.JSONSettings.WriteTextScalingToJSON(new_scaling)
-        
-    def change_appearance(self, new_appearance: str):
-        if new_appearance == None: return
-        ctk.set_appearance_mode(new_appearance)
-        js.JSONSettings.WriteAppearanceToJSON(new_appearance)
-    
-    def change_color_theme(self, color_theme: str):
-        if color_theme == None: return
-        ctk.set_default_color_theme(color_theme) 
-        js.JSONSettings.WriteColorThemeToJSON(color_theme)
-    
-    def set_color_theme(self, color_theme: str):
-        self.change_color_theme(color_theme)
-        CTkMessagebox(title="Information", message="The theme color will be updated when the application is restarted")
-    
-    def messagebox_exception(self, error):
-        error_message = str(error) + '\n\n' + traceback.format_exc()
-        
-        # Save the full error details to a temporary file
-        with tempfile.NamedTemporaryFile(mode='w+', delete=False, suffix=".txt") as temp_file:
-            temp_file.write(error_message)
-            
-        # Provide a link or an option to view the complete error details externally
-        msg = CTkMessagebox(title="Exception Error", message=error, icon="cancel", option_1="Ok", option_2="View Details")
-
-        if msg.get() == "Ok": msg.destroy()
-        if msg.get() == "View Details": self.messagebox_exception_error_window(error_message)
-           
-    def messagebox_exception_error_window(self, error):
-        if hasattr(self, "toplevel_window") and self.toplevel_window.winfo_exists():
-            self.toplevel_window.focus()  # If window exists, focus it
-            return
-
-        self.toplevel_window = ctk.CTkToplevel()
-        self.toplevel_window.after(200, lambda: self.toplevel_window.iconbitmap('./imgs/bug.ico')) # i have to delay the icon because it' buggy on windows
-        self.toplevel_window.title(f'Exception traceback')
-
-        # Create a grid inside the toplevel window
-        self.toplevel_window.grid_rowconfigure(0, weight=1)  # Allow row 0 to expand vertically
-        self.toplevel_window.grid_columnconfigure(0, weight=1)  # Allow column 0 to expand horizontally
-        self.toplevel_window.grid_columnconfigure(1, weight=1)  # Allow column 1 to expand horizontally
-
-        file_viewer = ctk.CTkTextbox(self.toplevel_window)
-        file_viewer.grid(row=0, column=0, columnspan=2, padx=0, pady=(0, 10), sticky="nsew")
-
-        button_close = ctk.CTkButton(self.toplevel_window, text="Close", command=self.toplevel_window.destroy)
-        button_close.grid(row=1, column=0, padx=5, pady=(0, 10), sticky="nsew")
-
-        button_report = ctk.CTkButton(self.toplevel_window, text="Report Exception", command=lambda: webbrowser.open(GITHUB_ISSUES_LINK))
-        button_report.grid(row=1, column=1, padx=5, pady=(0, 10), sticky="nsew")
-
-        # Insert text into the box
-        file_viewer.delete(0.0, tkinter.END)
-        file_viewer.insert(tkinter.END, str(error))
-
-        self.toplevel_window.attributes("-topmost", False)  # Focus on this window
-    
-    # to display the current frame passed as parameter
-    def show_frame(self, cont):
-        frame = self.frames[cont]
-        frame.tkraise()
-    
     def init_window(self):
         # configure window
         self.root.iconbitmap('./imgs/icon.ico')
@@ -1420,24 +1356,33 @@ class App():
         if listRes != None:
             try: 
                 appearance = listRes["Appearence"]
-                self.change_appearance(appearance)
+                CommonOperations.change_appearance(appearance)
             except: pass
             try: 
                 text_scaling = listRes["TextScaling"]
-                self.change_scaling_event(text_scaling)
+                CommonOperations.change_scaling_event(text_scaling)
             except: pass
             try: 
                 color_theme = listRes["ColorTheme"]
-                self.change_color_theme(color_theme)
+                CommonOperations.change_color_theme(color_theme)
             except: pass 
     
+    def centerWindow(self):
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight()
+        
+        x = (screen_width / 2) - (self.app_width / 2) 
+        y = (screen_height / 2) - (self.app_height / 2) 
+        
+        self.root.geometry(f'{self.app_width}x{self.app_height}+{int(x)}+{int(y)}')
+    
     def init_menu(self):
-        self.menu = CTkMenuBar(self.root) 
-        button_1 = self.menu.add_cascade("File")
-        button_3 = self.menu.add_cascade("Settings")
-        button_4 = self.menu.add_cascade("About")
+        self._menu = CTkMenuBar(self.root) 
+        button_1 = self._menu.add_cascade("File")
+        button_3 = self._menu.add_cascade("Settings")
+        button_4 = self._menu.add_cascade("About")
                         
-        if self.credentials is not None:
+        if self._common.get_credentials() is not None:
             self.updateUsernameMenuItem()
 
         dropdown1 = CustomDropdownMenu(widget=button_1)
@@ -1448,22 +1393,22 @@ class App():
 
         dropdown3 = CustomDropdownMenu(widget=button_3)
         sub_menu2 = dropdown3.add_submenu("Appearance")
-        sub_menu2.add_option(option="System", command=lambda: self.change_appearance("System"))
-        sub_menu2.add_option(option="Dark", command=lambda: self.change_appearance("dark"))
-        sub_menu2.add_option(option="Light", command=lambda: self.change_appearance("light"))
+        sub_menu2.add_option(option="System", command=lambda: CommonOperations.change_appearance("System"))
+        sub_menu2.add_option(option="Dark", command=lambda: CommonOperations.change_appearance("dark"))
+        sub_menu2.add_option(option="Light", command=lambda: CommonOperations.change_appearance("light"))
         
         sub_menu3 = dropdown3.add_submenu("Scaling")
-        sub_menu3.add_option(option="120%", command=lambda: self.change_scaling_event("120"))
-        sub_menu3.add_option(option="110%", command=lambda: self.change_scaling_event("110"))
-        sub_menu3.add_option(option="100%", command=lambda: self.change_scaling_event("100"))
-        sub_menu3.add_option(option="90%", command=lambda: self.change_scaling_event("90"))
-        sub_menu3.add_option(option="80%", command=lambda: self.change_scaling_event("80"))
-        sub_menu3.add_option(option="70%", command=lambda: self.change_scaling_event("70"))
+        sub_menu3.add_option(option="120%", command=lambda: CommonOperations.change_scaling_event("120"))
+        sub_menu3.add_option(option="110%", command=lambda: CommonOperations.change_scaling_event("110"))
+        sub_menu3.add_option(option="100%", command=lambda: CommonOperations.change_scaling_event("100"))
+        sub_menu3.add_option(option="90%", command=lambda: CommonOperations.change_scaling_event("90"))
+        sub_menu3.add_option(option="80%", command=lambda: CommonOperations.change_scaling_event("80"))
+        sub_menu3.add_option(option="70%", command=lambda: CommonOperations.change_scaling_event("70"))
         
         sub_menu4 = dropdown3.add_submenu("Theme")
-        sub_menu4.add_option(option="Blue", command=lambda: self.set_color_theme("blue"))
-        sub_menu4.add_option(option="Dark Blue", command=lambda: self.set_color_theme("dark-blue"))
-        sub_menu4.add_option(option="Green", command=lambda: self.set_color_theme("green"))
+        sub_menu4.add_option(option="Blue", command=lambda: CommonOperations.set_color_theme("blue"))
+        sub_menu4.add_option(option="Dark Blue", command=lambda: CommonOperations.set_color_theme("dark-blue"))
+        sub_menu4.add_option(option="Green", command=lambda: CommonOperations.set_color_theme("green"))
 
         dropdown4 = CustomDropdownMenu(widget=button_4)
         dropdown4.add_option(option="Share", command=lambda: webbrowser.open(GITHUB_PAGE_LINK))
@@ -1473,14 +1418,14 @@ class App():
         sub_menu4.add_option(option="Donate with \"Paypal\"", command=lambda: webbrowser.open(DONATE_PAYPAL_PAGE_LINK))
     
     def updateUsernameMenuItem(self):
-        (_, email, picture_url) = gc.CalendarEventsManager.get_user_info(self.credentials)
+        (_, email, picture_url) = gc.CalendarEventsManager.get_user_info(self._common.get_credentials())
         
         # Configure column 4 to expand (to align right).
-        self.menu.columnconfigure(4, weight=1)
+        self._menu.columnconfigure(4, weight=1)
         
         default_user_image = tkinter.PhotoImage(file='./imgs/user.png')
         
-        if self.credentials is not None:
+        if self._common.get_credentials() is not None:
             # Try to load the profile image from URL
             res = self.get_user_image_from_url(picture_url)
             if picture_url and res is not None:
@@ -1489,13 +1434,13 @@ class App():
                 # Fallback to default image
                 user_image = default_user_image
 
-            if self.button_5 is not None:
-                self.button_5.configure(text=str(email), image=user_image)
-                self.button_5.grid(row=0, column=4, padx=10, pady=10, sticky="e")
+            if self._button_5 is not None:
+                self._button_5.configure(text=str(email), image=user_image)
+                self._button_5.grid(row=0, column=4, padx=10, pady=10, sticky="e")
             else:
-                self.button_5 = ctk.CTkButton(self.menu, text=str(email), fg_color="transparent", image=user_image, command=self.show_user_menu)
-                self.button_5.grid(row=0, column=4, padx=10, pady=10, sticky="e")
-                self.dropdown5 = CustomDropdownMenu(widget=self.button_5)
+                self._button_5 = ctk.CTkButton(self._menu, text=str(email), fg_color="transparent", image=user_image, command=self.show_user_menu)
+                self._button_5.grid(row=0, column=4, padx=10, pady=10, sticky="e")
+                self.dropdown5 = CustomDropdownMenu(widget=self._button_5)
                 self.dropdown5.add_option(option="Google Calendar", command=lambda: webbrowser.open(GOOGLE_CALENDAR_LINK))
                 self.dropdown5.add_option(option="Log out", command=lambda: self.log_out())
         else:
@@ -1530,22 +1475,17 @@ class App():
         self.dropdown5.show()
     
     def forgetUsernameMenuItem(self):
-        if self.button_5 is not None:
-            self.button_5.grid_forget()
+        if self._button_5 is not None:
+            self._button_5.grid_forget()
             
     def log_out(self):
         self.forgetUsernameMenuItem()
         self.show_frame(LoginFrame)
     
-    def centerWindow(self):
-        screen_width = self.root.winfo_screenwidth()
-        screen_height = self.root.winfo_screenheight()
-        
-        x = (screen_width / 2) - (self.app_width / 2) 
-        y = (screen_height / 2) - (self.app_height / 2) 
-        
-        self.root.geometry(f'{self.app_width}x{self.app_height}+{int(x)}+{int(y)}')
-    
+    def show_frame(self, cont):
+        frame = self.frames[cont]
+        frame.tkraise()
+
     def page_controller(self):
         # creating a container
         container = ctk.CTkFrame(self.root) 
@@ -1567,204 +1507,11 @@ class App():
 
             frame.grid(row = 0, column = 0, sticky ="nsew")
         
-        if self.credentials is None or self.credentials_path is None:
+
+        if self._common.get_credentials() is None or self._common.get_credentials_path() is None:
             self.show_frame(LoginFrame)
         else:
             self.show_frame(MainFrame)
-    
-    def set_credentials(self, credentials, credentials_path, token_path):
-        self.credentials = credentials
-        self.credentials_path = credentials_path
-        self.token_path = token_path
-        js.JSONSettings.WriteCredentialsToJSON(self.credentials_path, self.token_path)
-        
-    def set_timezone(self, timezone):
-        js.JSONSettings.WriteTimeZoneToJSON(timezone)
-    
-    def get_timezone(self):
-        # read data from json to get path from last session
-        timezone = 'UTC' # set default timezone
-        listRes = js.JSONSettings.ReadFromJSON()
-        if listRes != None:
-            try: timezone = listRes["TimeZone"]
-            except: pass
-        return timezone
-    
-    def get_color_id(self, colors, color_selected):
-        color_index = 0
-        
-        for idx, color in enumerate(colors.keys()):
-            if color == color_selected:
-                color_index = idx+1
-                break
-            
-        # check if the color is valid (it is not setted 'No Color Filtering')
-        if color_index == 12: # 'No Color Filtering' has index == 12
-            color_index = -1
-            
-        return color_index
-    
-    def date_picker_window(self, type, toplevel_window, entry_date_from, entry_date_to, log_box):
-        if toplevel_window is None or not toplevel_window.winfo_exists():
-            toplevel_window = ctk.CTkToplevel() # create window if its None or destroyed
-            toplevel_window.after(200, lambda: toplevel_window.iconbitmap('./imgs/calendar.ico')) # i have to delay the icon because it' buggy on windows
-            
-            calendar = Calendar(toplevel_window)
-            calendar.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
-            hours_label = ctk.CTkLabel(toplevel_window, text="hours:")
-            hours_label.grid(row=1, column=0, padx=10, pady=10, sticky="w")
-
-            minutes_label = ctk.CTkLabel(toplevel_window, text="minutes: ")
-            minutes_label.grid(row=2, column=0, padx=10, pady=10, sticky="w")
-            
-            spinbox_hours = CustomSpinbox.CustomSpinbox(toplevel_window, width=105, step_size=1, min_value=0, max_value=23)
-            spinbox_hours.grid(row=1, column=0, padx=(70, 0), pady=10, sticky="w")
-            
-            spinbox_minutes = CustomSpinbox.CustomSpinbox(toplevel_window, width=105, step_size=1, min_value=0, max_value=59)
-            spinbox_minutes.grid(row=2, column=0, padx=(70, 0), pady=10, sticky="w")
-            
-            # get current hour
-            now = datetime.now()
-            current_hour = now.strftime("%H")
-
-            # calculate hour after one hour
-            after_one_hour = now + timedelta(hours=1)
-            hour_after_one_hour = after_one_hour.strftime("%H")
-
-            if type == 1:
-                toplevel_window.title("Date From")
-                confirm_button = ctk.CTkButton(toplevel_window, text="Confirm", command=lambda: self.get_date(1, toplevel_window, entry_date_from, entry_date_to, log_box, calendar, spinbox_hours.get(), spinbox_minutes.get()))
-                # set default hour
-                spinbox_hours.set(int(current_hour))
-            elif type == 2:
-                toplevel_window.title("Date To")
-                confirm_button = ctk.CTkButton(toplevel_window, text="Confirm", command=lambda: self.get_date(2, toplevel_window, entry_date_from, entry_date_to, log_box, calendar, spinbox_hours.get(), spinbox_minutes.get()))
-                # set default hour
-                spinbox_hours.set(int(hour_after_one_hour))
-            else:
-                raise Exception("type option doesn't exists")
-            
-            confirm_button.grid(row=3, column=0, padx=10, pady=10, sticky="nsew")
-            
-            toplevel_window.attributes("-topmost", True) # focus to this windows
-            toplevel_window.resizable(False, False)
-        else:
-            toplevel_window.focus()  # if window exists focus it
-        
-        return toplevel_window
-    
-    def get_date(self, type, toplevel_window, entry_date_from, entry_date_to, log_box, calendar, hours, minutes):
-        date = calendar.get_date() # get the date from the calendar
-        
-        try:
-            if hours > 23 or hours < 0 or minutes > 59 or minutes < 0:
-                return
-        except ValueError:
-            return
-        
-        # Format the datetime object as a string in DATE_FORMATTER
-        date = datetime.strptime(date, DAY_FORMATTER)
-        full_date = datetime(date.year, date.month, date.day, hours, minutes)
-        full_date_str = full_date.strftime(DATE_FORMATTER)
-        
-        if type == 1:
-            self.write_log(log_box, "Date Selected From: " + full_date_str)
-            entry_date_from.delete("0", tkinter.END)
-            entry_date_from.insert("0", full_date_str)
-        elif type == 2:
-            self.write_log(log_box, "Date Selected To: " + full_date_str)
-            entry_date_to.delete("0", tkinter.END)
-            entry_date_to.insert("0", full_date_str)
-        else:
-            raise Exception("type option doesn't exists")
-        
-        toplevel_window.destroy()
-    
-    def get_file_path(self, logbox, entry):
-        file_path = filedialog.askopenfilename(title="Select file where do you want to save data", filetypes=(("CSV files", "*.csv"), ("TXT files", "*.txt"), ("All files", "*.*")))
-        entry.delete("0", tkinter.END)
-        entry.insert("0", file_path)
-        self.write_log(logbox, f"file '{file_path}' selected")
-        return file_path
-    
-    def file_viewer_window(self, toplevel_window, filepath, log_box):
-        
-        if self.check_file_path_errors(log_box, filepath): return
-        
-        if toplevel_window is None or not toplevel_window.winfo_exists():
-            toplevel_window = ctk.CTkToplevel() # create window if its None or destroyed
-            toplevel_window.title(filepath)
-            toplevel_window.after(200, lambda: toplevel_window.iconbitmap('./imgs/list.ico')) # i have to delay the icon because it' buggy on windows
-            file_viewer = ctk.CTkTextbox(toplevel_window)
-            file_viewer.bind("<Key>", lambda e: "break")  # set the textbox readonly
-            file_viewer.pack(fill=tkinter.BOTH, expand=True)
-            
-            #insert text into box
-            with open(filepath, 'r', encoding='utf-8') as file:
-                file_content = file.read()
-                file_viewer.delete(1.0, tkinter.END)
-                file_viewer.insert(tkinter.END, file_content)
-
-            toplevel_window.attributes("-topmost", True) # focus to this windows
-            self.write_log(log_box, f"file '{filepath}' opened")
-        else:
-            toplevel_window.focus()  # if window exists focus it
-        
-        return toplevel_window
-    
-    def events_preview_in_table(self, toplevel_window, filepath, log_box):
-        if self.check_file_path_errors(log_box, filepath):
-            return
-
-        if toplevel_window is None or not toplevel_window.winfo_exists():
-            toplevel_window = ctk.CTkToplevel()  # create window if it's None or destroyed
-            toplevel_window.title(filepath)
-            toplevel_window.after(200, lambda: toplevel_window.iconbitmap('./imgs/list.ico'))  # delay the icon
-
-            events = []
-
-            with open(filepath, 'r', encoding='utf-8') as file:
-                counter = 1
-                for line in file:
-                    event_details = line.strip().split('|')
-                    if len(event_details) > 0:
-                        event_details.insert(0, str(counter))
-                        events.append(event_details)
-                        counter += 1
-            
-            if len(events) == 0:
-                self.write_log(log_box, f"file '{filepath}' is empty")
-                return
-
-            frame = CTkXYFrame(toplevel_window)
-            frame.pack(fill="both", expand=True, padx=10, pady=10)
-
-            table = CTkTable(frame, row=len(events), column=len(events[0]), values=events)
-            table.pack()
-
-            toplevel_window.attributes("-topmost", True)  # focus to this window
-            self.write_log(log_box, f"file '{filepath}' opened")
-            
-        else:
-            toplevel_window.focus()  # if window exists, focus it
-
-        return toplevel_window
-
-    
-    def check_file_path_errors(self, log_box, filepath):
-        if filepath is None or len(filepath) == 0:
-            self.write_log(log_box, f"ERROR: file path is missing")
-            return True
-        
-        if not os.path.exists(filepath):
-            self.write_log(log_box, f"ERROR: file '{filepath}' doesn't found")
-            return True
-    
-    def write_log(self, log_box, message):
-        log_box.insert("0.0", "\n" + str(datetime.now()) + ": " + message)
-
-    def get_credentials(self):
-        return self.credentials
 
 #*###########################################################
 
