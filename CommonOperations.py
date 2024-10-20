@@ -322,3 +322,17 @@ class CommonOperations():
         if new_appearance == None: return
         ctk.set_appearance_mode(new_appearance)
         js.JSONSettings.WriteAppearanceToJSON(new_appearance)
+    
+    def get_appearance(self) -> str:
+        appearance = ctk.get_appearance_mode()
+
+        if appearance is None or appearance == "":
+            listRes = js.JSONSettings.ReadFromJSON()
+            appearance = ""
+            if listRes != None:
+                try: 
+                    appearance = listRes["Appearence"]
+                    CommonOperations.change_appearance(appearance)
+                except: pass
+        
+        return appearance

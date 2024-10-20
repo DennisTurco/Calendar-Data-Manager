@@ -55,22 +55,6 @@ class JSONSettings:
         JSONSettings.__writeToFile(existing_data)
             
     @staticmethod
-    def WriteAppearenceToJSON(appearance: str) -> None:
-        if appearance is None or len(appearance) == 0: raise ValueError("Appearance can't be empty")
-
-        # check if directory exists
-        JSONSettings.__checkIfDirectoryExists()
-        
-        # Read existing data from the file
-        existing_data = JSONSettings.__readFromFile()
-
-        # Update or add the new appearance
-        existing_data["Appearence"] = appearance
-
-        # Write the updated data back to the file
-        JSONSettings.__writeToFile(existing_data)
-            
-    @staticmethod
     def WriteAppearanceToJSON(appearance: str) -> None:
         if appearance is None or len(appearance) == 0: raise ValueError("Appearance can't be empty")
 

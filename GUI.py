@@ -1393,9 +1393,8 @@ class App():
 
         dropdown3 = CustomDropdownMenu(widget=button_3)
         sub_menu2 = dropdown3.add_submenu("Appearance")
-        sub_menu2.add_option(option="System", command=lambda: CommonOperations.change_appearance("System"))
-        sub_menu2.add_option(option="Dark", command=lambda: CommonOperations.change_appearance("dark"))
-        sub_menu2.add_option(option="Light", command=lambda: CommonOperations.change_appearance("light"))
+        sub_menu2.add_option(option="Dark", command=lambda: self.change_app_appearance("dark"))
+        sub_menu2.add_option(option="Light", command=lambda: self.change_app_appearance("light"))
         
         sub_menu3 = dropdown3.add_submenu("Scaling")
         sub_menu3.add_option(option="120%", command=lambda: CommonOperations.change_scaling_event("120"))
@@ -1443,6 +1442,9 @@ class App():
                 self.dropdown5 = CustomDropdownMenu(widget=self._button_5)
                 self.dropdown5.add_option(option="Google Calendar", command=lambda: webbrowser.open(GOOGLE_CALENDAR_LINK))
                 self.dropdown5.add_option(option="Log out", command=lambda: self.log_out())
+        
+            self.change_app_appearance_profile()
+        
         else:
             self.forgetUsernameMenuItem()
             
@@ -1485,6 +1487,22 @@ class App():
     def show_frame(self, cont):
         frame = self.frames[cont]
         frame.tkraise()
+    
+    def change_app_appearance(self, mode: str):
+        CommonOperations.change_appearance(mode)
+        self.change_app_appearance_profile(mode)
+
+    def change_app_appearance_profile(self, appearance: str = ''):
+        # edit color text button following the style apperance
+        if appearance is None or appearance == '':
+            appearance = self._common.get_appearance()
+
+        if appearance.lower() == 'light':
+            self._button_5.configure(text_color="black")
+        elif appearance.lower() == 'dark':
+            self._button_5.configure(text_color="white")
+        else:
+            self._button_5.configure(text_color="#76797e")
 
     def page_controller(self):
         # creating a container
