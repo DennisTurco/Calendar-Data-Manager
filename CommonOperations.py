@@ -35,6 +35,7 @@ class CommonOperations():
     token_path: str
     credentials: Credentials
     credentials_path: str
+    _frames = {}
 
     def __new__(cls):
         if not cls._instance:
@@ -336,3 +337,9 @@ class CommonOperations():
                 except: pass
         
         return appearance
+    
+    def set_frames(self, frames):
+        self._frames = frames
+
+    def get_frames(self):
+        return self._frames

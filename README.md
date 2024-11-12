@@ -1,3 +1,5 @@
+![logo](imgs/icon.png)
+
 # Calendar Data Manager
 
 ## 📜 Description
@@ -34,13 +36,17 @@ This project is entirely free, devoid of any paid content or advertisements. It 
 ## 🐛 Report a BUG
 To report a BUG -> [ISSUE](https://github.com/DennisTurco/Calendar-Data-Manager/issues)
 
-<!-- ## Licence
 
-[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/) -->
+## Licence
+
+[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
+
+## Time report
+[![wakatime](https://wakatime.com/badge/user/ce36d0fc-2f0b-4e85-b318-872804ab18b6/project/6a2e8ba4-e41d-4ee4-bb83-20ca19fe3dfb.svg)](https://wakatime.com/badge/user/ce36d0fc-2f0b-4e85-b318-872804ab18b6/project/6a2e8ba4-e41d-4ee4-bb83-20ca19fe3dfb)
 
 ## Authors
 
-- [@DennisTurco](https://www.github.com/DennisTurco)
+- [DennisTurco](https://www.github.com/DennisTurco)
 
 
 ## Support

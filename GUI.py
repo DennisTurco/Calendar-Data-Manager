@@ -27,10 +27,9 @@ from CTkTable import *
 from CTkScrollableDropdown import *
 from CTkXYFrame import *
 
-
-from CommonOperations import CommonOperations 
-#from FrameController import FrameController
-#from MenuController import MenuController
+from CommonOperations import CommonOperations
+import GUIWidgets
+import FrameController
 
 # consts
 EVENT_COLOR: Final[dict] = {"Light Blue": "#7986cb", "Green": "#33b679", "Purple": "#8e24aa", "Pink": "#e67c73", "Yellow": "#f6bf26", "Orange": "#f4511e", "Blue": "#039be5", "Grey": "#616161", "Dark Blue": "#3f51b5", "Dark Green": "#0b8043", "Red": "#d50000"}
@@ -71,21 +70,12 @@ class NewEventsFrame(ctk.CTkFrame):
         self.grid_rowconfigure((0, 1, 2), weight=1)
 
         # create sidebar frame with widgets
-        self.sidebar_frame = ctk.CTkFrame(self, width=140, corner_radius=0)
-        self.sidebar_frame.grid(row=0, column=0, rowspan=6, sticky="nsew")
-        self.sidebar_frame.grid_rowconfigure(5, weight=1)
-        self.title_label = ctk.CTkLabel(self.sidebar_frame, text="Other Options", font=ctk.CTkFont(size=20, weight="bold"))
-        self.title_label.grid(row=0, column=0, padx=20, pady=(20, 10))
-        self.sidebar_button_1 = ctk.CTkButton(self.sidebar_frame, image=plus_image, text="New Events", command=self.go_to_new_events_frame)
-        self.sidebar_button_1.grid(row=1, column=0, padx=20, pady=10)
-        self.sidebar_button_2 = ctk.CTkButton(self.sidebar_frame, image=edit_image, text="Edit Events", command=self.go_to_edit_events_frame)
-        self.sidebar_button_2.grid(row=2, column=0, padx=20, pady=10)
-        self.sidebar_button_3 = ctk.CTkButton(self.sidebar_frame, image=list_image, text="Get Events List", command=self.go_to_get_events_by_title_frame)
-        self.sidebar_button_3.grid(row=3, column=0, padx=20, pady=10)
-        self.sidebar_button_4 = ctk.CTkButton(self.sidebar_frame, image=chart_image, text="Graph", command=self.go_to_graph_frame)
-        self.sidebar_button_4.grid(row=4, column=0, padx=20, pady=10)
-        self.google_calendar_link = ctk.CTkButton(self.sidebar_frame, image=google_image, text="Google Calendar", command=lambda: webbrowser.open(GOOGLE_CALENDAR_LINK))
-        self.google_calendar_link.grid(row=6, column=0, padx=20, pady=(10, 10))
+        (self.sidebar_button_1, self.sidebar_button_2, self.sidebar_button_3, self.sidebar_button_4, self.google_calendar_link) = GUIWidgets.create_side_bar_frame(self, plus_image, edit_image, list_image, chart_image, google_image)
+        self.sidebar_button_1.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[NewEventsFrame]))
+        self.sidebar_button_2.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[EditEventsFrame]))
+        self.sidebar_button_3.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GetEventsFrame]))
+        self.sidebar_button_4.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GraphFrame]))
+        self.google_calendar_link.configure(command=lambda: webbrowser.open(GOOGLE_CALENDAR_LINK))
         
         # create main panel
         self.title_label_main = ctk.CTkLabel(self, text="Create New Event", font=ctk.CTkFont(size=20, weight="bold"))
@@ -110,30 +100,12 @@ class NewEventsFrame(ctk.CTkFrame):
         CTkScrollableDropdown(self.multi_selection, values=list(EVENT_COLOR.keys()), button_color="transparent", command=self.combobox_callback)
         self.multi_selection.configure(button_color=EVENT_COLOR.get("Light Blue"))
         self.multi_selection.set("Light Blue")
-        self.multi_selection.grid(row=2, column=1, padx=0, pady=(10, 10), sticky="w")
-        
+        self.multi_selection.grid(row=2, column=1, padx=0, pady=(10, 10), sticky="w")        
+
         # date
-        self.date_frame = ctk.CTkScrollableFrame(self, label_text="Date Interval")
-        self.date_frame.grid(row=2, column=1, padx=(50, 50), pady=10, sticky="nsew")
-        self.date_frame.grid_columnconfigure((0, 1, 2), weight=1)
-        self.label_date_from = ctk.CTkLabel(self.date_frame, text="From:")
-        self.label_date_from.grid(row=0, column=0, padx=10, pady=10, sticky="e")
-        self.entry_date_from = ctk.CTkEntry(self.date_frame, placeholder_text="dd-mm-yyyy hh:mm")
-        self.entry_date_from.grid(row=0, column=1, padx=0, pady=10, sticky="ew")
-        self.entry_date_button = ctk.CTkButton(self.date_frame, text="", width=10, image=calendar_image, command=lambda: self.date_picker(1))
-        self.entry_date_button.grid(row=0, column=2, padx=0, pady=10, sticky="w")
-        self.label_date_to = ctk.CTkLabel(self.date_frame, text="To:")
-        self.label_date_to.grid(row=1, column=0, padx=10, pady=10, sticky="e")
-        self.entry_date_to = ctk.CTkEntry(self.date_frame, placeholder_text="dd-mm-yyyy hh:mm")
-        self.entry_date_to.grid(row=1, column=1, padx=0, pady=10, sticky="ew")
-        self.entry_date_button2 = ctk.CTkButton(self.date_frame, text="", width=10, image=calendar_image, command=lambda: self.date_picker(2))
-        self.entry_date_button2.grid(row=1, column=2, padx=0, pady=10, sticky="w")
-        self.label_timezone = ctk.CTkLabel(self.date_frame, text="Timezone:")
-        self.label_timezone.grid(row=2, column=0, padx=10, pady=10, sticky="e")
-        self.timezone_selection = ctk.CTkComboBox(self.date_frame, state="readonly")
-        CTkScrollableDropdown(self.timezone_selection, values=list(TIMEZONE), justify="left", button_color="transparent")
-        self.timezone_selection.set(CommonOperations.get_timezone())
-        self.timezone_selection.grid(row=2, column=1, padx=0, pady=(10, 10), sticky="nsew")
+        (self.entry_date_from, self.entry_date_to, self.timezone_selection, self.entry_date_button, self.entry_date_button2) = GUIWidgets.create_date_interval_scroll_frame(self, calendar_image, TIMEZONE)
+        self.entry_date_button.configure(command=lambda: self.date_picker(1))
+        self.entry_date_button2.configure(command=lambda: self.date_picker(2))
         
         # create button
         self.create_button = ctk.CTkButton(self, image=plus_image, text="Create", border_width=2, command=self.create_event)
@@ -201,23 +173,12 @@ class NewEventsFrame(ctk.CTkFrame):
     
     def date_picker(self, type):
         self.toplevel_window = self._common.date_picker_window(type, self.toplevel_window, self.entry_date_from, self.entry_date_to, self.log_box)
-    
-    def go_to_new_events_frame(self):
-        self.main_class.show_frame(NewEventsFrame)
-    
-    def go_to_edit_events_frame(self):
-        self.main_class.show_frame(EditEventsFrame)
-    
-    def go_to_get_events_by_title_frame(self):
-        self.main_class.show_frame(GetEventsFrame)
-    
-    def go_to_graph_frame(self):
-        self.main_class.show_frame(GraphFrame)
 #?###########################################################
 
 #?###########################################################
 class EditEventsFrame(ctk.CTkFrame):
     main_class = None
+    _common = CommonOperations()
     toplevel_window: ctk.CTkToplevel
     date_picker_window = None
     event_color_from = EVENT_COLOR
@@ -244,22 +205,13 @@ class EditEventsFrame(ctk.CTkFrame):
         self.grid_rowconfigure((0, 1, 2), weight=1)
 
         # create sidebar frame with widgets
-        self.sidebar_frame = ctk.CTkFrame(self, width=140, corner_radius=0)
-        self.sidebar_frame.grid(row=0, column=0, rowspan=6, sticky="nsew")
-        self.sidebar_frame.grid_rowconfigure(5, weight=1)
-        self.title_label = ctk.CTkLabel(self.sidebar_frame, text="Other Options", font=ctk.CTkFont(size=20, weight="bold"))
-        self.title_label.grid(row=0, column=0, padx=20, pady=(20, 10))
-        self.sidebar_button_1 = ctk.CTkButton(self.sidebar_frame, image=plus_image, text="New Events", command=self.go_to_new_events_frame)
-        self.sidebar_button_1.grid(row=1, column=0, padx=20, pady=10)
-        self.sidebar_button_2 = ctk.CTkButton(self.sidebar_frame, image=edit_image, text="Edit Events", command=self.go_to_edit_events_frame)
-        self.sidebar_button_2.grid(row=2, column=0, padx=20, pady=10)
-        self.sidebar_button_3 = ctk.CTkButton(self.sidebar_frame, image=list_image, text="Get Events List", command=self.go_to_get_events_by_title_frame)
-        self.sidebar_button_3.grid(row=3, column=0, padx=20, pady=10)
-        self.sidebar_button_4 = ctk.CTkButton(self.sidebar_frame, image=chart_image, text="Graph", command=self.go_to_graph_frame)
-        self.sidebar_button_4.grid(row=4, column=0, padx=20, pady=10)
-        self.google_calendar_link = ctk.CTkButton(self.sidebar_frame, image=google_image, text="Google Calendar", command=lambda: webbrowser.open(GOOGLE_CALENDAR_LINK))
-        self.google_calendar_link.grid(row=6, column=0, padx=20, pady=(10, 10))
-        
+        (self.sidebar_button_1, self.sidebar_button_2, self.sidebar_button_3, self.sidebar_button_4, self.google_calendar_link) = GUIWidgets.create_side_bar_frame(self, plus_image, edit_image, list_image, chart_image, google_image)
+        self.sidebar_button_1.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[NewEventsFrame]))
+        self.sidebar_button_2.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[EditEventsFrame]))
+        self.sidebar_button_3.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GetEventsFrame]))
+        self.sidebar_button_4.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GraphFrame]))
+        self.google_calendar_link.configure(command=lambda: webbrowser.open(GOOGLE_CALENDAR_LINK))
+
         # create main panel
         self.title_label_main = ctk.CTkLabel(self, text="Edit Events", font=ctk.CTkFont(size=20, weight="bold"))
         self.title_label_main.grid(row=0, column=1, padx=20, pady=(20, 10), sticky="nsew")
@@ -317,28 +269,9 @@ class EditEventsFrame(ctk.CTkFrame):
         self.multi_selection_new.grid(row=3, column=1, padx=0, pady=5, sticky="w")
         
         # date
-        self.date_frame = ctk.CTkScrollableFrame(self, label_text="Date Interval")
-        self.date_frame.grid(row=2, column=1, padx=(50, 50), pady=10, sticky="ew")
-        self.date_frame.grid_columnconfigure((0, 1, 2), weight=1)
-        self.date_frame.grid_rowconfigure((0, 1), weight=0)
-        self.label_date_from = ctk.CTkLabel(self.date_frame, text="From:")
-        self.label_date_from.grid(row=0, column=0, padx=10, pady=10, sticky="e")
-        self.entry_date_from = ctk.CTkEntry(self.date_frame, placeholder_text="dd-mm-yyyy hh:mm")
-        self.entry_date_from.grid(row=0, column=1, padx=0, pady=10, sticky="ew")
-        self.entry_date_button = ctk.CTkButton(self.date_frame, text="", width=10, image=calendar_image, command=lambda: self.date_picker(1))
-        self.entry_date_button.grid(row=0, column=2, padx=0, pady=10, sticky="w")
-        self.label_date_to = ctk.CTkLabel(self.date_frame, text="To:")
-        self.label_date_to.grid(row=1, column=0, padx=10, pady=10, sticky="e")
-        self.entry_date_to = ctk.CTkEntry(self.date_frame, placeholder_text="dd-mm-yyyy hh:mm")
-        self.entry_date_to.grid(row=1, column=1, padx=0, pady=10, sticky="ew")
-        self.entry_date_button2 = ctk.CTkButton(self.date_frame, text="", width=10, image=calendar_image, command=lambda: self.date_picker(2))
-        self.entry_date_button2.grid(row=1, column=2, padx=0, pady=10, sticky="w")
-        self.label_timezone = ctk.CTkLabel(self.date_frame, text="Timezone:")
-        self.label_timezone.grid(row=2, column=0, padx=10, pady=10, sticky="e")
-        self.timezone_selection = ctk.CTkComboBox(self.date_frame, state="readonly")
-        CTkScrollableDropdown(self.timezone_selection, values=list(TIMEZONE), justify="left", button_color="transparent")
-        self.timezone_selection.set(CommonOperations.get_timezone())
-        self.timezone_selection.grid(row=2, column=1, padx=0, pady=(10, 10), sticky="nsew")
+        (self.entry_date_from, self.entry_date_to, self.timezone_selection, self.entry_date_button, self.entry_date_button2) = GUIWidgets.create_date_interval_scroll_frame(self, calendar_image, TIMEZONE)
+        self.entry_date_button.configure(command=lambda: self.date_picker(1))
+        self.entry_date_button2.configure(command=lambda: self.date_picker(2))
         
         # edit button
         self.edit_button = ctk.CTkButton(self, image=edit_image, text="Edit", border_width=2, command=self.edit_events)
@@ -406,7 +339,7 @@ class EditEventsFrame(ctk.CTkFrame):
         try:
             # Retrieve events to edit
             old_events = gc.CalendarEventsManager.getEvents(
-                self.main_class.get_credentials(),
+                self._common.get_credentials(),
                 title=summary_old,
                 description=description_old,
                 start_date=date_from,
@@ -420,7 +353,7 @@ class EditEventsFrame(ctk.CTkFrame):
             else:
                 # Simulate event updates without applying them
                 new_events = gc.CalendarEventsManager.simulateEventUpdates(
-                    self.main_class.get_credentials(),
+                    self._common.get_credentials(),
                     old_events,
                     summary_new,
                     description_new,
@@ -434,16 +367,16 @@ class EditEventsFrame(ctk.CTkFrame):
         
         # Handle various exceptions
         except FileNotFoundError as e:
-            self.main_class.messagebox_exception(e)
+            self._common.messagebox_exception(e)
             CommonOperations.write_log(self.log_box, f"File not found error: {str(e)}")
         except PermissionError as e:
-            self.main_class.messagebox_exception(e)
+            self._common.messagebox_exception(e)
             CommonOperations.write_log(self.log_box, f"Permission error: {str(e)}")
         except ValueError as e:
-            self.main_class.messagebox_exception(e)
+            self._common.messagebox_exception(e)
             CommonOperations.write_log(self.log_box, f"Value error: {str(e)}")
         except Exception as e:
-            self.main_class.messagebox_exception(e)
+            self._common.messagebox_exception(e)
             CommonOperations.write_log(self.log_box, f"Generic error: {str(e)}")       
     
     def combobox_callback_color1(self, color):
@@ -455,25 +388,13 @@ class EditEventsFrame(ctk.CTkFrame):
         self.multi_selection_new.configure(button_color=self.event_color_to.get(color))
         self.multi_selection_new.set(color)
         CommonOperations.write_log(self.log_box, f"color '{color}' selected")
-    
-    def go_to_new_events_frame(self):
-        self.main_class.show_frame(NewEventsFrame)
-    
-    def go_to_edit_events_frame(self):
-        self.main_class.show_frame(EditEventsFrame)
-    
-    def go_to_get_events_by_title_frame(self):
-        self.main_class.show_frame(GetEventsFrame)
-    
-    def go_to_graph_frame(self):
-        self.main_class.show_frame(GraphFrame)
         
     def update_events(self, old_events: dict, summary_new: str, description_new: str, color_index_new, date_from: str, date_to: str, time_zone: str):
         # Apply updates to the events
         msg = CTkMessagebox(title="Edit events", message=f"Are you sure you want to confirm the changes?\n{len(old_events)} events will be changed.", icon="question", option_1="No", option_2="Yes")
         if msg.get() == "Yes":
             updated_events = gc.CalendarEventsManager.editEvent(
-                self.main_class.get_credentials(),
+                self._common.get_credentials(),
                 old_events,
                 summary_new,
                 description_new,
@@ -598,21 +519,12 @@ class GetEventsFrame(ctk.CTkFrame):
         self.grid_rowconfigure((0, 1, 2, 3), weight=1)
         
         # create sidebar frame with widgets
-        self.sidebar_frame = ctk.CTkFrame(self, width=140, corner_radius=0)
-        self.sidebar_frame.grid(row=0, column=0, rowspan=6, sticky="nsew")
-        self.sidebar_frame.grid_rowconfigure(5, weight=1)
-        self.title_label = ctk.CTkLabel(self.sidebar_frame, text="Other Options", font=ctk.CTkFont(size=20, weight="bold"))
-        self.title_label.grid(row=0, column=0, padx=20, pady=(20, 10))
-        self.sidebar_button_1 = ctk.CTkButton(self.sidebar_frame, image=plus_image, text="New Events", command=self.go_to_new_events_frame)
-        self.sidebar_button_1.grid(row=1, column=0, padx=20, pady=10)
-        self.sidebar_button_2 = ctk.CTkButton(self.sidebar_frame, image=edit_image, text="Edit Events", command=self.go_to_edit_events_frame)
-        self.sidebar_button_2.grid(row=2, column=0, padx=20, pady=10)
-        self.sidebar_button_3 = ctk.CTkButton(self.sidebar_frame, image=list_image, text="Get Events List", command=self.go_to_get_events_by_title_frame)
-        self.sidebar_button_3.grid(row=3, column=0, padx=20, pady=10)
-        self.sidebar_button_4 = ctk.CTkButton(self.sidebar_frame, image=chart_image, text="Graph", command=self.go_to_graph_frame)
-        self.sidebar_button_4.grid(row=4, column=0, padx=20, pady=10)
-        self.google_calendar_link = ctk.CTkButton(self.sidebar_frame, image=google_image, text="Google Calendar", command=lambda: webbrowser.open(GOOGLE_CALENDAR_LINK))
-        self.google_calendar_link.grid(row=6, column=0, padx=20, pady=(10, 10))
+        (self.sidebar_button_1, self.sidebar_button_2, self.sidebar_button_3, self.sidebar_button_4, self.google_calendar_link) = GUIWidgets.create_side_bar_frame(self, plus_image, edit_image, list_image, chart_image, google_image)
+        self.sidebar_button_1.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[NewEventsFrame]))
+        self.sidebar_button_2.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[EditEventsFrame]))
+        self.sidebar_button_3.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GetEventsFrame]))
+        self.sidebar_button_4.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GraphFrame]))
+        self.google_calendar_link.configure(command=lambda: webbrowser.open(GOOGLE_CALENDAR_LINK))
         
         # create main panel title
         self.title_label_main = ctk.CTkLabel(self, text="Get Events List", font=ctk.CTkFont(size=20, weight="bold"))
@@ -648,48 +560,15 @@ class GetEventsFrame(ctk.CTkFrame):
         self.multi_selection.grid(row=3, column=1, padx=0, pady=5, sticky="w")
         
         # Column 2: date_frame (Date Interval)
-        self.date_frame = ctk.CTkScrollableFrame(self.container_frame, label_text="Date Interval")
-        self.date_frame.grid(row=0, column=1, padx=10, pady=10, sticky="nsew")
-        self.date_frame.grid_columnconfigure(1, weight=1)
-        self.label_date_from = ctk.CTkLabel(self.date_frame, text="From:")
-        self.label_date_from.grid(row=0, column=0, padx=10, pady=10, sticky="e")
-        self.entry_date_from = ctk.CTkEntry(self.date_frame, placeholder_text="dd-mm-yyyy hh:mm")
-        self.entry_date_from.grid(row=0, column=1, padx=0, pady=10, sticky="ew")
-        self.entry_date_button = ctk.CTkButton(self.date_frame, text="", width=10, image=calendar_image, command=lambda: self.date_picker(1))
-        self.entry_date_button.grid(row=0, column=2, padx=0, pady=10, sticky="w")
-        self.label_date_to = ctk.CTkLabel(self.date_frame, text="To:")
-        self.label_date_to.grid(row=1, column=0, padx=10, pady=10, sticky="e")
-        self.entry_date_to = ctk.CTkEntry(self.date_frame, placeholder_text="dd-mm-yyyy hh:mm")
-        self.entry_date_to.grid(row=1, column=1, padx=0, pady=10, sticky="ew")
-        self.entry_date_button2 = ctk.CTkButton(self.date_frame, text="", width=10, image=calendar_image, command=lambda: self.date_picker(2))
-        self.entry_date_button2.grid(row=1, column=2, padx=0, pady=10, sticky="w")
-        self.label_timezone = ctk.CTkLabel(self.date_frame, text="Timezone:")
-        self.label_timezone.grid(row=2, column=0, padx=10, pady=10, sticky="e")
-        self.timezone_selection = ctk.CTkComboBox(self.date_frame, state="readonly")
-        CTkScrollableDropdown(self.timezone_selection, values=list(TIMEZONE), justify="left", button_color="transparent")
-        self.timezone_selection.set(CommonOperations.get_timezone())
-        self.timezone_selection.grid(row=2, column=1, padx=0, pady=(10, 10), sticky="nsew")
+        (self.entry_date_from, self.entry_date_to, self.entry_date_button, self.label_date_to, self.entry_date_button2, self.timezone_selection) = GUIWidgets.create_date_selection_for_events_list_scroll_frame(self.container_frame, TIMEZONE, calendar_image)
+        self.entry_date_button.configure(command=lambda: self.date_picker(1))
+        self.entry_date_button2.configure(command=lambda: self.date_picker(2))
 
         # file output
-        self.file_output_frame = ctk.CTkScrollableFrame(self, label_text="Save results to file")
-        self.file_output_frame.grid(row=3, column=1, padx=(50, 50), pady=10, sticky="ew")
-        self.file_output_frame.grid_columnconfigure(0, weight=1)
-        self.first_row_frame = ctk.CTkFrame(self.file_output_frame)  # first row
-        self.first_row_frame.grid(row=0, column=0, padx=0, pady=0, sticky="nsew")
-        self.first_row_frame.grid_columnconfigure((0, 1, 2), weight=1)
-        self.file_path = ctk.CTkEntry(master=self.first_row_frame, placeholder_text="file path")
-        self.file_path.grid(row=0, column=1, padx=10, pady=10, sticky="ew")
-        self.button_file_path = ctk.CTkButton(self.first_row_frame, text="", width=10, image=self.folder_image, command=lambda: self.get_file_path(self.file_path))
-        self.button_file_path.grid(row=0, column=2, padx=10, pady=10, sticky="w")
-        self.overwrite_mode = ctk.CTkCheckBox(self.first_row_frame, text="Overwrite file", onvalue="on", offvalue="off") # second row
-        self.overwrite_mode.grid(row=1, column=1, padx=10, pady=10, sticky="ew")
-        self.third_row_frame = ctk.CTkFrame(self.file_output_frame)  # third row
-        self.third_row_frame.grid(row=2, column=0, padx=0, pady=0, sticky="ew")
-        self.third_row_frame.grid_columnconfigure((0, 1), weight=1)
-        self.button_open_file = ctk.CTkButton(master=self.third_row_frame, image=file_image, text="open", command=self.open_file)
-        self.button_open_file.grid(row=0, column=0, padx=10, pady=10, sticky="e")
-        self.button_open_events_table_preview = ctk.CTkButton(master=self.third_row_frame, image=table_image, text="table preview", command=self.events_table_preview)
-        self.button_open_events_table_preview.grid(row=0, column=1, padx=10, pady=10, sticky="w")
+        (self.file_path, self.overwrite_mode, self.button_file_path, self.button_open_file, self.button_open_events_table_preview) = GUIWidgets.create_file_output_scroll_frame_for_events_list_frame(self, self.folder_image, file_image, table_image)
+        self.button_file_path.configure(command=lambda: self.get_file_path(self.file_path))
+        self.button_open_file.configure(command=self.open_file)
+        self.button_open_events_table_preview.configure(command=self.events_table_preview)
 
         # create a container frame for the buttons
         self.container_frame2 = ctk.CTkFrame(self, fg_color="transparent")
@@ -978,18 +857,6 @@ class GetEventsFrame(ctk.CTkFrame):
     
     def date_picker(self, type):
         self.date_picker_window = self._common.date_picker_window(type, self.date_picker_window, self.entry_date_from, self.entry_date_to, self.log_box)
-
-    def go_to_new_events_frame(self):
-        self.main_class.show_frame(NewEventsFrame)
-    
-    def go_to_edit_events_frame(self):
-        self.main_class.show_frame(EditEventsFrame)
-    
-    def go_to_get_events_by_title_frame(self):
-        self.main_class.show_frame(GetEventsFrame)
-        
-    def go_to_graph_frame(self):
-        self.main_class.show_frame(GraphFrame)
 #?###########################################################
 
 #?###########################################################
@@ -1021,68 +888,23 @@ class GraphFrame(ctk.CTkFrame):
         self.grid_rowconfigure((0, 1, 2), weight=1)
         
         # create sidebar frame with widgets
-        self.sidebar_frame = ctk.CTkFrame(self, width=140, corner_radius=0)
-        self.sidebar_frame.grid(row=0, column=0, rowspan=6, sticky="nsew")
-        self.sidebar_frame.grid_rowconfigure(5, weight=1)
-        self.title_label = ctk.CTkLabel(self.sidebar_frame, text="Other Options", font=ctk.CTkFont(size=20, weight="bold"))
-        self.title_label.grid(row=0, column=0, padx=20, pady=(20, 10))
-        self.sidebar_button_1 = ctk.CTkButton(self.sidebar_frame, image=plus_image, text="New Events", command=self.go_to_new_events_frame)
-        self.sidebar_button_1.grid(row=1, column=0, padx=20, pady=10)
-        self.sidebar_button_2 = ctk.CTkButton(self.sidebar_frame, image=edit_image, text="Edit Events", command=self.go_to_edit_events_frame)
-        self.sidebar_button_2.grid(row=2, column=0, padx=20, pady=10)
-        self.sidebar_button_3 = ctk.CTkButton(self.sidebar_frame, image=list_image, text="Get Events List", command=self.go_to_get_events_by_title_frame)
-        self.sidebar_button_3.grid(row=3, column=0, padx=20, pady=10)
-        self.sidebar_button_4 = ctk.CTkButton(self.sidebar_frame, image=chart_image, text="Graph", command=self.go_to_graph_frame)
-        self.sidebar_button_4.grid(row=4, column=0, padx=20, pady=10)
-        self.google_calendar_link = ctk.CTkButton(self.sidebar_frame, image=google_image, text="Google Calendar", command=lambda: webbrowser.open(GOOGLE_CALENDAR_LINK))
-        self.google_calendar_link.grid(row=6, column=0, padx=20, pady=10)
+        (self.sidebar_button_1, self.sidebar_button_2, self.sidebar_button_3, self.sidebar_button_4, self.google_calendar_link) = GUIWidgets.create_side_bar_frame(self, plus_image, edit_image, list_image, chart_image, google_image)
+        self.sidebar_button_1.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[NewEventsFrame]))
+        self.sidebar_button_2.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[EditEventsFrame]))
+        self.sidebar_button_3.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GetEventsFrame]))
+        self.sidebar_button_4.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GraphFrame]))
+        self.google_calendar_link.configure(command=lambda: webbrowser.open(GOOGLE_CALENDAR_LINK))
         
         # create main panel
-        self.title_label_main = ctk.CTkLabel(self, text="Create Graph", font=ctk.CTkFont(size=20, weight="bold"))
-        self.title_label_main.grid(row=0, column=1, padx=20, pady=(20, 10), sticky="nsew")
-        self.file_output_frame = ctk.CTkScrollableFrame(self, label_text="Set File Path")
-        self.file_output_frame.grid(row=1, column=1, padx=(50, 50), pady=10, sticky="ew")
-        self.file_output_frame.grid_columnconfigure(0, weight=1)
-        self.first_row_frame = ctk.CTkFrame(self.file_output_frame) # first row
-        self.first_row_frame.grid(row=0, column=0, padx=0, pady=0, sticky="ew")
-        self.first_row_frame.grid_columnconfigure((0, 1, 2), weight=1)
-        self.file_path = ctk.CTkEntry(master=self.first_row_frame, placeholder_text="file path")
-        self.file_path.grid(row=0, column=1, padx=10, pady=10, sticky="ew")
-        self.button_file_path = ctk.CTkButton(self.first_row_frame, text="", width=10, image=folder_image, command=self.get_file_path)
-        self.button_file_path.grid(row=0, column=2, padx=10, pady=10, sticky="w")
-        self.second_row_frame = ctk.CTkFrame(self.file_output_frame) # second row
-        self.second_row_frame.grid(row=1, column=0, padx=0, pady=0, sticky="ew")
-        self.second_row_frame.grid_columnconfigure((0, 1), weight=1)
-        self.button_open_file = ctk.CTkButton(master=self.second_row_frame, image=file_image, text="open", command=self.open_file)
-        self.button_open_file.grid(row=0, column=0, padx=10, pady=10, sticky="e")
-        self.button_open_events_table_preview = ctk.CTkButton(master=self.second_row_frame, image=table_image, text="table preview", command=self.events_table_preview)
-        self.button_open_events_table_preview.grid(row=0, column=1, padx=10, pady=10, sticky="w") 
+        (self.file_path, self.button_file_path, self.button_open_file, self.button_open_events_table_preview) = GUIWidgets.create_file_path_scroll_frame_for_graph_frame(self, folder_image, file_image, table_image)
+        self.button_file_path.configure(command=self.get_file_path)
+        self.button_open_file.configure(command=self.open_file)
+        self.button_open_events_table_preview.configure(command=self.events_table_preview)
         
         # Graph types
-        self.graph_types_frame = ctk.CTkScrollableFrame(self, label_text="Set Graph Types")
-        self.graph_types_frame.grid(row=2, column=1, padx=(50, 50), pady=10, sticky="ew")
-        self.graph_types_frame.grid_columnconfigure((0, 1), weight=1)
-        self.graph_types_frame.grid_rowconfigure((0, 1), weight=1)
-        self.button_select_all = ctk.CTkButton(self.graph_types_frame, text="select all", image=square_check_image, command=self.select_all)
-        self.button_select_all.grid(row=0, column=0, padx=10, pady=10, sticky="e")
-        self.button_deselect_all = ctk.CTkButton(self.graph_types_frame, text="deselect all", image=square_image, command=self.deselect_all)
-        self.button_deselect_all.grid(row=0, column=1, padx=10, pady=10, sticky="w")
-        self.total_hours_per_year = ctk.CTkCheckBox(self.graph_types_frame, text="Hours per Year", onvalue="on", offvalue="off")
-        self.total_hours_per_year.grid(row=1, column=0, padx=10, pady=10, sticky="ew")
-        self.total_hours_per_year.select()
-        self.total_hours_per_month = ctk.CTkCheckBox(self.graph_types_frame, text="Hours per Month", onvalue="on", offvalue="off")
-        self.total_hours_per_month.grid(row=1, column=1, padx=10, pady=10, sticky="ew")
-        self.total_hours_per_month.select()
-        self.total_hours_by_summary = ctk.CTkCheckBox(self.graph_types_frame, text="Hours by Summary Bar chart", onvalue="on", offvalue="off")
-        self.total_hours_by_summary.grid(row=2, column=0, padx=10, pady=10, sticky="ew")
-        self.total_hours_by_summary.select()
-        self.total_hours_by_summary2 = ctk.CTkCheckBox(self.graph_types_frame, text="Hours by Summary Pie chart", onvalue="on", offvalue="off")
-        self.total_hours_by_summary2.grid(row=2, column=1, padx=10, pady=10, sticky="ew")
-        self.total_hours_by_summary2.select()
-        self.total_hours_per_year_by_summary = ctk.CTkCheckBox(self.graph_types_frame, text="Hours per Year By Summary", onvalue="on", offvalue="off")
-        self.total_hours_per_year_by_summary.grid(row=3, column=0, padx=10, pady=10, sticky="ew")
-        self.total_hours_per_month_by_summary = ctk.CTkCheckBox(self.graph_types_frame, text="Hours per Month By Summary", onvalue="on", offvalue="off")
-        self.total_hours_per_month_by_summary.grid(row=3, column=1, padx=10, pady=10, sticky="ew")
+        (self.button_select_all, self.button_deselect_all, self.total_hours_per_year, self.total_hours_per_month, self.total_hours_by_summary, self.total_hours_by_summary2, self.total_hours_per_year_by_summary, self.total_hours_per_month_by_summary) = GUIWidgets.create_graph_types_scroll_frame(self, square_check_image, square_image)
+        self.button_select_all.configure(command=self.select_all)
+        self.button_deselect_all.configure(command=self.deselect_all)
 
         # Generate Graph Button
         self.graph_button = ctk.CTkButton(self, command=self.generate_graph, image=chart_image, border_width=2, text="Generate")
@@ -1170,24 +992,12 @@ class GraphFrame(ctk.CTkFrame):
         except Exception as error:
             self._common.messagebox_exception(error)
             self._common.write_log(self.log_box, f"Generic error: {str(error)}")
-    
-    def go_to_new_events_frame(self):
-        self.main_class.show_frame(NewEventsFrame)
-    
-    def go_to_edit_events_frame(self):
-        self.main_class.show_frame(EditEventsFrame)
-    
-    def go_to_get_events_by_title_frame(self):
-        self.main_class.show_frame(GetEventsFrame)
-        
-    def go_to_graph_frame(self):
-        self.main_class.show_frame(GraphFrame)
 #?###########################################################
 
 #?###########################################################
 class MainFrame(ctk.CTkFrame):
-    
     main_class = None
+    _common = CommonOperations()
     
     def __init__(self, parent, main_class):
         ctk.CTkFrame.__init__(self, parent)
@@ -1211,10 +1021,10 @@ class MainFrame(ctk.CTkFrame):
         ctk.CTkLabel(self, text="", image=icon, fg_color="transparent").pack(padx=20, pady=(50, 20))
         ctk.CTkLabel(self, text="Calendar Data Manager", font=title_font, text_color='#e06c29', fg_color="transparent").pack(padx=20, pady=50)
         #ctk.CTkLabel(self, text="Choose the action", fg_color="transparent", font=("Arial", 32)).pack(padx=20, pady=20)
-        ctk.CTkButton(master=self, image=plus_image, text="New Events", command=self.go_to_new_events_frame).pack(padx=20, pady=10, anchor='center')
-        ctk.CTkButton(master=self, image=edit_image, text="Edit Events", command=self.go_to_edit_events_frame).pack(padx=20, pady=10, anchor='center')
-        ctk.CTkButton(master=self, image=list_image, text="Get Events", command=self.go_to_get_events_by_title_frame).pack(padx=20, pady=10, anchor='center')
-        ctk.CTkButton(master=self, image=chart_image, text="Graph", command=self.go_to_graph_frame).pack(padx=20, pady=10, anchor='center')
+        ctk.CTkButton(master=self, image=plus_image, text="New Events", command=lambda: FrameController.show_frame(self._common.get_frames()[NewEventsFrame])).pack(padx=20, pady=10, anchor='center')
+        ctk.CTkButton(master=self, image=edit_image, text="Edit Events", command=lambda: FrameController.show_frame(self._common.get_frames()[EditEventsFrame])).pack(padx=20, pady=10, anchor='center')
+        ctk.CTkButton(master=self, image=list_image, text="Get Events", command=lambda: FrameController.show_frame(self._common.get_frames()[GetEventsFrame])).pack(padx=20, pady=10, anchor='center')
+        ctk.CTkButton(master=self, image=chart_image, text="Graph", command=lambda: FrameController.show_frame(self._common.get_frames()[GraphFrame])).pack(padx=20, pady=10, anchor='center')
         
         button_frame = ctk.CTkFrame(master=self, fg_color="transparent")
         button_frame.pack(side='bottom', anchor='sw', padx=20, pady=10)
@@ -1232,18 +1042,6 @@ class MainFrame(ctk.CTkFrame):
         CTkToolTip(github_btn, delay=0.3, message="Github page")
         CTkToolTip(donate_buymeacoffe_btn, delay=0.3, message="Donate with \"buy me a coffe\"")
         CTkToolTip(donate__paypal_btn, delay=0.3, message="Donate with \"Paypal\"")
-        
-    def go_to_new_events_frame(self):
-        self.main_class.show_frame(NewEventsFrame)
-    
-    def go_to_edit_events_frame(self):
-        self.main_class.show_frame(EditEventsFrame)
-    
-    def go_to_get_events_by_title_frame(self):
-        self.main_class.show_frame(GetEventsFrame)
-        
-    def go_to_graph_frame(self):
-        self.main_class.show_frame(GraphFrame)
 #?###########################################################
 
 #?###########################################################   
@@ -1302,7 +1100,7 @@ class LoginFrame(ctk.CTkFrame):
             
             self.updateUsernameMenuItem()
             
-            self.main_class.show_frame(MainFrame)
+            FrameController.show_frame(self._common.get_frames()[MainFrame])
         else:
             msg = CTkMessagebox(title="Credentials error", message="Do you wish to retry?", icon="cancel", option_1="No", option_2="Yes")
             response = msg.get()
@@ -1319,6 +1117,7 @@ class App():
     _menu: CTkMenuBar
     _button_5: ctk.CTkButton
     _common = CommonOperations()
+    frames = {}
     
     app_width = 1100
     app_height = 900
@@ -1341,7 +1140,7 @@ class App():
          
         self.init_window()
         self.init_menu()
-        self.page_controller()
+        FrameController.page_controller(self, self.root, self._common)
         
         self.root.mainloop()
     
@@ -1386,7 +1185,7 @@ class App():
             self.updateUsernameMenuItem()
 
         dropdown1 = CustomDropdownMenu(widget=button_1)
-        dropdown1.add_option(option="Home", command=lambda: self.show_frame(MainFrame))
+        dropdown1.add_option(option="Home", command=lambda: FrameController.show_frame(self._common.get_frames()[MainFrame]))
         dropdown1.add_option(option="Exit", command=lambda: exit())
 
         dropdown1.add_separator()
@@ -1482,14 +1281,10 @@ class App():
             
     def log_out(self):
         self.forgetUsernameMenuItem()
-        self.show_frame(LoginFrame)
-    
-    def show_frame(self, cont):
-        frame = self.frames[cont]
-        frame.tkraise()
+        FrameController.show_frame(self._common.get_frames()[LoginFrame])
     
     def change_app_appearance(self, mode: str):
-        CommonOperations.change_appearance(mode)
+        self._common.change_appearance(mode)
         self.change_app_appearance_profile(mode)
 
     def change_app_appearance_profile(self, appearance: str = ''):
@@ -1503,33 +1298,6 @@ class App():
             self._button_5.configure(text_color="white")
         else:
             self._button_5.configure(text_color="#76797e")
-
-    def page_controller(self):
-        # creating a container
-        container = ctk.CTkFrame(self.root) 
-        container.pack(side = "top", fill = "both", expand = True) 
-
-        container.grid_rowconfigure(0, weight = 1)
-        container.grid_columnconfigure(0, weight = 1)        
-
-        # initializing frames to an empty array
-        self.frames = {} 
-
-        # iterating through a tuple consisting of the different page layouts
-        for F in (LoginFrame, MainFrame, NewEventsFrame, EditEventsFrame, GetEventsFrame, GraphFrame):
-
-            frame = F(container, self)
-
-            # initializing frame of that object from pages for loop
-            self.frames[F] = frame 
-
-            frame.grid(row = 0, column = 0, sticky ="nsew")
-        
-
-        if self._common.get_credentials() is None or self._common.get_credentials_path() is None:
-            self.show_frame(LoginFrame)
-        else:
-            self.show_frame(MainFrame)
 
 #*###########################################################
 
