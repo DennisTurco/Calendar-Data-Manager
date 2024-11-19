@@ -2,6 +2,7 @@ import os
 from datetime import datetime, timedelta
 from typing import Final
 from googleapiclient.discovery import build
+import pyperclip
 
 import JSONSettings as js
 
@@ -88,20 +89,31 @@ class CommonOperations():
         self.toplevel_window.grid_columnconfigure(0, weight=1)  # Allow column 0 to expand horizontally
         self.toplevel_window.grid_columnconfigure(1, weight=1)  # Allow column 1 to expand horizontally
 
+        # Textbox for displaying the error text
         file_viewer = ctk.CTkTextbox(self.toplevel_window)
-        file_viewer.grid(row=0, column=0, columnspan=2, padx=0, pady=(0, 10), sticky="nsew")
+        file_viewer.grid(row=0, column=0, columnspan=3, padx=0, pady=(0, 10), sticky="nsew")
 
+        # Button to close the window
         button_close = ctk.CTkButton(self.toplevel_window, text="Close", command=self.toplevel_window.destroy)
         button_close.grid(row=1, column=0, padx=5, pady=(0, 10), sticky="nsew")
+        
+        # Button to copy the error text
+        button_copy = ctk.CTkButton(self.toplevel_window, text="Copy Error", command=lambda: self.copy_to_clipboard(file_viewer.get("1.0", tkinter.END).strip()))
+        button_copy.grid(row=1, column=1, padx=5, pady=(0, 10), sticky="nsew")
 
+        # Button to report the exception
         button_report = ctk.CTkButton(self.toplevel_window, text="Report Exception", command=lambda: webbrowser.open(GITHUB_ISSUES_LINK))
-        button_report.grid(row=1, column=1, padx=5, pady=(0, 10), sticky="nsew")
+        button_report.grid(row=1, column=2, padx=5, pady=(0, 10), sticky="nsew")
 
         # Insert text into the box
         file_viewer.delete(0.0, tkinter.END)
         file_viewer.insert(tkinter.END, str(error))
 
         self.toplevel_window.attributes("-topmost", False)  # Focus on this window
+    
+    @staticmethod
+    def copy_to_clipboard(error_text: str):
+        pyperclip.copy(error_text)  
 
     @staticmethod
     def change_scaling_event(new_scaling: str):

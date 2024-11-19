@@ -1,6 +1,7 @@
 from ast import List
 from datetime import datetime
 from io import BytesIO
+import threading
 from typing import Final, List
 import webbrowser
 import os
@@ -179,7 +180,7 @@ class NewEventsFrame(ctk.CTkFrame):
 class EditEventsFrame(ctk.CTkFrame):
     main_class = None
     _common = CommonOperations()
-    toplevel_window: ctk.CTkToplevel
+    toplevel_window: ctk.CTkToplevel = None
     date_picker_window = None
     event_color_from = EVENT_COLOR
     event_color_to = EVENT_COLOR
@@ -215,7 +216,7 @@ class EditEventsFrame(ctk.CTkFrame):
         # create main panel
         self.title_label_main = ctk.CTkLabel(self, text="Edit Events", font=ctk.CTkFont(size=20, weight="bold"))
         self.title_label_main.grid(row=0, column=1, padx=20, pady=(20, 10), sticky="nsew")
-                
+             
         # Create a frame with a 1x2 grid
         main_frame = ctk.CTkScrollableFrame(self, label_text="Event Information")
         main_frame.grid(row=1, column=1, padx=50, pady=10, sticky="nsew")
@@ -383,7 +384,7 @@ class EditEventsFrame(ctk.CTkFrame):
         self.multi_selection_old.configure(button_color=self.event_color_from.get(color))
         self.multi_selection_old.set(color)
         CommonOperations.write_log(self.log_box, f"color '{color}' selected")
-    
+
     def combobox_callback_color2(self, color):
         self.multi_selection_new.configure(button_color=self.event_color_to.get(color))
         self.multi_selection_new.set(color)
@@ -600,6 +601,7 @@ class GetEventsFrame(ctk.CTkFrame):
         self.log_box.bind("<Key>", lambda e: "break")  # set the textbox readonly
         self.log_box.grid(row=5, column=1, columnspan=2, padx=(0, 0), pady=(20, 0), sticky="nsew")
 
+    # returns the number of events obtained
     def get_events(self):
         self.events = None
         
@@ -648,10 +650,11 @@ class GetEventsFrame(ctk.CTkFrame):
             self.events = gc.CalendarEventsManager.getEvents(creds=self._common.get_credentials(), title=summary, start_date=date_from, end_date=date_to, color_id=color_index, description=description, time_zone=time_zone)
             if self.events == None or len(self.events) == 0:
                 self._common.write_log(self.log_box, f"No events obtained")
-                return
+                return 0
             
             #self.events_list_viewer_window() # i have to truncate the list for performances reason
             self._common.write_log(self.log_box, f"{len(self.events)} Event(s) obtained succesfully!")
+            return len(self.events)
         except FileNotFoundError as file_not_found_error:
             self._common.messagebox_exception(file_not_found_error)
             self._common.write_log(self.log_box, f"File not found error: {str(file_not_found_error)}")
@@ -672,11 +675,19 @@ class GetEventsFrame(ctk.CTkFrame):
             self._common.write_log(self.log_box, f"Generic error: {str(error)}")
 
     def get_and_preview(self):
-        self.get_events()
+        events_count = self.get_events()
+        
+        if (events_count == 0): 
+            return;
+        
         self.events_list_viewer_window()
 
     def get_and_plot(self):
-        self.get_events()
+        events_count = self.get_events()
+        
+        if (events_count == 0): 
+            return;
+        
         self.events_list_viewer_window()
         self.go_to_graph_frame()
     
@@ -865,6 +876,7 @@ class GraphFrame(ctk.CTkFrame):
     file_viewer_window = None
     events_preview_in_table = None
     _common = CommonOperations()
+    stop_event = threading.Event() 
     
     def __init__(self, parent, main_class):
         ctk.CTkFrame.__init__(self, parent)
@@ -956,42 +968,72 @@ class GraphFrame(ctk.CTkFrame):
         self.total_hours_per_year_by_summary.deselect()
         self.total_hours_per_month_by_summary.deselect()
         self._common.write_log(self.log_box, f"all chart types deselected")
-    
-    def generate_graph(self):
-        if self._common.check_file_path_errors(self.log_box, self.file_path.get()): return  
         
+    # Timeout function to stop the chart generation
+    def generate_chart_with_timeout(self, chart_function, data, timeout=10):
+        def target():
+            try:
+                if not self.stop_event.is_set():  # Check if timeout occurred
+                    chart_function(data)
+            except Exception as ex:
+                self._common.messagebox_exception(ex)
+                self._common.write_log(self.log_box, f"An error occurred during setting timeout for chart generation")
+
+        # Create and start the thread
+        chart_thread = threading.Thread(target=target)
+        chart_thread.start()
+
+        # Wait for the thread to finish or timeout
+        chart_thread.join(timeout)
+
+        # If the thread is still alive after the timeout, set the stop event
+        if chart_thread.is_alive():
+            self.stop_event.set()
+            self._common.write_log(self.log_box, "Chart generation timed out.")
+            CTkMessagebox(title="Chart Generation Error", message="One or more charts were cancelled due to a timeout. Please try again later.", icon="cancel", option_1="OK")
+
+    def reset_stop_event(self):
+        self.stop_event.clear()  # Reset the stop event for future calls
+
+    def generate_graph(self):
+        if self._common.check_file_path_errors(self.log_box, self.file_path.get()):
+            return
+
         try:
             self._common.write_log(self.log_box, "Generating chart")
             data = Plotter.Plotter.loadData(self.file_path.get())
-            
-            Plotter.Plotter.allStats(data) 
-            
-            if self.total_hours_per_year.get() == "on": Plotter.Plotter.chart_TotalHoursPerYear(data)   
-            if self.total_hours_per_month.get() == "on": Plotter.Plotter.chart_TotalHoursPerMonth(data)   
-            if self.total_hours_by_summary.get() == "on": Plotter.Plotter.chart_TotalHoursBySummary(data)   
-            if self.total_hours_by_summary2.get() == "on": Plotter.Plotter.chart_TotalHoursBySummaryPie(data)
-            if self.total_hours_per_year_by_summary.get() == "on": Plotter.Plotter.chart_TotalHoursPerYearBySummary(data)
-            if self.total_hours_per_month_by_summary.get() == "on": Plotter.Plotter.chart_TotalHoursPerMonthBySummary(data)
-               
+            Plotter.Plotter.allStats(data)
+
+            # Reset the stop event before generating new charts
+            self.reset_stop_event()
+
+            if self.total_hours_per_year.get() == "on":
+                self.generate_chart_with_timeout(Plotter.Plotter.chart_TotalHoursPerYear, data)
+            if self.total_hours_per_month.get() == "on":
+                self.generate_chart_with_timeout(Plotter.Plotter.chart_TotalHoursPerMonth, data)
+            if self.total_hours_by_summary.get() == "on":
+                self.generate_chart_with_timeout(Plotter.Plotter.chart_TotalHoursBySummary, data)
+            if self.total_hours_by_summary2.get() == "on":
+                self.generate_chart_with_timeout(Plotter.Plotter.chart_TotalHoursBySummaryPie, data)
+            if self.total_hours_per_year_by_summary.get() == "on":
+                self.generate_chart_with_timeout(Plotter.Plotter.chart_TotalHoursPerYearBySummary, data)
+            if self.total_hours_per_month_by_summary.get() == "on":
+                self.generate_chart_with_timeout(Plotter.Plotter.chart_TotalHoursPerMonthBySummary, data)
+
         except FileNotFoundError:
             self._common.write_log(self.log_box, f"Error, the file '{self.file_path.get()}' doesn't exist")
-            return
         except pandas.errors.EmptyDataError:
             self._common.write_log(self.log_box, f"Error, the file '{self.file_path.get()}' is empty")
-            return
         except PermissionError as permission_error:
             self._common.messagebox_exception(permission_error)
             self._common.write_log(self.log_box, f"Permission error: {str(permission_error)}")
         except ValueError as value_error:
             self._common.messagebox_exception(value_error)
             self._common.write_log(self.log_box, f"Value error: {str(value_error)}")
-        # except Plotter.PlotterError as plotter_error:
-        #     # Replace 'PlotterError' with the actual custom exception class from your Plotter module
-        #     self._common.messagebox_exception(plotter_error)
-        #     self._common.write_log(self.log_box, f"Plotter error: {str(plotter_error)}")
         except Exception as error:
             self._common.messagebox_exception(error)
             self._common.write_log(self.log_box, f"Generic error: {str(error)}")
+
 #?###########################################################
 
 #?###########################################################
