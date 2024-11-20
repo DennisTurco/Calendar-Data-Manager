@@ -1,5 +1,6 @@
 from ast import List
 from datetime import datetime
+from enum import Enum
 from io import BytesIO
 import threading
 from typing import Final, List
@@ -11,6 +12,7 @@ from googleapiclient.discovery import build
 import requests
 from PIL import Image as pilImage, ImageTk, ImageDraw
 
+from ConfigKeys import ConfigKeys
 import JSONSettings as js
 import CalendarEventsManager as gc
 import Plotter
@@ -35,14 +37,6 @@ import FrameController
 # consts
 EVENT_COLOR: Final[dict] = {"Light Blue": "#7986cb", "Green": "#33b679", "Purple": "#8e24aa", "Pink": "#e67c73", "Yellow": "#f6bf26", "Orange": "#f4511e", "Blue": "#039be5", "Grey": "#616161", "Dark Blue": "#3f51b5", "Dark Green": "#0b8043", "Red": "#d50000"}
 TIMEZONE: Final[List[str]] = ['Africa/Abidjan', 'Africa/Accra', 'Africa/Algiers', 'Africa/Bissau', 'Africa/Cairo', 'Africa/Casablanca', 'Africa/Ceuta', 'Africa/El_Aaiun', 'Africa/Juba', 'Africa/Khartoum', 'Africa/Lagos', 'Africa/Maputo', 'Africa/Monrovia', 'Africa/Nairobi', 'Africa/Ndjamena', 'Africa/Sao_Tome', 'Africa/Tripoli', 'Africa/Tunis', 'Africa/Windhoek', 'America/Adak', 'America/Anchorage', 'America/Araguaina', 'America/Argentina/Buenos_Aires', 'America/Argentina/Catamarca', 'America/Argentina/Cordoba', 'America/Argentina/Jujuy', 'America/Argentina/La_Rioja', 'America/Argentina/Mendoza', 'America/Argentina/Rio_Gallegos', 'America/Argentina/Salta', 'America/Argentina/San_Juan', 'America/Argentina/San_Luis', 'America/Argentina/Tucuman', 'America/Argentina/Ushuaia', 'America/Asuncion', 'America/Atikokan', 'America/Bahia', 'America/Bahia_Banderas', 'America/Barbados', 'America/Belem', 'America/Belize', 'America/Blanc-Sablon', 'America/Boa_Vista', 'America/Bogota', 'America/Boise', 'America/Cambridge_Bay', 'America/Campo_Grande', 'America/Cancun', 'America/Caracas', 'America/Cayenne', 'America/Chicago', 'America/Chihuahua', 'America/Costa_Rica', 'America/Creston', 'America/Cuiaba', 'America/Curacao', 'America/Danmarkshavn', 'America/Dawson', 'America/Dawson_Creek', 'America/Denver', 'America/Detroit', 'America/Edmonton', 'America/Eirunepe', 'America/El_Salvador', 'America/Fort_Nelson', 'America/Fortaleza', 'America/Glace_Bay', 'America/Godthab', 'America/Goose_Bay', 'America/Grand_Turk', 'America/Guatemala', 'America/Guayaquil', 'America/Guyana', 'America/Halifax', 'America/Havana', 'America/Hermosillo', 'America/Indiana/Indianapolis', 'America/Indiana/Knox', 'America/Indiana/Marengo', 'America/Indiana/Petersburg', 'America/Indiana/Tell_City', 'America/Indiana/Vevay', 'America/Indiana/Vincennes', 'America/Indiana/Winamac', 'America/Inuvik', 'America/Iqaluit', 'America/Jamaica', 'America/Juneau', 'America/Kentucky/Louisville', 'America/Kentucky/Monticello', 'America/Kralendijk', 'America/La_Paz', 'America/Lima', 'America/Los_Angeles', 'America/Louisville', 'America/Lower_Princes', 'America/Maceio', 'America/Managua', 'America/Manaus', 'America/Marigot', 'America/Martinique', 'America/Matamoros', 'America/Mazatlan', 'America/Menominee', 'America/Merida', 'America/Metlakatla', 'America/Mexico_City', 'America/Miquelon', 'America/Moncton', 'America/Monterrey', 'America/Montevideo', 'America/Montreal', 'America/Montserrat', 'America/Nassau', 'America/New_York', 'America/Nipigon', 'America/Nome', 'America/Noronha', 'America/North_Dakota/Beulah', 'America/North_Dakota/Center', 'America/North_Dakota/New_Salem', 'America/Nuuk', 'America/Ojinaga', 'America/Panama', 'America/Pangnirtung', 'America/Paramaribo', 'America/Phoenix', 'America/Port-au-Prince', 'America/Port_of_Spain', 'America/Porto_Acre', 'America/Porto_Velho', 'America/Puerto_Rico', 'America/Punta_Arenas', 'America/Rainy_River', 'America/Rankin_Inlet', 'America/Recife', 'America/Regina', 'America/Resolute', 'America/Rio_Branco', 'America/Santarem', 'America/Santiago', 'America/Santo_Domingo', 'America/Sao_Paulo', 'America/Scoresbysund', 'America/Sitka', 'America/St_Barthelemy', 'America/St_Johns', 'America/St_Kitts', 'America/St_Lucia', 'America/St_Thomas', 'America/St_Vincent', 'America/Swift_Current', 'America/Tegucigalpa', 'America/Thule', 'America/Thunder_Bay', 'America/Tijuana', 'America/Toronto', 'America/Tortola', 'America/Vancouver', 'America/Whitehorse', 'America/Winnipeg', 'America/Yakutat', 'America/Yellowknife', 'Antarctica/Casey', 'Antarctica/Davis', 'Antarctica/DumontDUrville', 'Antarctica/Macquarie', 'Antarctica/Mawson', 'Antarctica/McMurdo', 'Antarctica/Palmer', 'Antarctica/Rothera', 'Antarctica/Syowa', 'Antarctica/Troll', 'Antarctica/Vostok', 'Arctic/Longyearbyen', 'Asia/Aden', 'Asia/Almaty', 'Asia/Amman', 'Asia/Anadyr', 'Asia/Aqtau', 'Asia/Aqtobe', 'Asia/Ashgabat', 'Asia/Atyrau', 'Asia/Baghdad', 'Asia/Bahrain', 'Asia/Baku', 'Asia/Bangkok', 'Asia/Barnaul', 'Asia/Beirut', 'Asia/Bishkek', 'Asia/Brunei', 'Asia/Chita', 'Asia/Choibalsan', 'Asia/Colombo', 'Asia/Damascus', 'Asia/Dhaka', 'Asia/Dili', 'Asia/Dubai', 'Asia/Dushanbe', 'Asia/Famagusta', 'Asia/Gaza', 'Asia/Hebron', 'Asia/Ho_Chi_Minh', 'Asia/Hong_Kong', 'Asia/Hovd', 'Asia/Irkutsk', 'Asia/Istanbul', 'Asia/Jakarta', 'Asia/Jayapura', 'Asia/Jerusalem', 'Asia/Kabul', 'Asia/Kamchatka', 'Asia/Karachi', 'Asia/Kathmandu', 'Asia/Khandyga', 'Asia/Kolkata', 'Asia/Krasnoyarsk', 'Asia/Kuala_Lumpur', 'Asia/Kuching', 'Asia/Kuwait', 'Asia/Macau', 'Asia/Magadan', 'Asia/Makassar', 'Asia/Manila', 'Asia/Muscat', 'Asia/Nicosia', 'Asia/Novokuznetsk', 'Asia/Novosibirsk', 'Asia/Omsk', 'Asia/Oral', 'Asia/Phnom_Penh', 'Asia/Pontianak', 'Asia/Pyongyang', 'Asia/Qatar', 'Asia/Qostanay', 'Asia/Qyzylorda', 'Asia/Riyadh', 'Asia/Sakhalin', 'Asia/Samarkand', 'Asia/Seoul', 'Asia/Shanghai', 'Asia/Singapore', 'Asia/Srednekolymsk', 'Asia/Taipei', 'Asia/Tashkent', 'Asia/Tbilisi', 'Asia/Tehran', 'Asia/Thimphu', 'Asia/Tokyo', 'Asia/Tomsk', 'Asia/Ulaanbaatar', 'Asia/Urumqi', 'Asia/Ust-Nera', 'Asia/Vientiane', 'Asia/Vladivostok', 'Asia/Yakutsk', 'Asia/Yangon', 'Asia/Yekaterinburg', 'Asia/Yerevan', 'Atlantic/Azores', 'Atlantic/Bermuda', 'Atlantic/Canary', 'Atlantic/Cape_Verde', 'Atlantic/Faroe', 'Atlantic/Madeira', 'Atlantic/Reykjavik', 'Atlantic/South_Georgia', 'Atlantic/St_Helena', 'Atlantic/Stanley', 'Australia/Adelaide', 'Australia/Brisbane', 'Australia/Broken_Hill', 'Australia/Currie', 'Australia/Darwin', 'Australia/Eucla', 'Australia/Hobart', 'Australia/Lindeman', 'Australia/Lord_Howe', 'Australia/Melbourne', 'Australia/Perth', 'Australia/Sydney', 'Canada/Atlantic', 'Canada/Central', 'Canada/Eastern', 'Canada/Mountain', 'Canada/Newfoundland', 'Canada/Pacific', 'Europe/Amsterdam', 'Europe/Andorra', 'Europe/Astrakhan', 'Europe/Athens', 'Europe/Belgrade', 'Europe/Berlin', 'Europe/Bratislava', 'Europe/Brussels', 'Europe/Bucharest', 'Europe/Budapest', 'Europe/Busingen', 'Europe/Chisinau', 'Europe/Copenhagen', 'Europe/Dublin', 'Europe/Gibraltar', 'Europe/Guernsey', 'Europe/Helsinki', 'Europe/Isle_of_Man', 'Europe/Istanbul', 'Europe/Jersey', 'Europe/Kaliningrad', 'Europe/Kiev', 'Europe/Kirov', 'Europe/Lisbon', 'Europe/Ljubljana', 'Europe/London', 'Europe/Luxembourg', 'Europe/Madrid', 'Europe/Malta', 'Europe/Mariehamn', 'Europe/Minsk', 'Europe/Monaco', 'Europe/Moscow', 'Europe/Oslo', 'Europe/Paris', 'Europe/Podgorica', 'Europe/Prague', 'Europe/Riga', 'Europe/Rome', 'Europe/Samara', 'Europe/San_Marino', 'Europe/Sarajevo', 'Europe/Saratov', 'Europe/Simferopol', 'Europe/Skopje', 'Europe/Sofia', 'Europe/Stockholm', 'Europe/Tallinn', 'Europe/Tirane', 'Europe/Ulyanovsk', 'Europe/Uzhgorod', 'Europe/Vaduz', 'Europe/Vatican', 'Europe/Vienna', 'Europe/Vilnius', 'Europe/Volgograd', 'Europe/Warsaw', 'Europe/Zagreb', 'Europe/Zaporozhye', 'Europe/Zurich', 'GMT', 'Indian/Antananarivo', 'Indian/Chagos', 'Indian/Christmas', 'Indian/Cocos', 'Indian/Comoro', 'Indian/Kerguelen', 'Indian/Mahe', 'Indian/Maldives', 'Indian/Mauritius', 'Indian/Mayotte', 'Indian/Reunion', 'Pacific/Apia', 'Pacific/Auckland', 'Pacific/Bougainville', 'Pacific/Chatham', 'Pacific/Chuuk', 'Pacific/Easter', 'Pacific/Efate', 'Pacific/Enderbury', 'Pacific/Fakaofo', 'Pacific/Fiji', 'Pacific/Funafuti', 'Pacific/Galapagos', 'Pacific/Gambier', 'Pacific/Guadalcanal', 'Pacific/Guam', 'Pacific/Honolulu', 'Pacific/Kiritimati', 'Pacific/Kosrae', 'Pacific/Kwajalein', 'Pacific/Majuro', 'Pacific/Marquesas', 'Pacific/Midway', 'Pacific/Nauru', 'Pacific/Niue', 'Pacific/Norfolk', 'Pacific/Noumea', 'Pacific/Pago_Pago', 'Pacific/Palau', 'Pacific/Pitcairn', 'Pacific/Pohnpei', 'Pacific/Port_Moresby', 'Pacific/Rarotonga', 'Pacific/Saipan', 'Pacific/Tahiti', 'Pacific/Tarawa', 'Pacific/Tongatapu', 'Pacific/Wake', 'Pacific/Wallis', 'UTC']
-
-GOOGLE_CALENDAR_LINK: Final[str] = 'https://calendar.google.com/'
-TUTORIAL_SETUP_LINK: Final[str] = 'https://github.com/DennisTurco/Calendar-Data-Manager/blob/master/docs/GoogleCloudAPISetup.md'
-GITHUB_ISSUES_LINK: Final[str] = 'https://github.com/DennisTurco/Calendar-Data-Manager/issues'
-GITHUB_PAGE_LINK: Final[str] = 'https://github.com/DennisTurco/Calendar-Data-Manager'
-DONATE_BUYMEACOFFE_PAGE_LINK: Final[str] = 'https://www.buymeacoffee.com/denno'
-DONATE_PAYPAL_PAGE_LINK: Final[str] = 'https://www.paypal.com/donate/?hosted_button_id=M7CJXS929334U'
-VERSION: Final[str] = '1.0.3'
 
 DATE_FORMATTER: Final[str] = '%d-%m-%Y %H:%M'
 DAY_FORMATTER: Final[str] = "%m/%d/%y" # use this only for calendar picker
@@ -76,7 +70,7 @@ class NewEventsFrame(ctk.CTkFrame):
         self.sidebar_button_2.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[EditEventsFrame]))
         self.sidebar_button_3.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GetEventsFrame]))
         self.sidebar_button_4.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GraphFrame]))
-        self.google_calendar_link.configure(command=lambda: webbrowser.open(GOOGLE_CALENDAR_LINK))
+        self.google_calendar_link.configure(command=lambda: webbrowser.open(ConfigKeys.Keys.get('GOOGLE_CALENDAR_LINK')))
         
         # create main panel
         self.title_label_main = ctk.CTkLabel(self, text="Create New Event", font=ctk.CTkFont(size=20, weight="bold"))
@@ -211,7 +205,7 @@ class EditEventsFrame(ctk.CTkFrame):
         self.sidebar_button_2.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[EditEventsFrame]))
         self.sidebar_button_3.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GetEventsFrame]))
         self.sidebar_button_4.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GraphFrame]))
-        self.google_calendar_link.configure(command=lambda: webbrowser.open(GOOGLE_CALENDAR_LINK))
+        self.google_calendar_link.configure(command=lambda: webbrowser.open(ConfigKeys.Keys.get('GOOGLE_CALENDAR_LINK')))
 
         # create main panel
         self.title_label_main = ctk.CTkLabel(self, text="Edit Events", font=ctk.CTkFont(size=20, weight="bold"))
@@ -525,7 +519,7 @@ class GetEventsFrame(ctk.CTkFrame):
         self.sidebar_button_2.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[EditEventsFrame]))
         self.sidebar_button_3.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GetEventsFrame]))
         self.sidebar_button_4.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GraphFrame]))
-        self.google_calendar_link.configure(command=lambda: webbrowser.open(GOOGLE_CALENDAR_LINK))
+        self.google_calendar_link.configure(command=lambda: webbrowser.open(ConfigKeys.Keys.get('GOOGLE_CALENDAR_LINK')))
         
         # create main panel title
         self.title_label_main = ctk.CTkLabel(self, text="Get Events List", font=ctk.CTkFont(size=20, weight="bold"))
@@ -905,7 +899,7 @@ class GraphFrame(ctk.CTkFrame):
         self.sidebar_button_2.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[EditEventsFrame]))
         self.sidebar_button_3.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GetEventsFrame]))
         self.sidebar_button_4.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GraphFrame]))
-        self.google_calendar_link.configure(command=lambda: webbrowser.open(GOOGLE_CALENDAR_LINK))
+        self.google_calendar_link.configure(command=lambda: webbrowser.open(ConfigKeys.Keys.get('GOOGLE_CALENDAR_LINK')))
         
         # create main panel
         (self.file_path, self.button_file_path, self.button_open_file, self.button_open_events_table_preview) = GUIWidgets.create_file_path_scroll_frame_for_graph_frame(self, folder_image, file_image, table_image)
@@ -1071,19 +1065,26 @@ class MainFrame(ctk.CTkFrame):
         button_frame = ctk.CTkFrame(master=self, fg_color="transparent")
         button_frame.pack(side='bottom', anchor='sw', padx=20, pady=10)
         
-        ctk.CTkLabel(self, text=f"Version {VERSION}", fg_color="transparent").place(relx=1.0, rely=1.0, anchor='se', x=-10, y=-10) # version
-        ctk.CTkLabel(button_frame, text="If you'd like to learn more about the project or support it:", fg_color="transparent", font=("Arial", 12, "italic")).pack(side='top', anchor='w', pady=(0, 10)) # description
-
-        github_btn = ctk.CTkButton(master=button_frame, image=github_image, fg_color="transparent", border_width=1, text="", width=32, height=32, command=lambda: webbrowser.open(GITHUB_PAGE_LINK))
-        github_btn.pack(side='left', padx=5)
-        donate_buymeacoffe_btn = ctk.CTkButton(master=button_frame, image=buymeacoffe_donation_image, fg_color="transparent", border_width=1, text="", width=32, height=32, command=lambda: webbrowser.open(DONATE_BUYMEACOFFE_PAGE_LINK))
-        donate_buymeacoffe_btn.pack(side='left', padx=5)
-        donate__paypal_btn = ctk.CTkButton(master=button_frame, image=paypal_donation_image, fg_color="transparent", border_width=1, text="", width=32, height=32, command=lambda: webbrowser.open(DONATE_PAYPAL_PAGE_LINK))
-        donate__paypal_btn.pack(side='left', padx=5)
+        ctk.CTkLabel(self, text=f"Version {ConfigKeys.Keys.get('VERSION')}", fg_color="transparent").place(relx=1.0, rely=1.0, anchor='se', x=-10, y=-10) # version
         
-        CTkToolTip(github_btn, delay=0.3, message="Github page")
-        CTkToolTip(donate_buymeacoffe_btn, delay=0.3, message="Donate with \"buy me a coffe\"")
-        CTkToolTip(donate__paypal_btn, delay=0.3, message="Donate with \"Paypal\"")
+        if (ConfigKeys.Keys.get('HOMEBUTTONS_MESSAGESECTION')):
+            ctk.CTkLabel(button_frame, text="If you'd like to learn more about the project or support it:", fg_color="transparent", font=("Arial", 12, "italic")).pack(side='top', anchor='w', pady=(0, 10)) # description
+
+        if (ConfigKeys.Keys.get('HOMEBUTTONS_GITHUB')):
+            github_btn = ctk.CTkButton(master=button_frame, image=github_image, fg_color="transparent", border_width=1, text="", width=32, height=32, command=lambda: webbrowser.open(ConfigKeys.Keys.get('GITHUB_PAGE_LINK')))
+            github_btn.pack(side='left', padx=5)
+            CTkToolTip(github_btn, delay=0.3, message="Github page")
+
+        if (ConfigKeys.Keys.get('HOMEBUTTONS_BUYMEACOFFE')):
+            donate_buymeacoffe_btn = ctk.CTkButton(master=button_frame, image=buymeacoffe_donation_image, fg_color="transparent", border_width=1, text="", width=32, height=32, command=lambda: webbrowser.open(ConfigKeys.Keys.get('DONATE_BUYMEACOFFE_PAGE_LINK')))
+            donate_buymeacoffe_btn.pack(side='left', padx=5)
+            CTkToolTip(donate_buymeacoffe_btn, delay=0.3, message="Donate with \"buy me a coffe\"")
+        
+        if (ConfigKeys.Keys.get('HOMEBUTTONS_PAYPAL')):
+            donate__paypal_btn = ctk.CTkButton(master=button_frame, image=paypal_donation_image, fg_color="transparent", border_width=1, text="", width=32, height=32, command=lambda: webbrowser.open(ConfigKeys.Keys.get('DONATE_PAYPAL_PAGE_LINK')))
+            donate__paypal_btn.pack(side='left', padx=5)
+            CTkToolTip(donate__paypal_btn, delay=0.3, message="Donate with \"Paypal\"")
+        
 #?###########################################################
 
 #?###########################################################   
@@ -1104,7 +1105,7 @@ class LoginFrame(ctk.CTkFrame):
 
         ctk.CTkLabel(self, text="Login", fg_color="transparent", font=("Arial", 32)).pack(padx=20, pady=20)
 
-        google_calendar = ctk.CTkButton(master=self, image=google_image, text="Google Calendar", height=50, width=250, command=lambda: webbrowser.open(GOOGLE_CALENDAR_LINK))
+        google_calendar = ctk.CTkButton(master=self, image=google_image, text="Google Calendar", height=50, width=250, command=lambda: webbrowser.open(ConfigKeys.Keys.get('GOOGLE_CALENDAR_LINK')))
         google_login = ctk.CTkButton(master=self, image=arrow_image, text="Login with Google", height=50, width=250, command=lambda: self.setCredentialsPathFrame())
 
         google_calendar.pack(padx=20, pady=10, anchor='center')
@@ -1169,6 +1170,8 @@ class App():
         self.root = root
         self._menu = None
         self._button_5 = None
+
+        ConfigKeys.load_and_set_keys("./config/config.json")
         
         # read data from json to get path from last session
         listRes = js.JSONSettings.ReadFromJSON()
@@ -1227,35 +1230,46 @@ class App():
             self.updateUsernameMenuItem()
 
         dropdown1 = CustomDropdownMenu(widget=button_1)
-        dropdown1.add_option(option="Home", command=lambda: FrameController.show_frame(self._common.get_frames()[MainFrame]))
-        dropdown1.add_option(option="Exit", command=lambda: exit())
+
+        if (ConfigKeys.Keys.get('MENUITEM_HOME')):
+            dropdown1.add_option(option="Home", command=lambda: FrameController.show_frame(self._common.get_frames()[MainFrame]))
+        
+        if (ConfigKeys.Keys.get('MENUITEM_EXIT')):
+            dropdown1.add_option(option="Exit", command=lambda: exit())
 
         dropdown1.add_separator()
 
         dropdown3 = CustomDropdownMenu(widget=button_3)
-        sub_menu2 = dropdown3.add_submenu("Appearance")
-        sub_menu2.add_option(option="Dark", command=lambda: self.change_app_appearance("dark"))
-        sub_menu2.add_option(option="Light", command=lambda: self.change_app_appearance("light"))
+
+        if (ConfigKeys.Keys.get('MENUITEM_APPEARANCE')):
+            sub_menu2 = dropdown3.add_submenu("Appearance")
+            sub_menu2.add_option(option="Dark", command=lambda: self.change_app_appearance("dark"))
+            sub_menu2.add_option(option="Light", command=lambda: self.change_app_appearance("light"))
         
-        sub_menu3 = dropdown3.add_submenu("Scaling")
-        sub_menu3.add_option(option="120%", command=lambda: CommonOperations.change_scaling_event("120"))
-        sub_menu3.add_option(option="110%", command=lambda: CommonOperations.change_scaling_event("110"))
-        sub_menu3.add_option(option="100%", command=lambda: CommonOperations.change_scaling_event("100"))
-        sub_menu3.add_option(option="90%", command=lambda: CommonOperations.change_scaling_event("90"))
-        sub_menu3.add_option(option="80%", command=lambda: CommonOperations.change_scaling_event("80"))
-        sub_menu3.add_option(option="70%", command=lambda: CommonOperations.change_scaling_event("70"))
+        if (ConfigKeys.Keys.get('MENUITEM_SCALING')):
+            sub_menu3 = dropdown3.add_submenu("Scaling")
+            sub_menu3.add_option(option="120%", command=lambda: CommonOperations.change_scaling_event("120"))
+            sub_menu3.add_option(option="110%", command=lambda: CommonOperations.change_scaling_event("110"))
+            sub_menu3.add_option(option="100%", command=lambda: CommonOperations.change_scaling_event("100"))
+            sub_menu3.add_option(option="90%", command=lambda: CommonOperations.change_scaling_event("90"))
+            sub_menu3.add_option(option="80%", command=lambda: CommonOperations.change_scaling_event("80"))
+            sub_menu3.add_option(option="70%", command=lambda: CommonOperations.change_scaling_event("70"))
         
-        sub_menu4 = dropdown3.add_submenu("Theme")
-        sub_menu4.add_option(option="Blue", command=lambda: CommonOperations.set_color_theme("blue"))
-        sub_menu4.add_option(option="Dark Blue", command=lambda: CommonOperations.set_color_theme("dark-blue"))
-        sub_menu4.add_option(option="Green", command=lambda: CommonOperations.set_color_theme("green"))
+        if (ConfigKeys.Keys.get('MENUITEM_THEME')):
+            sub_menu4 = dropdown3.add_submenu("Theme")
+            sub_menu4.add_option(option="Blue", command=lambda: CommonOperations.set_color_theme("blue"))
+            sub_menu4.add_option(option="Dark Blue", command=lambda: CommonOperations.set_color_theme("dark-blue"))
+            sub_menu4.add_option(option="Green", command=lambda: CommonOperations.set_color_theme("green"))
 
         dropdown4 = CustomDropdownMenu(widget=button_4)
-        dropdown4.add_option(option="Share", command=lambda: webbrowser.open(GITHUB_PAGE_LINK))
-        dropdown4.add_option(option="Report a bug", command=lambda: webbrowser.open(GITHUB_ISSUES_LINK))
-        sub_menu4 = dropdown4.add_submenu("Support this project")
-        sub_menu4.add_option(option="Donate with \"Buy me a coffe\"", command=lambda: webbrowser.open(DONATE_BUYMEACOFFE_PAGE_LINK))
-        sub_menu4.add_option(option="Donate with \"Paypal\"", command=lambda: webbrowser.open(DONATE_PAYPAL_PAGE_LINK))
+        if (ConfigKeys.Keys.get('MENUITEM_SHARE')):
+            dropdown4.add_option(option="Share", command=lambda: webbrowser.open(ConfigKeys.Keys.get('GITHUB_PAGE_LINK')))
+        if (ConfigKeys.Keys.get('MENUITEM_BUGREPORT')):
+            dropdown4.add_option(option="Report a bug", command=lambda: webbrowser.open(ConfigKeys.Keys.get('GITHUB_ISSUES_LINK')))
+        if (ConfigKeys.Keys.get('MENUITEM_DONATE')):
+            sub_menu4 = dropdown4.add_submenu("Support this project")
+            sub_menu4.add_option(option="Donate with \"Buy me a coffe\"", command=lambda: webbrowser.open(ConfigKeys.Keys.get('DONATE_BUYMEACOFFE_PAGE_LINK')))
+            sub_menu4.add_option(option="Donate with \"Paypal\"", command=lambda: webbrowser.open(ConfigKeys.Keys.get('DONATE_PAYPAL_PAGE_LINK')))
     
     def updateUsernameMenuItem(self):
         (_, email, picture_url) = gc.CalendarEventsManager.get_user_info(self._common.get_credentials())
@@ -1281,7 +1295,7 @@ class App():
                 self._button_5 = ctk.CTkButton(self._menu, text=str(email), fg_color="transparent", image=user_image, command=self.show_user_menu)
                 self._button_5.grid(row=0, column=4, padx=10, pady=10, sticky="e")
                 self.dropdown5 = CustomDropdownMenu(widget=self._button_5)
-                self.dropdown5.add_option(option="Google Calendar", command=lambda: webbrowser.open(GOOGLE_CALENDAR_LINK))
+                self.dropdown5.add_option(option="Google Calendar", command=lambda: webbrowser.open(ConfigKeys.Keys.get('GOOGLE_CALENDAR_LINK')))
                 self.dropdown5.add_option(option="Log out", command=lambda: self.log_out())
         
             self.change_app_appearance_profile()

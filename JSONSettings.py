@@ -1,14 +1,14 @@
+from enum import Enum
 import json
 import os
 
-DIRECTORY = "settings/"
-FILE = "session.json"
-JSON_PATH = DIRECTORY + FILE
+from ConfigKeys import ConfigKeys
+
+# CONFIG: Enum = ConfigKeys.load_and_set_keys("./config/config.json")
+
+JSON_PATH = (str)(ConfigKeys.Keys.get('CONFIG_DIR')) + (str)(ConfigKeys.Keys.get('PREFERENCE_FILE'))
 
 class JSONSettings:
-    def __init__():
-        pass
-    
     @staticmethod
     def ReadFromJSON() -> list:
         try:
@@ -24,9 +24,6 @@ class JSONSettings:
     def WriteCredentialsToJSON(credentials_path: str, token_path: str) -> None:
         if credentials_path is None or len(credentials_path) == 0: raise ValueError("Credentials path can't be empty")
         if token_path is None or len(token_path) == 0: raise ValueError("Token path can't be empty")
-
-        # check if directory exists
-        JSONSettings.__checkIfDirectoryExists()
         
         # Read existing data from the file
         existing_data = JSONSettings.__readFromFile()
@@ -41,9 +38,6 @@ class JSONSettings:
     @staticmethod
     def WriteTimeZoneToJSON(timezone: str) -> None:
         if timezone is None or len(timezone) == 0: raise ValueError("TimeZone can't be empty")
-
-        # check if directory exists
-        JSONSettings.__checkIfDirectoryExists()
         
         # Read existing data from the file
         existing_data = JSONSettings.__readFromFile()
@@ -57,9 +51,6 @@ class JSONSettings:
     @staticmethod
     def WriteAppearanceToJSON(appearance: str) -> None:
         if appearance is None or len(appearance) == 0: raise ValueError("Appearance can't be empty")
-
-        # check if directory exists
-        JSONSettings.__checkIfDirectoryExists()
         
         # Read existing data from the file
         existing_data = JSONSettings.__readFromFile()
@@ -73,9 +64,6 @@ class JSONSettings:
     @staticmethod
     def WriteTextScalingToJSON(scaling: str) -> None:
         if scaling is None or len(scaling) == 0: raise ValueError("TextScaling can't be empty")
-
-        # check if directory exists
-        JSONSettings.__checkIfDirectoryExists()
         
         # Read existing data from the file
         existing_data = JSONSettings.__readFromFile()
@@ -89,9 +77,6 @@ class JSONSettings:
     @staticmethod
     def WriteColorThemeToJSON(theme: str) -> None:
         if theme is None or len(theme) == 0: raise ValueError("ColorTheme can't be empty")
-
-        # check if directory exists
-        JSONSettings.__checkIfDirectoryExists()
         
         # Read existing data from the file
         existing_data = JSONSettings.__readFromFile()
@@ -117,8 +102,3 @@ class JSONSettings:
     def __writeToFile(existing_data) -> None:
         with open(JSON_PATH, "w") as jsonFile:
             json.dump(existing_data, jsonFile)  
-    
-    @staticmethod
-    def __checkIfDirectoryExists():
-        if not os.path.isdir(DIRECTORY):
-            os.mkdir(DIRECTORY)

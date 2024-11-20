@@ -1,9 +1,11 @@
+from enum import Enum
 import os
 from datetime import datetime, timedelta
 from typing import Final
 from googleapiclient.discovery import build
 import pyperclip
 
+from ConfigKeys import ConfigKeys
 import JSONSettings as js
 
 import traceback
@@ -24,10 +26,9 @@ from google.oauth2.credentials import Credentials
 
 import webbrowser
 
-GITHUB_ISSUES_LINK: Final[str] = 'https://github.com/DennisTurco/Calendar-Data-Manager/issues'
-
 DATE_FORMATTER: Final[str] = '%d-%m-%Y %H:%M'
 DAY_FORMATTER: Final[str] = "%m/%d/%y" # use this only for calendar picker
+
 
 # singleton class
 class CommonOperations():
@@ -102,7 +103,7 @@ class CommonOperations():
         button_copy.grid(row=1, column=1, padx=5, pady=(0, 10), sticky="nsew")
 
         # Button to report the exception
-        button_report = ctk.CTkButton(self.toplevel_window, text="Report Exception", command=lambda: webbrowser.open(GITHUB_ISSUES_LINK))
+        button_report = ctk.CTkButton(self.toplevel_window, text="Report Exception", command=lambda: webbrowser.open(ConfigKeys.Keys.get('GITHUB_ISSUES_LINK')))
         button_report.grid(row=1, column=2, padx=5, pady=(0, 10), sticky="nsew")
 
         # Insert text into the box
