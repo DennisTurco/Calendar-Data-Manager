@@ -1,4 +1,4 @@
-from enum import Enum
+from markdown import markdown
 import os
 from datetime import datetime, timedelta
 from typing import Final
@@ -6,7 +6,7 @@ from googleapiclient.discovery import build
 import pyperclip
 
 from ConfigKeys import ConfigKeys
-import JSONSettings as js
+import JSONPreferences as js
 
 import traceback
 import tempfile
@@ -55,7 +55,7 @@ class CommonOperations():
         self.credentials = credentials
         self.credentials_path = credentials_path
         self.token_path = token_path
-        js.JSONSettings.WriteCredentialsToJSON(self.credentials_path, self.token_path)
+        js.JSONPreferences.WriteCredentialsToJSON(self.credentials_path, self.token_path)
 
     def get_credentials(self) -> Credentials:
         return self.credentials
@@ -121,7 +121,7 @@ class CommonOperations():
         if new_scaling == None: return
         new_scaling_float = int(new_scaling) / 100
         ctk.set_widget_scaling(new_scaling_float)
-        js.JSONSettings.WriteTextScalingToJSON(new_scaling)
+        js.JSONPreferences.WriteTextScalingToJSON(new_scaling)
     
     @staticmethod
     def write_log(log_box, message):
@@ -242,8 +242,8 @@ class CommonOperations():
     def get_timezone():
         # read data from json to get path from last session
         timezone = 'UTC' # set default timezone
-        listRes = js.JSONSettings.ReadFromJSON()
-        if listRes != None:
+        listRes = js.JSONPreferences.ReadFromJSON()
+        if listRes != None and len(listRes) > 0:
             try: timezone = listRes["TimeZone"]
             except: pass
         return timezone
@@ -318,7 +318,7 @@ class CommonOperations():
     
     @staticmethod
     def set_timezone(timezone):
-        js.JSONSettings.WriteTimeZoneToJSON(timezone)
+        js.JSONPreferences.WriteTimeZoneToJSON(timezone)
     
     @staticmethod
     def set_color_theme(color_theme: str):
@@ -329,27 +329,61 @@ class CommonOperations():
     def change_color_theme(color_theme: str):
         if color_theme == None: return
         ctk.set_default_color_theme(color_theme) 
-        js.JSONSettings.WriteColorThemeToJSON(color_theme)
+        js.JSONPreferences.WriteColorThemeToJSON(color_theme)
 
     @staticmethod
     def change_appearance(new_appearance: str):
         if new_appearance == None: return
         ctk.set_appearance_mode(new_appearance)
-        js.JSONSettings.WriteAppearanceToJSON(new_appearance)
-    
+        js.JSONPreferences.WriteAppearanceToJSON(new_appearance)
+
+    @staticmethod
+    def open_info_section_dialog(root, title: str, section_message):
+        # Create a dialog window with a CTkTextbox
+        dialog = ctk.CTkToplevel(root)
+        dialog.title(title)
+        dialog.after(200, lambda: dialog.iconbitmap('./imgs/information.ico'))
+
+        CommonOperations.centerWindow(dialog, 420, 400)
+
+        # Make the dialog always stay on top
+        dialog.attributes("-topmost", True)
+
+        dialog.resizable(False, False)
+
+        # Add a CTkTextbox for displaying the text
+        text_box = ctk.CTkTextbox(dialog, wrap="word")
+        text_box.insert("1.0", section_message)  # Insert the preprocessed plain text
+        text_box.configure(state="disabled")  # Make the textbox read-only
+        text_box.pack(pady=5, padx=10, fill="both", expand=True)
+
+        # Add a close button
+        close_button = ctk.CTkButton(dialog, text="Ok", command=dialog.destroy)
+        close_button.pack(pady=10)
+        
     def get_appearance(self) -> str:
         appearance = ctk.get_appearance_mode()
 
         if appearance is None or appearance == "":
-            listRes = js.JSONSettings.ReadFromJSON()
+            listRes = js.JSONPreferences.ReadFromJSON()
             appearance = ""
-            if listRes != None:
+            if listRes != None and len(listRes) > 0:
                 try: 
                     appearance = listRes["Appearence"]
                     CommonOperations.change_appearance(appearance)
                 except: pass
         
         return appearance
+    
+    @staticmethod
+    def centerWindow(root, app_width, app_height):
+        screen_width = root.winfo_screenwidth()
+        screen_height = root.winfo_screenheight()
+        
+        x = (screen_width / 2) - (app_width / 2) 
+        y = (screen_height / 2) - (app_height / 2) 
+        
+        root.geometry(f'{app_width}x{app_height}+{int(x)}+{int(y)}')
     
     def set_frames(self, frames):
         self._frames = frames

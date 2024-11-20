@@ -68,9 +68,32 @@ def create_file_output_scroll_frame_for_events_list_frame(master, folder_image: 
     button_open_events_table_preview.grid(row=0, column=1, padx=10, pady=10, sticky="w")
     return (file_path, overwrite_mode, button_file_path, button_open_file, button_open_events_table_preview)
 
-def create_file_path_scroll_frame_for_graph_frame(master, folder_image: PhotoImage, file_image: PhotoImage, table_image: PhotoImage):
-    title_label_main = ctk.CTkLabel(master, text="Create Graph", font=ctk.CTkFont(size=20, weight="bold"))
-    title_label_main.grid(row=0, column=1, padx=20, pady=(20, 10), sticky="nsew")
+def create_file_path_scroll_frame_for_graph_frame(master, folder_image: PhotoImage, file_image: PhotoImage, table_image: PhotoImage, info_image: PhotoImage):
+    section_message = '''The Create Graph section of the Calendar Data Manager lets you transform your event data into insightful visualizations for better analysis. Here's what you can do:
+
+• Select File for Analysis: Choose a previously generated `.csv` or `.txt` file that contains your calendar event data. You can preview the file content before proceeding.
+• Choose Graph Types: Select from various visualization options, including:
+    - Hours per Year
+    - Hours by Summary (Bar Chart or Pie Chart)
+    - Hours per Month
+    - Hours per Year by Summary
+    - Hours per Month by Summary
+
+Use the Select All or Deselect All buttons for quick graph type selection.
+
+• Generate Graphs: Once you've set your preferences, click Generate to create the selected graphs. These visualizations help you uncover patterns and trends in your calendar usage, such as how much time you spend on specific activities or summaries over different periods.
+
+This feature is perfect for analyzing productivity, tracking activity trends, and gaining valuable insights from your calendar data.
+        '''
+
+    # create main panel
+    title_frame = ctk.CTkFrame(master, fg_color="transparent")
+    title_frame.grid(row=0, column=1, padx=0, pady=5, sticky="ew")
+    title_frame.grid_columnconfigure((0, 1), weight=1)
+    ctk.CTkLabel(title_frame, text="Create Graph", font=ctk.CTkFont(size=20, weight="bold")).grid(row=0, column=0, padx=5, pady=0, sticky="e")
+    ctk.CTkButton(title_frame, text="", width=10, image=info_image,  fg_color="transparent", command=lambda: CommonOperations.open_info_section_dialog(master, "Create Graph", section_message)).grid(row=0, column=1, padx=5, pady=0, sticky="w")
+
+
     file_output_frame = ctk.CTkScrollableFrame(master, label_text="Set File Path")
     file_output_frame.grid(row=1, column=1, padx=(50, 50), pady=10, sticky="ew")
     file_output_frame.grid_columnconfigure(0, weight=1)

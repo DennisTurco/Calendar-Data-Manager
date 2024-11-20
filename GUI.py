@@ -13,7 +13,7 @@ import requests
 from PIL import Image as pilImage, ImageTk, ImageDraw
 
 from ConfigKeys import ConfigKeys
-import JSONSettings as js
+import JSONPreferences as js
 import CalendarEventsManager as gc
 import Plotter
 from DataEditor import DataCSV
@@ -50,7 +50,7 @@ class NewEventsFrame(ctk.CTkFrame):
     def __init__(self, parent, main_class):
         ctk.CTkFrame.__init__(self, parent)
         self.main_class = main_class
-                
+        
         # load images
         calendar_image = tkinter.PhotoImage(file='./imgs/calendar.png')
         google_image = tkinter.PhotoImage(file='./imgs/google.png')
@@ -58,6 +58,7 @@ class NewEventsFrame(ctk.CTkFrame):
         list_image = tkinter.PhotoImage(file='./imgs/list.png')
         edit_image = tkinter.PhotoImage(file='./imgs/edit.png')
         chart_image = tkinter.PhotoImage(file='./imgs/chart.png')
+        info_image = tkinter.PhotoImage(file='./imgs/information.png')
         
         # configure grid layout (4x4)
         self.grid_columnconfigure(1, weight=1)
@@ -73,8 +74,26 @@ class NewEventsFrame(ctk.CTkFrame):
         self.google_calendar_link.configure(command=lambda: webbrowser.open(ConfigKeys.Keys.get('GOOGLE_CALENDAR_LINK')))
         
         # create main panel
-        self.title_label_main = ctk.CTkLabel(self, text="Create New Event", font=ctk.CTkFont(size=20, weight="bold"))
-        self.title_label_main.grid(row=0, column=1, padx=20, pady=(20, 10), sticky="nsew")
+        section_message = '''The Create New Event section allows you to quickly add events to your Google Calendar with customized details. Here's how to use it:
+
+• Event Information:
+    - Summary: (Required) Enter a brief title or name for your event.
+    - Description: (Optional) Add more details to describe the event. This can be helpful for further context, such as the agenda or any notes.
+    - Color: (Required) Choose a color to visually categorize your event for easy identification on your calendar.
+• Date Interval:
+    - From: (Optional) Set the starting date and time for the event.
+    - To: (Optional) Set the ending date and time for the event.
+    - Timezone: (Optional) Select the timezone in which the event will occur (default is UTC).
+
+Once you've filled in the event details, simply click Create to add the event to your calendar. This tool makes it easy to create events quickly and organize your calendar effectively.
+'''  
+
+        # create main panel
+        title_frame = ctk.CTkFrame(self, fg_color="transparent")
+        title_frame.grid(row=0, column=1, padx=0, pady=5, sticky="ew")
+        title_frame.grid_columnconfigure((0, 1), weight=1)
+        ctk.CTkLabel(title_frame, text="Create New Event", font=ctk.CTkFont(size=20, weight="bold")).grid(row=0, column=0, padx=5, pady=0, sticky="e")
+        ctk.CTkButton(title_frame, text="", width=10, image=info_image,  fg_color="transparent", command=lambda: CommonOperations.open_info_section_dialog(self, "Edit Events", section_message)).grid(row=0, column=1, padx=5, pady=0, sticky="w")
         
         # main entry
         self.main_frame = ctk.CTkFrame(self)
@@ -193,6 +212,7 @@ class EditEventsFrame(ctk.CTkFrame):
         edit_image = tkinter.PhotoImage(file='./imgs/edit.png')
         chart_image = tkinter.PhotoImage(file='./imgs/chart.png')
         arrow_image = tkinter.PhotoImage(file='./imgs/arrow-right2.png')
+        info_image = tkinter.PhotoImage(file='./imgs/information.png')
         
         # configure grid layout (4x4)
         self.grid_columnconfigure(1, weight=1)
@@ -207,10 +227,21 @@ class EditEventsFrame(ctk.CTkFrame):
         self.sidebar_button_4.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GraphFrame]))
         self.google_calendar_link.configure(command=lambda: webbrowser.open(ConfigKeys.Keys.get('GOOGLE_CALENDAR_LINK')))
 
+        section_message = '''This section of the Calendar Data Manager enables you to update multiple events in your Google Calendar simultaneously, saving you time and effort. Here's how it works:
+
+• Filter Existing Events: Use fields such as Summary, Description, Color, and a Date Interval to select the events you want to edit. You can refine your search by combining these criteria.
+• Apply New Values: Define the updates you want to make, such as changing the summary, description, or event color.
+• Edit with Precision: Specify the date range and timezone to ensure that only the desired events within that period are modified.
+
+Once you've set your filters and new values, click the Edit button to apply the changes instantly across all matching events. This tool ensures a seamless way to manage your calendar efficiently.'''
+
         # create main panel
-        self.title_label_main = ctk.CTkLabel(self, text="Edit Events", font=ctk.CTkFont(size=20, weight="bold"))
-        self.title_label_main.grid(row=0, column=1, padx=20, pady=(20, 10), sticky="nsew")
-             
+        title_frame = ctk.CTkFrame(self, fg_color="transparent")
+        title_frame.grid(row=0, column=1, padx=0, pady=5, sticky="ew")
+        title_frame.grid_columnconfigure((0, 1), weight=1)
+        ctk.CTkLabel(title_frame, text="Edit Events", font=ctk.CTkFont(size=20, weight="bold")).grid(row=0, column=0, padx=5, pady=0, sticky="e")
+        ctk.CTkButton(title_frame, text="", width=10, image=info_image,  fg_color="transparent", command=lambda: CommonOperations.open_info_section_dialog(self, "Edit Events", section_message)).grid(row=0, column=1, padx=5, pady=0, sticky="w")
+
         # Create a frame with a 1x2 grid
         main_frame = ctk.CTkScrollableFrame(self, label_text="Event Information")
         main_frame.grid(row=1, column=1, padx=50, pady=10, sticky="nsew")
@@ -507,6 +538,7 @@ class GetEventsFrame(ctk.CTkFrame):
         file_image = tkinter.PhotoImage(file='./imgs/file.png')
         table_image = tkinter.PhotoImage(file='./imgs/table.png')
         chart_image = tkinter.PhotoImage(file='./imgs/chart.png')
+        info_image = tkinter.PhotoImage(file='./imgs/information.png')
         
         # configure grid layout (4x4)
         self.grid_columnconfigure(1, weight=1)
@@ -521,9 +553,21 @@ class GetEventsFrame(ctk.CTkFrame):
         self.sidebar_button_4.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GraphFrame]))
         self.google_calendar_link.configure(command=lambda: webbrowser.open(ConfigKeys.Keys.get('GOOGLE_CALENDAR_LINK')))
         
-        # create main panel title
-        self.title_label_main = ctk.CTkLabel(self, text="Get Events List", font=ctk.CTkFont(size=20, weight="bold"))
-        self.title_label_main.grid(row=0, column=1, padx=20, pady=20, sticky="nsew")
+        section_message = '''This section of the Calendar Data Manager allows you to efficiently retrieve and analyze your Google Calendar events. Here's what you can do:
+
+• Filter by Date Interval: Specify a time range to narrow down the events you want to retrieve. You can set the start and end dates, along with the timezone, for precise filtering.
+• Save Results: Export the retrieved events list to a file in `.csv` or `.txt` format for further analysis or sharing. You can choose the file location, name, and whether to overwrite an existing file.
+• Preview Results or Visualize Data: Quickly preview the events in a table or generate graphs directly from the exported file. This feature enables you to gain insights and statistics about your calendar activities.
+
+Once you've configured your filters, click Get to retrieve the data or Get and Plot to visualize it right away!
+        '''
+
+        # create main panel
+        title_frame = ctk.CTkFrame(self, fg_color="transparent")
+        title_frame.grid(row=0, column=1, padx=0, pady=5, sticky="ew")
+        title_frame.grid_columnconfigure((0, 1), weight=1)
+        ctk.CTkLabel(title_frame, text="Get Events List", font=ctk.CTkFont(size=20, weight="bold")).grid(row=0, column=0, padx=5, pady=0, sticky="e")
+        ctk.CTkButton(title_frame, text="", width=10, image=info_image,  fg_color="transparent", command=lambda: CommonOperations.open_info_section_dialog(self, "Get Events List", section_message)).grid(row=0, column=1, padx=5, pady=0, sticky="w")
 
         # create a container frame for the two scrollable frames
         self.container_frame = ctk.CTkFrame(self, fg_color="transparent")
@@ -887,6 +931,7 @@ class GraphFrame(ctk.CTkFrame):
         chart_image = tkinter.PhotoImage(file='./imgs/chart.png')
         square_image = tkinter.PhotoImage(file='./imgs/square.png')
         square_check_image = tkinter.PhotoImage(file='./imgs/square-check.png')
+        info_image = tkinter.PhotoImage(file='./imgs/information.png')
         
         # configure grid layout (4x4)
         self.grid_columnconfigure(1, weight=1)
@@ -902,7 +947,7 @@ class GraphFrame(ctk.CTkFrame):
         self.google_calendar_link.configure(command=lambda: webbrowser.open(ConfigKeys.Keys.get('GOOGLE_CALENDAR_LINK')))
         
         # create main panel
-        (self.file_path, self.button_file_path, self.button_open_file, self.button_open_events_table_preview) = GUIWidgets.create_file_path_scroll_frame_for_graph_frame(self, folder_image, file_image, table_image)
+        (self.file_path, self.button_file_path, self.button_open_file, self.button_open_events_table_preview) = GUIWidgets.create_file_path_scroll_frame_for_graph_frame(self, folder_image, file_image, table_image, info_image)
         self.button_file_path.configure(command=self.get_file_path)
         self.button_open_file.configure(command=self.open_file)
         self.button_open_events_table_preview.configure(command=self.events_table_preview)
@@ -1174,8 +1219,8 @@ class App():
         ConfigKeys.load_and_set_keys("./config/config.json")
         
         # read data from json to get path from last session
-        listRes = js.JSONSettings.ReadFromJSON()
-        if listRes != None:
+        listRes = js.JSONPreferences.ReadFromJSON()
+        if listRes != None and len(listRes) > 0:
             self.credentials_path = listRes["CredentialsPath"]
             self.token_path = listRes["TokenPath"]
             try: 
@@ -1193,11 +1238,11 @@ class App():
         # configure window
         self.root.iconbitmap('./imgs/icon.ico')
         self.root.title("Calendar Data Manager")
-        self.centerWindow()
+        CommonOperations.centerWindow(self.root, self.app_width, self.app_height)
         self.root.minsize(1100, 900)
 
-        listRes = js.JSONSettings.ReadFromJSON()
-        if listRes != None:
+        listRes = js.JSONPreferences.ReadFromJSON()
+        if listRes != None and len(listRes) > 0:
             try: 
                 appearance = listRes["Appearence"]
                 CommonOperations.change_appearance(appearance)
@@ -1210,15 +1255,6 @@ class App():
                 color_theme = listRes["ColorTheme"]
                 CommonOperations.change_color_theme(color_theme)
             except: pass 
-    
-    def centerWindow(self):
-        screen_width = self.root.winfo_screenwidth()
-        screen_height = self.root.winfo_screenheight()
-        
-        x = (screen_width / 2) - (self.app_width / 2) 
-        y = (screen_height / 2) - (self.app_height / 2) 
-        
-        self.root.geometry(f'{self.app_width}x{self.app_height}+{int(x)}+{int(y)}')
     
     def init_menu(self):
         self._menu = CTkMenuBar(self.root) 
