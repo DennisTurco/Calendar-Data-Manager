@@ -9,6 +9,7 @@
     "DONATE_PAYPAL_PAGE_LINK": "https://www.paypal.com/donate/?hosted_button_id=M7CJXS929334U",
     "PREFERENCE_FILE": "preferences.json",
     "CONFIG_FILE": "config.json",
+    "LOG_FILE": "logs.txt",
     "CONFIG_DIR": "./config/",
     "VERSION": "1.0.3",
     "MenuItems": {
@@ -43,7 +44,7 @@
             "description": "Maximum number of logs for the file"
         },
         "LinesToKeepAfterFileClear": {
-            "value": 1000,
+            "value": 3000,
             "type": "int",
             "description": "Lines to keep after file clear"
         }

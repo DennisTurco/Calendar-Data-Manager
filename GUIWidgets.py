@@ -93,7 +93,6 @@ This feature is perfect for analyzing productivity, tracking activity trends, an
     ctk.CTkLabel(title_frame, text="Create Graph", font=ctk.CTkFont(size=20, weight="bold")).grid(row=0, column=0, padx=5, pady=0, sticky="e")
     ctk.CTkButton(title_frame, text="", width=10, image=info_image,  fg_color="transparent", command=lambda: CommonOperations.open_info_section_dialog(master, "Create Graph", section_message)).grid(row=0, column=1, padx=5, pady=0, sticky="w")
 
-
     file_output_frame = ctk.CTkScrollableFrame(master, label_text="Set File Path")
     file_output_frame.grid(row=1, column=1, padx=(50, 50), pady=10, sticky="ew")
     file_output_frame.grid_columnconfigure(0, weight=1)
@@ -139,7 +138,6 @@ def create_graph_types_scroll_frame(master, square_check_image: PhotoImage, squa
     total_hours_per_month_by_summary = ctk.CTkCheckBox(graph_types_frame, text="Hours per Month By Summary", onvalue="on", offvalue="off")
     total_hours_per_month_by_summary.grid(row=3, column=1, padx=10, pady=10, sticky="ew")
     return(button_select_all, button_deselect_all, total_hours_per_year, total_hours_per_month, total_hours_by_summary, total_hours_by_summary2, total_hours_per_year_by_summary, total_hours_per_month_by_summary)
-
 
 def create_date_selection_for_events_list_scroll_frame(master, timezone: list[str], calendar_image: PhotoImage):
     date_frame = ctk.CTkScrollableFrame(master, label_text="Date Interval")

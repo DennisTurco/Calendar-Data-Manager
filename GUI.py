@@ -2,6 +2,7 @@ from ast import List
 from datetime import datetime
 from enum import Enum
 from io import BytesIO
+from Logger import Logger
 import threading
 from typing import Final, List
 import webbrowser
@@ -149,15 +150,18 @@ Once you've filled in the event details, simply click Create to add the event to
         self._common.set_timezone(time_zone)
         
         if len(summary.replace(" ", "")) == 0:
+            Logger.write_log(f"Error on creating event: summary is missing", Logger.LogType.WARN)
             self._common.write_log(self.log_box, f"Error on creating event: summary is missing")
             return
         if len(date_from.replace(" ", "")) == 0 or len(date_to.replace(" ", "")) == 0:
+            Logger.write_log(f"Error on creating event: date is missing", Logger.LogType.WARN)
             self._common.write_log(self.log_box, f"Error on creating event: date is missing")
             return
         try:
             date_from = datetime.strptime(date_from, DATE_FORMATTER)
             date_to = datetime.strptime(date_to, DATE_FORMATTER)
-        except ValueError:
+        except ValueError as error:
+            Logger.write_log(f"Error on creating event: date format is not correct", Logger.LogType.ERROR, error)
             self._common.write_log(self.log_box, f"Error on creating event: date format is not correct")
             return
         
@@ -166,23 +170,29 @@ Once you've filled in the event details, simply click Create to add the event to
         
         try: 
             gc.CalendarEventsManager.createEvent(self._common.get_credentials(), summary, self.entry_description.get("0.0", tkinter.END), date_from, date_to, color_index, timeZone=time_zone)
+            Logger.write_log(f"Event '{summary}' created succesfully!", Logger.LogType.INFO)
             self._common.write_log(self.log_box, f"Event '{summary}' created succesfully!")
         except FileNotFoundError as file_not_found_error:
             self._common.messagebox_exception(file_not_found_error)
+            Logger.write_log(f"File not found error: {str(file_not_found_error)}", Logger.LogType.ERROR, file_not_found_error)
             self._common.write_log(self.log_box, f"File not found error: {str(file_not_found_error)}")
         except PermissionError as permission_error:
             self._common.messagebox_exception(permission_error)
+            Logger.write_log(f"Permission error: {str(permission_error)}", Logger.LogType.ERROR, permission_error)
             self._common.write_log(self.log_box, f"Permission error: {str(permission_error)}")
         except HttpError as http_error:
             self._common.messagebox_exception(http_error)
+            Logger.write_log(f"HTTP error: {str(http_error)}", Logger.LogType.ERROR, http_error)
             self._common.write_log(self.log_box, f"HTTP error: {str(http_error)}")
         except Exception as error:
             self._common.messagebox_exception(error)
+            Logger.write_log(f"Generic error: {str(error)}", Logger.LogType.ERROR, error)
             self._common.write_log(self.log_box, f"Generic error: {str(error)}")   
         
     def combobox_callback(self, color):
         self.multi_selection.configure(button_color=EVENT_COLOR.get(color))
         self.multi_selection.set(color)
+        Logger.write_log(f"color '{color}' selected", Logger.LogType.INFO)
         self._common.write_log(self.log_box, f"color '{color}' selected")
     
     def date_picker(self, type):
@@ -336,9 +346,11 @@ Once you've set your filters and new values, click the Edit button to apply the 
         
         # Validate input data
         if not summary_old:
+            Logger.write_log("ERROR: Missing old summary", Logger.LogType.WARN)
             CommonOperations.write_log(self.log_box, "ERROR: Missing old summary")
             return
         if not summary_new:
+            Logger.write_log("ERROR: Missing new summary", Logger.LogType.WARN)
             CommonOperations.write_log(self.log_box, "ERROR: Missing new summary")
             return
         
@@ -353,6 +365,7 @@ Once you've set your filters and new values, click the Edit button to apply the 
             if date_to:
                 date_to = datetime.strptime(date_to, DATE_FORMATTER)
         except ValueError:
+            Logger.write_log("ERROR: Invalid date format", Logger.LogType.ERROR)
             CommonOperations.write_log(self.log_box, "ERROR: Invalid date format")
             return
         
@@ -375,6 +388,7 @@ Once you've set your filters and new values, click the Edit button to apply the 
             )
             
             if not old_events:
+                Logger.write_log("No events found", Logger.LogType.INFO)
                 CommonOperations.write_log(self.log_box, "No events found")
             else:
                 # Simulate event updates without applying them
@@ -394,15 +408,19 @@ Once you've set your filters and new values, click the Edit button to apply the 
         # Handle various exceptions
         except FileNotFoundError as e:
             self._common.messagebox_exception(e)
+            Logger.write_log(f"File not found error: {str(e)}", Logger.LogType.ERROR, e)
             CommonOperations.write_log(self.log_box, f"File not found error: {str(e)}")
         except PermissionError as e:
             self._common.messagebox_exception(e)
+            Logger.write_log(f"Permission error: {str(e)}", Logger.LogType.ERROR, e)
             CommonOperations.write_log(self.log_box, f"Permission error: {str(e)}")
         except ValueError as e:
             self._common.messagebox_exception(e)
+            Logger.write_log(f"Value error: {str(e)}", Logger.LogType.ERROR, e)
             CommonOperations.write_log(self.log_box, f"Value error: {str(e)}")
         except Exception as e:
             self._common.messagebox_exception(e)
+            Logger.write_log(f"Generic error: {str(e)}", Logger.LogType.ERROR, e)
             CommonOperations.write_log(self.log_box, f"Generic error: {str(e)}")       
     
     def combobox_callback_color1(self, color):
@@ -413,6 +431,7 @@ Once you've set your filters and new values, click the Edit button to apply the 
     def combobox_callback_color2(self, color):
         self.multi_selection_new.configure(button_color=self.event_color_to.get(color))
         self.multi_selection_new.set(color)
+        Logger.write_log(f"color '{color}' selected", Logger.LogType.INFO)
         CommonOperations.write_log(self.log_box, f"color '{color}' selected")
         
     def update_events(self, old_events: dict, summary_new: str, description_new: str, color_index_new, date_from: str, date_to: str, time_zone: str):
@@ -431,6 +450,7 @@ Once you've set your filters and new values, click the Edit button to apply the 
             )
             if updated_events is None: return
             
+            Logger.write_log(f"{len(updated_events)} event(s) successfully updated!", Logger.LogType.INFO)
             CommonOperations.write_log(self.log_box, f"{len(updated_events)} event(s) successfully updated!")
             self.close_top_frame_window()
     
@@ -648,19 +668,24 @@ Once you've configured your filters, click Get to retrieve the data or Get and P
             try: 
                 self.events = gc.CalendarEventsManager.getEventByID(self._common.get_credentials(), id)
                 #self.events_list_viewer_window()
+                Logger.write_log(f"Event obtained succesfully!", Logger.LogType.INFO)
                 self._common.write_log(self.log_box, f"Event obtained succesfully!")
                 return
             except FileNotFoundError as file_not_found_error:
                 self._common.messagebox_exception(file_not_found_error)
+                Logger.write_log(f"File not found error: {str(file_not_found_error)}", Logger.LogType.ERROR, file_not_found_error)
                 self._common.write_log(self.log_box, f"File not found error: {str(file_not_found_error)}")
             except PermissionError as permission_error:
                 self._common.messagebox_exception(permission_error)
+                Logger.write_log(f"Permission error: {str(permission_error)}", Logger.LogType.ERROR, permission_error)
                 self._common.write_log(self.log_box, f"Permission error: {str(permission_error)}")
             except ValueError as value_error:
                 self._common.messagebox_exception(value_error)
+                Logger.write_log(f"Value error: {str(value_error)}", Logger.LogType.ERROR, value_error)
                 self._common.write_log(self.log_box, f"Value error: {str(value_error)}")
             except Exception as error:
                 self._common.messagebox_exception(error)
+                Logger.write_log(f"Generic error: {str(error)}", Logger.LogType.ERROR, error)
                 self._common.write_log(self.log_box, f"Generic error: {str(error)}")
         
         summary = self.entry_summary.get()
@@ -677,7 +702,8 @@ Once you've configured your filters, click Get to retrieve the data or Get and P
                 date_from = datetime.strptime(date_from, DATE_FORMATTER)
             if len(date_to) != 0:
                 date_to = datetime.strptime(date_to, DATE_FORMATTER)
-        except ValueError:
+        except ValueError as error:
+            Logger.write_log(f"Error on creating event: date format is not correct", Logger.LogType.ERROR, error)
             self._common.write_log(self.log_box, f"Error on creating event: date format is not correct")
             return
         
@@ -687,20 +713,25 @@ Once you've configured your filters, click Get to retrieve the data or Get and P
         try: 
             self.events = gc.CalendarEventsManager.getEvents(creds=self._common.get_credentials(), title=summary, start_date=date_from, end_date=date_to, color_id=color_index, description=description, time_zone=time_zone)
             if self.events == None or len(self.events) == 0:
+                Logger.write_log(f"No events obtained", Logger.LogType.INFO)
                 self._common.write_log(self.log_box, f"No events obtained")
                 return 0
             
             #self.events_list_viewer_window() # i have to truncate the list for performances reason
+            Logger.write_log(f"{len(self.events)} Event(s) obtained succesfully!", Logger.LogType.INFO)
             self._common.write_log(self.log_box, f"{len(self.events)} Event(s) obtained succesfully!")
             return len(self.events)
         except FileNotFoundError as file_not_found_error:
             self._common.messagebox_exception(file_not_found_error)
+            Logger.write_log(f"File not found error: {str(file_not_found_error)}", Logger.LogType.ERROR, file_not_found_error)
             self._common.write_log(self.log_box, f"File not found error: {str(file_not_found_error)}")
         except PermissionError as permission_error:
             self._common.messagebox_exception(permission_error)
+            Logger.write_log(f"Permission error: {str(permission_error)}", Logger.LogType.ERROR, permission_error)
             self._common.write_log(self.log_box, f"Permission error: {str(permission_error)}")
         except ValueError as value_error:
             self._common.messagebox_exception(value_error)
+            Logger.write_log(f"Value error: {str(value_error)}", Logger.LogType.ERROR, value_error)
             self._common.write_log(self.log_box, f"Value error: {str(value_error)}")
         # except GoogleCalendarConnectionError as connection_error:
         #     self._common.messagebox_exception(connection_error)
@@ -710,6 +741,7 @@ Once you've configured your filters, click Get to retrieve the data or Get and P
         #     CommonOperations.write_log(self.log_box, f"Google Calendar API error: {str(api_error)}")
         except Exception as error:
             self._common.messagebox_exception(error)
+            Logger.write_log(f"Generic error: {str(error)}", Logger.LogType.ERROR, error)
             self._common.write_log(self.log_box, f"Generic error: {str(error)}")
 
     def get_and_preview(self):
@@ -856,22 +888,28 @@ Once you've configured your filters, click Get to retrieve the data or Get and P
             # save all into data
             DataCSV.saveDataToFile(self.data, self.file_path.get(), '|', 'utf-8')     
             
+            Logger.write_log(f"{counter} event(s) added to file {self.file_path.get()}", Logger.LogType.INFO)
             self._common.write_log(self.log_box, f"{counter} event(s) added to file {self.file_path.get()}")
             
         except FileNotFoundError as file_not_found_error:
             self._common.messagebox_exception(file_not_found_error)
+            Logger.write_log(f"File not found error: {str(file_not_found_error)}", Logger.LogType.ERROR, file_not_found_error)
             self._common.write_log(self.log_box, f"File not found error: {str(file_not_found_error)}")
         except PermissionError as permission_error:
             self._common.messagebox_exception(permission_error)
+            Logger.write_log(f"Permission error: {str(permission_error)}", Logger.LogType.ERROR, permission_error)
             self._common.write_log(self.log_box, f"Permission error: {str(permission_error)}")
         except ValueError as value_error:
             self._common.messagebox_exception(value_error)
+            Logger.write_log(f"Value error: {str(value_error)}", Logger.LogType.ERROR, value_error)
             self._common.write_log(self.log_box, f"Value error: {str(value_error)}")
         except KeyError as key_error:
             self._common.messagebox_exception(key_error)
+            Logger.write_log(f"Key error: {str(key_error)}", Logger.LogType.ERROR, key_error)
             self._common.write_log(self.log_box, f"Key error: {str(key_error)}")
         except Exception as error:
             self._common.messagebox_exception(error)
+            Logger.write_log(f"Generic error: {str(error)}", Logger.LogType.ERROR, error)
             self._common.write_log(self.log_box, f"Generic error: {str(error)}")
     
     def save_results_to_file2(self, entry):
@@ -889,6 +927,7 @@ Once you've configured your filters, click Get to retrieve the data or Get and P
     def combobox_callback(self, color):
         self.multi_selection.configure(button_color=EVENT_COLOR.get(color))
         self.multi_selection.set(color)
+        Logger.write_log(f"color '{color}' selected", Logger.LogType.INFO)
         CommonOperations.write_log(log_box=self.log_box, message=f"color '{color}' selected")
     
     def get_file_path(self, entry):
@@ -978,6 +1017,7 @@ class GraphFrame(ctk.CTkFrame):
         file_path = filedialog.askopenfilename(title="Select file where do you want to save data", filetypes=(("CSV files", "*.csv"), ("TXT files", "*.txt"), ("All files", "*.*")))
         self.file_path.delete("0", tkinter.END)
         self.file_path.insert("0", file_path)
+        Logger.write_log(f"file '{file_path}' selected", Logger.LogType.INFO)
         self._common.write_log(self.log_box, f"file '{file_path}' selected")
     
     def set_logbox_text(self, text):
@@ -997,6 +1037,7 @@ class GraphFrame(ctk.CTkFrame):
         self.total_hours_by_summary2.select()
         self.total_hours_per_year_by_summary.select()
         self.total_hours_per_month_by_summary.select()
+        Logger.write_log(f"all chart types selected", Logger.LogType.INFO)
         self._common.write_log(self.log_box, f"all chart types selected")
         
     def deselect_all(self):
@@ -1006,6 +1047,7 @@ class GraphFrame(ctk.CTkFrame):
         self.total_hours_by_summary2.deselect()
         self.total_hours_per_year_by_summary.deselect()
         self.total_hours_per_month_by_summary.deselect()
+        Logger.write_log(f"all chart types deselected", Logger.LogType.INFO)
         self._common.write_log(self.log_box, f"all chart types deselected")
         
     # Timeout function to stop the chart generation
@@ -1016,6 +1058,7 @@ class GraphFrame(ctk.CTkFrame):
                     chart_function(data)
             except Exception as ex:
                 self._common.messagebox_exception(ex)
+                Logger.write_log(f"An error occurred during setting timeout for chart generation", Logger.LogType.INFO)
                 self._common.write_log(self.log_box, f"An error occurred during setting timeout for chart generation")
 
         # Create and start the thread
@@ -1028,6 +1071,7 @@ class GraphFrame(ctk.CTkFrame):
         # If the thread is still alive after the timeout, set the stop event
         if chart_thread.is_alive():
             self.stop_event.set()
+            Logger.write_log(f"Chart generation timed out.", Logger.LogType.INFO)
             self._common.write_log(self.log_box, "Chart generation timed out.")
             CTkMessagebox(title="Chart Generation Error", message="One or more charts were cancelled due to a timeout. Please try again later.", icon="cancel", option_1="OK")
 
@@ -1039,6 +1083,7 @@ class GraphFrame(ctk.CTkFrame):
             return
 
         try:
+            Logger.write_log(f"Generating chart", Logger.LogType.INFO)
             self._common.write_log(self.log_box, "Generating chart")
             data = Plotter.Plotter.loadData(self.file_path.get())
             Plotter.Plotter.allStats(data)
@@ -1059,17 +1104,22 @@ class GraphFrame(ctk.CTkFrame):
             if self.total_hours_per_month_by_summary.get() == "on":
                 self.generate_chart_with_timeout(Plotter.Plotter.chart_TotalHoursPerMonthBySummary, data)
 
-        except FileNotFoundError:
+        except FileNotFoundError as error:
+            Logger.write_log(f"Error, the file '{self.file_path.get()}' doesn't exist", Logger.LogType.ERROR, error)
             self._common.write_log(self.log_box, f"Error, the file '{self.file_path.get()}' doesn't exist")
-        except pandas.errors.EmptyDataError:
+        except pandas.errors.EmptyDataError as error:
+            Logger.write_log(f"Error, the file '{self.file_path.get()}' is empty", Logger.LogType.ERROR, error)
             self._common.write_log(self.log_box, f"Error, the file '{self.file_path.get()}' is empty")
         except PermissionError as permission_error:
+            Logger.write_log(f"Permission error: {str(permission_error)}", Logger.LogType.ERROR, permission_error)
             self._common.messagebox_exception(permission_error)
             self._common.write_log(self.log_box, f"Permission error: {str(permission_error)}")
         except ValueError as value_error:
+            Logger.write_log(f"Value error: {str(value_error)}", Logger.LogType.ERROR, value_error)
             self._common.messagebox_exception(value_error)
             self._common.write_log(self.log_box, f"Value error: {str(value_error)}")
         except Exception as error:
+            Logger.write_log(f"Generic error: {str(error)}", Logger.LogType.ERROR, error)
             self._common.messagebox_exception(error)
             self._common.write_log(self.log_box, f"Generic error: {str(error)}")
 
@@ -1217,7 +1267,10 @@ class App():
         self._button_5 = None
 
         ConfigKeys.load_and_set_keys("./config/config.json")
+        Logger.load_values_from_json()
         
+        Logger.write_log("Application started", Logger.LogType.INFO)
+
         # read data from json to get path from last session
         listRes = js.JSONPreferences.ReadFromJSON()
         if listRes != None and len(listRes) > 0:

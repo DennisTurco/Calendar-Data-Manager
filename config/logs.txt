@@ -1,0 +1,2 @@
+2024-11-21 22:30:51.268912 [INFO] color 'Green' selected
+2024-11-21 22:30:14.260626 [INFO] Application started

@@ -18,6 +18,7 @@ class ConfigKeys:
             "CONFIG_DIR": str,
             "CONFIG_FILE": str,
             "PREFERENCE_FILE": str,
+            "LOG_FILE": str,
             "HOMEBUTTONS_MESSAGESECTION": bool,
             "HOMEBUTTONS_GITHUB": bool,
             "HOMEBUTTONS_BUYMEACOFFE": bool,

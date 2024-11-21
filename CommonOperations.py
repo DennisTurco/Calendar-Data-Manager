@@ -12,6 +12,7 @@ import traceback
 import tempfile
 
 import tkinter
+from Logger import Logger
 from tkinter import filedialog
 import customtkinter as ctk
 from CTkScrollableDropdown import *
@@ -111,7 +112,7 @@ class CommonOperations():
 
         self.toplevel_window.attributes("-topmost", False)  # Focus on this window
         CommonOperations.centerTopLevel(self.toplevel_window)
-        
+
     @staticmethod
     def copy_to_clipboard(error_text: str):
         pyperclip.copy(error_text)  
@@ -131,9 +132,11 @@ class CommonOperations():
     def check_file_path_errors(log_box, filepath):
         if filepath is None or len(filepath) == 0:
             CommonOperations.write_log(log_box, f"ERROR: file path is missing")
+            Logger.write_log("ERROR: file path is missing", Logger.LogType.WARN)
             return True
         
         if not os.path.exists(filepath):
+            Logger.write_log(f"ERROR: file '{filepath}' doesn't found", Logger.LogType.WARN)
             CommonOperations.write_log(log_box, f"ERROR: file '{filepath}' doesn't found")
             return True
     
@@ -142,6 +145,7 @@ class CommonOperations():
         file_path = filedialog.askopenfilename(title="Select file where do you want to save data", filetypes=(("CSV files", "*.csv"), ("TXT files", "*.txt"), ("All files", "*.*")))
         entry.delete("0", tkinter.END)
         entry.insert("0", file_path)
+        Logger.write_log(f"file '{file_path}' selected", Logger.LogType.INFO)
         CommonOperations.write_log(logbox, f"file '{file_path}' selected")
         return file_path
     
@@ -161,11 +165,13 @@ class CommonOperations():
         full_date_str = full_date.strftime(DATE_FORMATTER)
         
         if type == 1:
-            CommonOperations.write_log(log_box, "Date Selected From: " + full_date_str)
+            Logger.write_log(f"Date Selected From: {full_date_str}", Logger.LogType.INFO)
+            CommonOperations.write_log(log_box, f"Date Selected From: {full_date_str}")
             entry_date_from.delete("0", tkinter.END)
             entry_date_from.insert("0", full_date_str)
         elif type == 2:
-            CommonOperations.write_log(log_box, "Date Selected To: " + full_date_str)
+            Logger.write_log(f"Date Selected To: {full_date_str}", Logger.LogType.INFO)
+            CommonOperations.write_log(log_box, f"Date Selected To: {full_date_str}")
             entry_date_to.delete("0", tkinter.END)
             entry_date_to.insert("0", full_date_str)
         else:
@@ -270,6 +276,7 @@ class CommonOperations():
                 file_viewer.insert(tkinter.END, file_content)
 
             toplevel_window.attributes("-topmost", True) # focus to this windows
+            Logger.write_log(f"file '{filepath}' opened", Logger.LogType.INFO)
             CommonOperations.write_log(log_box, f"file '{filepath}' opened")
             CommonOperations.centerTopLevel(toplevel_window)
         else:
@@ -295,9 +302,11 @@ class CommonOperations():
                         counter += 1
             
             if len(events) == 0:
+                Logger.write_log(f"file '{filepath}' is empty", Logger.LogType.INFO)
                 CommonOperations.write_log(log_box, f"file '{filepath}' is empty")
                 return
             elif len(events) > 200:
+                Logger.write_log(f"unable to display table preview: the file '{filepath}' is too large.", Logger.LogType.INFO)
                 CommonOperations.write_log(log_box, f"unable to display table preview: the file '{filepath}' is too large.")
                 return
             
@@ -312,6 +321,7 @@ class CommonOperations():
             table.pack()
 
             toplevel_window.attributes("-topmost", True)  # focus to this window
+            Logger.write_log(f"file '{filepath}' opened", Logger.LogType.INFO)
             CommonOperations.write_log(log_box, f"file '{filepath}' opened")
             CommonOperations.centerTopLevel(toplevel_window)
         else:
