@@ -1,6 +1,5 @@
 from ast import List
 from datetime import datetime
-from enum import Enum
 from io import BytesIO
 from Logger import Logger
 import threading
@@ -72,7 +71,7 @@ class NewEventsFrame(ctk.CTkFrame):
         self.sidebar_button_2.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[EditEventsFrame]))
         self.sidebar_button_3.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GetEventsFrame]))
         self.sidebar_button_4.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GraphFrame]))
-        self.google_calendar_link.configure(command=lambda: webbrowser.open(ConfigKeys.Keys.get('GOOGLE_CALENDAR_LINK')))
+        self.google_calendar_link.configure(command=lambda: webbrowser.open(ConfigKeys.Keys.GOOGLE_CALENDAR_LINK))
         
         # create main panel
         section_message = '''The Create New Event section allows you to quickly add events to your Google Calendar with customized details. Here's how to use it:
@@ -235,7 +234,7 @@ class EditEventsFrame(ctk.CTkFrame):
         self.sidebar_button_2.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[EditEventsFrame]))
         self.sidebar_button_3.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GetEventsFrame]))
         self.sidebar_button_4.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GraphFrame]))
-        self.google_calendar_link.configure(command=lambda: webbrowser.open(ConfigKeys.Keys.get('GOOGLE_CALENDAR_LINK')))
+        self.google_calendar_link.configure(command=lambda: webbrowser.open(ConfigKeys.Keys.GOOGLE_CALENDAR_LINK.value))
 
         section_message = '''This section of the Calendar Data Manager enables you to update multiple events in your Google Calendar simultaneously, saving you time and effort. Here's how it works:
 
@@ -571,7 +570,7 @@ class GetEventsFrame(ctk.CTkFrame):
         self.sidebar_button_2.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[EditEventsFrame]))
         self.sidebar_button_3.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GetEventsFrame]))
         self.sidebar_button_4.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GraphFrame]))
-        self.google_calendar_link.configure(command=lambda: webbrowser.open(ConfigKeys.Keys.get('GOOGLE_CALENDAR_LINK')))
+        self.google_calendar_link.configure(command=lambda: webbrowser.open(ConfigKeys.Keys.GOOGLE_CALENDAR_LINK))
         
         section_message = '''This section of the Calendar Data Manager allows you to efficiently retrieve and analyze your Google Calendar events. Here's what you can do:
 
@@ -983,7 +982,7 @@ class GraphFrame(ctk.CTkFrame):
         self.sidebar_button_2.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[EditEventsFrame]))
         self.sidebar_button_3.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GetEventsFrame]))
         self.sidebar_button_4.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GraphFrame]))
-        self.google_calendar_link.configure(command=lambda: webbrowser.open(ConfigKeys.Keys.get('GOOGLE_CALENDAR_LINK')))
+        self.google_calendar_link.configure(command=lambda: webbrowser.open(ConfigKeys.Keys.GOOGLE_CALENDAR_LINK))
         
         # create main panel
         (self.file_path, self.button_file_path, self.button_open_file, self.button_open_events_table_preview) = GUIWidgets.create_file_path_scroll_frame_for_graph_frame(self, folder_image, file_image, table_image, info_image)
@@ -1160,23 +1159,23 @@ class MainFrame(ctk.CTkFrame):
         button_frame = ctk.CTkFrame(master=self, fg_color="transparent")
         button_frame.pack(side='bottom', anchor='sw', padx=20, pady=10)
         
-        ctk.CTkLabel(self, text=f"Version {ConfigKeys.Keys.get('VERSION')}", fg_color="transparent").place(relx=1.0, rely=1.0, anchor='se', x=-10, y=-10) # version
+        ctk.CTkLabel(self, text=f"Version {ConfigKeys.Keys.VERSION.value}", fg_color="transparent").place(relx=1.0, rely=1.0, anchor='se', x=-10, y=-10) # version
         
-        if (ConfigKeys.Keys.get('HOMEBUTTONS_MESSAGESECTION')):
+        if (ConfigKeys.Keys.HOMEBUTTONS_MESSAGESECTION.value):
             ctk.CTkLabel(button_frame, text="If you'd like to learn more about the project or support it:", fg_color="transparent", font=("Arial", 12, "italic")).pack(side='top', anchor='w', pady=(0, 10)) # description
 
-        if (ConfigKeys.Keys.get('HOMEBUTTONS_GITHUB')):
-            github_btn = ctk.CTkButton(master=button_frame, image=github_image, fg_color="transparent", border_width=1, text="", width=32, height=32, command=lambda: webbrowser.open(ConfigKeys.Keys.get('GITHUB_PAGE_LINK')))
+        if (ConfigKeys.Keys.HOMEBUTTONS_GITHUB.value):
+            github_btn = ctk.CTkButton(master=button_frame, image=github_image, fg_color="transparent", border_width=1, text="", width=32, height=32, command=lambda: webbrowser.open(ConfigKeys.Keys.GITHUB_PAGE_LINK.value))
             github_btn.pack(side='left', padx=5)
             CTkToolTip(github_btn, delay=0.3, message="Github page")
 
-        if (ConfigKeys.Keys.get('HOMEBUTTONS_BUYMEACOFFE')):
-            donate_buymeacoffe_btn = ctk.CTkButton(master=button_frame, image=buymeacoffe_donation_image, fg_color="transparent", border_width=1, text="", width=32, height=32, command=lambda: webbrowser.open(ConfigKeys.Keys.get('DONATE_BUYMEACOFFE_PAGE_LINK')))
+        if (ConfigKeys.Keys.HOMEBUTTONS_BUYMEACOFFE.value):
+            donate_buymeacoffe_btn = ctk.CTkButton(master=button_frame, image=buymeacoffe_donation_image, fg_color="transparent", border_width=1, text="", width=32, height=32, command=lambda: webbrowser.open(ConfigKeys.Keys.DONATE_BUYMEACOFFE_PAGE_LINK.value))
             donate_buymeacoffe_btn.pack(side='left', padx=5)
             CTkToolTip(donate_buymeacoffe_btn, delay=0.3, message="Donate with \"buy me a coffe\"")
         
-        if (ConfigKeys.Keys.get('HOMEBUTTONS_PAYPAL')):
-            donate__paypal_btn = ctk.CTkButton(master=button_frame, image=paypal_donation_image, fg_color="transparent", border_width=1, text="", width=32, height=32, command=lambda: webbrowser.open(ConfigKeys.Keys.get('DONATE_PAYPAL_PAGE_LINK')))
+        if (ConfigKeys.Keys.HOMEBUTTONS_PAYPAL.value):
+            donate__paypal_btn = ctk.CTkButton(master=button_frame, image=paypal_donation_image, fg_color="transparent", border_width=1, text="", width=32, height=32, command=lambda: webbrowser.open(ConfigKeys.Keys.DONATE_PAYPAL_PAGE_LINK.value))
             donate__paypal_btn.pack(side='left', padx=5)
             CTkToolTip(donate__paypal_btn, delay=0.3, message="Donate with \"Paypal\"")
         
@@ -1200,7 +1199,7 @@ class LoginFrame(ctk.CTkFrame):
 
         ctk.CTkLabel(self, text="Login", fg_color="transparent", font=("Arial", 32)).pack(padx=20, pady=20)
 
-        google_calendar = ctk.CTkButton(master=self, image=google_image, text="Google Calendar", height=50, width=250, command=lambda: webbrowser.open(ConfigKeys.Keys.get('GOOGLE_CALENDAR_LINK')))
+        google_calendar = ctk.CTkButton(master=self, image=google_image, text="Google Calendar", height=50, width=250, command=lambda: webbrowser.open(ConfigKeys.Keys.GOOGLE_CALENDAR_LINK.value))
         google_login = ctk.CTkButton(master=self, image=arrow_image, text="Login with Google", height=50, width=250, command=lambda: self.setCredentialsPathFrame())
 
         google_calendar.pack(padx=20, pady=10, anchor='center')
@@ -1257,8 +1256,8 @@ class App():
     _common = CommonOperations()
     frames = {}
     
-    app_width = 1100
-    app_height = 900
+    app_width: int 
+    app_height: int 
     
     def __init__(self):
         root = ctk.CTk()
@@ -1266,8 +1265,11 @@ class App():
         self._menu = None
         self._button_5 = None
 
-        ConfigKeys.load_and_set_keys("./config/config.json")
+        ConfigKeys.load_values_from_json()
         Logger.load_values_from_json()
+
+        self.app_width = ConfigKeys.Keys.APP_WIDTH.value
+        self.app_height = ConfigKeys.Keys.APP_HEIGHT.value
         
         Logger.write_log("Application started", Logger.LogType.INFO)
 
@@ -1320,22 +1322,22 @@ class App():
 
         dropdown1 = CustomDropdownMenu(widget=button_1)
 
-        if (ConfigKeys.Keys.get('MENUITEM_HOME')):
+        if (ConfigKeys.Keys.MENUITEM_HOME.value):
             dropdown1.add_option(option="Home", command=lambda: FrameController.show_frame(self._common.get_frames()[MainFrame]))
         
-        if (ConfigKeys.Keys.get('MENUITEM_EXIT')):
+        if (ConfigKeys.Keys.MENUITEM_EXIT.value):
             dropdown1.add_option(option="Exit", command=lambda: exit())
 
         dropdown1.add_separator()
 
         dropdown3 = CustomDropdownMenu(widget=button_3)
 
-        if (ConfigKeys.Keys.get('MENUITEM_APPEARANCE')):
+        if (ConfigKeys.Keys.MENUITEM_APPEARANCE.value):
             sub_menu2 = dropdown3.add_submenu("Appearance")
             sub_menu2.add_option(option="Dark", command=lambda: self.change_app_appearance("dark"))
             sub_menu2.add_option(option="Light", command=lambda: self.change_app_appearance("light"))
         
-        if (ConfigKeys.Keys.get('MENUITEM_SCALING')):
+        if (ConfigKeys.Keys.MENUITEM_SCALING.value):
             sub_menu3 = dropdown3.add_submenu("Scaling")
             sub_menu3.add_option(option="120%", command=lambda: CommonOperations.change_scaling_event("120"))
             sub_menu3.add_option(option="110%", command=lambda: CommonOperations.change_scaling_event("110"))
@@ -1344,21 +1346,21 @@ class App():
             sub_menu3.add_option(option="80%", command=lambda: CommonOperations.change_scaling_event("80"))
             sub_menu3.add_option(option="70%", command=lambda: CommonOperations.change_scaling_event("70"))
         
-        if (ConfigKeys.Keys.get('MENUITEM_THEME')):
+        if (ConfigKeys.Keys.MENUITEM_THEME.value):
             sub_menu4 = dropdown3.add_submenu("Theme")
             sub_menu4.add_option(option="Blue", command=lambda: CommonOperations.set_color_theme("blue"))
             sub_menu4.add_option(option="Dark Blue", command=lambda: CommonOperations.set_color_theme("dark-blue"))
             sub_menu4.add_option(option="Green", command=lambda: CommonOperations.set_color_theme("green"))
 
         dropdown4 = CustomDropdownMenu(widget=button_4)
-        if (ConfigKeys.Keys.get('MENUITEM_SHARE')):
-            dropdown4.add_option(option="Share", command=lambda: webbrowser.open(ConfigKeys.Keys.get('GITHUB_PAGE_LINK')))
-        if (ConfigKeys.Keys.get('MENUITEM_BUGREPORT')):
-            dropdown4.add_option(option="Report a bug", command=lambda: webbrowser.open(ConfigKeys.Keys.get('GITHUB_ISSUES_LINK')))
-        if (ConfigKeys.Keys.get('MENUITEM_DONATE')):
+        if (ConfigKeys.Keys.MENUITEM_SHARE.value):
+            dropdown4.add_option(option="Share", command=lambda: webbrowser.open(ConfigKeys.Keys.GITHUB_PAGE_LINK.value))
+        if (ConfigKeys.Keys.MENUITEM_BUGREPORT.value):
+            dropdown4.add_option(option="Report a bug", command=lambda: webbrowser.open(ConfigKeys.Keys.GITHUB_ISSUES_LINK.value))
+        if (ConfigKeys.Keys.MENUITEM_DONATE.value):
             sub_menu4 = dropdown4.add_submenu("Support this project")
-            sub_menu4.add_option(option="Donate with \"Buy me a coffe\"", command=lambda: webbrowser.open(ConfigKeys.Keys.get('DONATE_BUYMEACOFFE_PAGE_LINK')))
-            sub_menu4.add_option(option="Donate with \"Paypal\"", command=lambda: webbrowser.open(ConfigKeys.Keys.get('DONATE_PAYPAL_PAGE_LINK')))
+            sub_menu4.add_option(option="Donate with \"Buy me a coffe\"", command=lambda: webbrowser.open(ConfigKeys.Keys.DONATE_BUYMEACOFFE_PAGE_LINK.value))
+            sub_menu4.add_option(option="Donate with \"Paypal\"", command=lambda: webbrowser.open(ConfigKeys.Keys.DONATE_PAYPAL_PAGE_LINK.value))
     
     def updateUsernameMenuItem(self):
         (_, email, picture_url) = gc.CalendarEventsManager.get_user_info(self._common.get_credentials())
@@ -1384,7 +1386,7 @@ class App():
                 self._button_5 = ctk.CTkButton(self._menu, text=str(email), fg_color="transparent", image=user_image, command=self.show_user_menu)
                 self._button_5.grid(row=0, column=4, padx=10, pady=10, sticky="e")
                 self.dropdown5 = CustomDropdownMenu(widget=self._button_5)
-                self.dropdown5.add_option(option="Google Calendar", command=lambda: webbrowser.open(ConfigKeys.Keys.get('GOOGLE_CALENDAR_LINK')))
+                self.dropdown5.add_option(option="Google Calendar", command=lambda: webbrowser.open(ConfigKeys.Keys.GOOGLE_CALENDAR_LINK.value))
                 self.dropdown5.add_option(option="Log out", command=lambda: self.log_out())
         
             self.change_app_appearance_profile()

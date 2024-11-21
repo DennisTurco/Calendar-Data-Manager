@@ -12,6 +12,8 @@
     "LOG_FILE": "logs.txt",
     "CONFIG_DIR": "./config/",
     "VERSION": "1.0.3",
+    "APP_WIDTH": 1100,
+    "APP_HEIGHT": 900,
     "MenuItems": {
         "BugReport": true,
         "Exit": true,

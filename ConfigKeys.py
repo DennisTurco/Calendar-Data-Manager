@@ -1,100 +1,81 @@
+from enum import Enum
 import json
-from typing import Dict, Any
 
 
 class ConfigKeys:
-    class Keys:
-        """A mutable keys class to mimic Enum behavior with dynamic values."""
-        _keys = {
-            "EVENT_COLOR": None,
-            "TIMEZONE": None,
-            "GOOGLE_CALENDAR_LINK": None,
-            "TUTORIAL_SETUP_LINK": None,
-            "GITHUB_ISSUES_LINK": None,
-            "GITHUB_PAGE_LINK": None,
-            "DONATE_BUYMEACOFFE_PAGE_LINK": None,
-            "DONATE_PAYPAL_PAGE_LINK": None,
-            "VERSION": None,
-            "CONFIG_DIR": str,
-            "CONFIG_FILE": str,
-            "PREFERENCE_FILE": str,
-            "LOG_FILE": str,
-            "HOMEBUTTONS_MESSAGESECTION": bool,
-            "HOMEBUTTONS_GITHUB": bool,
-            "HOMEBUTTONS_BUYMEACOFFE": bool,
-            "HOMEBUTTONS_PAYPAL": bool,
-            "MENUITEM_BUGREPORT": bool,
-            "MENUITEM_EXIT": bool,
-            "MENUITEM_HOME": bool,
-            "MENUITEM_THEME": bool,
-            "MENUITEM_SCALING": bool,
-            "MENUITEM_APPEARANCE": bool,
-            "MENUITEM_SHARE": bool,
-            "MENUITEM_DONATE": bool,
-        }
+    class Keys(Enum):
+        EVENT_COLOR = ""
+        TIMEZONE = ""
+        GOOGLE_CALENDAR_LINK = "https://calendar.google.com/"
+        TUTORIAL_SETUP_LINK = "https://github.com/DennisTurco/Calendar-Data-Manager/blob/master/docs/GoogleCloudAPISetup.md"
+        GITHUB_ISSUES_LINK = "https://github.com/DennisTurco/Calendar-Data-Manager/issues"
+        GITHUB_PAGE_LINK = "https://github.com/DennisTurco/Calendar-Data-Manager"
+        DONATE_BUYMEACOFFE_PAGE_LINK = "https://www.buymeacoffee.com/denno"
+        DONATE_PAYPAL_PAGE_LINK = "https://www.paypal.com/donate/?hosted_button_id=M7CJXS929334U"
+        VERSION = "1.0.3"
+        APP_WIDTH = 1100
+        APP_HEIGHT = 900
+        CONFIG_DIR = "./config/"
+        CONFIG_FILE = "config.json"
+        PREFERENCE_FILE = "preferences.json"
+        LOG_FILE = "logs.txt"
+        GRAPH_TIMEOUT = 5
+        HOMEBUTTONS_MESSAGESECTION = True
+        HOMEBUTTONS_GITHUB = True
+        HOMEBUTTONS_BUYMEACOFFE = True
+        HOMEBUTTONS_PAYPAL = True
+        MENUITEM_BUGREPORT = True
+        MENUITEM_EXIT = True
+        MENUITEM_HOME = True
+        MENUITEM_THEME = True
+        MENUITEM_SCALING = True
+        MENUITEM_APPEARANCE = True
+        MENUITEM_SHARE = True
+        MENUITEM_DONATE = True
 
         @classmethod
-        def get(cls, key: str):
-            return cls._keys.get(key)
-
-        @classmethod
-        def set(cls, key: str, value: Any):
-            if key in cls._keys:
-                cls._keys[key] = value
-
-        @classmethod
-        def all_keys(cls) -> Dict[str, Any]:
-            return cls._keys
-
-    @staticmethod
-    def flatten_dict(d: Dict[str, Any], parent_key: str = '', sep: str = '.') -> Dict[str, Any]:
-        """
-        Flattens a nested dictionary by concatenating keys with a separator.
-        
-        Args:
-            d (dict): The dictionary to flatten.
-            parent_key (str): The base key string for recursion.
-            sep (str): Separator to use when joining keys.
-        
-        Returns:
-            dict: A flattened dictionary.
-        """
-        items = []
-        for k, v in d.items():
-            new_key = f"{parent_key}{sep}{k}" if parent_key else k
-            if isinstance(v, dict):
-                items.extend(ConfigKeys.flatten_dict(v, new_key, sep=sep).items())
+        def _set(cls, key: str, value: bool):
+            """Set the value for a given config key."""
+            if key in cls.__members__:
+                cls.__members__[key]._value_ = value  # Dynamically update the Enum value
             else:
-                items.append((new_key, v))
-        return dict(items)
+                raise KeyError(f"Key '{key}' not found in ConfigKeys.Keys")
 
     @staticmethod
-    def load_and_set_keys(file_path: str):
+    def load_values_from_json():
         """
-        Reads a JSON file, flattens it, and sets values in the mutable keys class.
-        
-        Args:
-            file_path (str): Path to the JSON file.
-        
-        Returns:
-            None
+        Load log type values from a JSON file and update the ConfigKeys enum.
         """
         try:
-            with open(file_path, 'r') as file:
-                data = json.load(file)
+            with open(ConfigKeys.Keys.CONFIG_DIR.value + ConfigKeys.Keys.CONFIG_FILE.value, 'r') as file:
+                data = json.load(file)  # Parse JSON file content
 
-            # Validate data is a dictionary
-            if not isinstance(data, dict):
-                raise ValueError(f"JSON file '{file_path}' must contain a dictionary at the root.")
+            ConfigKeys.Keys._set('GOOGLE_CALENDAR_LINK', data['GOOGLE_CALENDAR_LINK'])
+            ConfigKeys.Keys._set('TUTORIAL_SETUP_LINK', data['TUTORIAL_SETUP_LINK'])
+            ConfigKeys.Keys._set('GITHUB_ISSUES_LINK', data['GITHUB_ISSUES_LINK'])
+            ConfigKeys.Keys._set('GITHUB_PAGE_LINK', data['GITHUB_PAGE_LINK'])
+            ConfigKeys.Keys._set('DONATE_BUYMEACOFFE_PAGE_LINK', data['DONATE_BUYMEACOFFE_PAGE_LINK'])
+            ConfigKeys.Keys._set('DONATE_PAYPAL_PAGE_LINK', data['DONATE_PAYPAL_PAGE_LINK'])
+            ConfigKeys.Keys._set('VERSION', data['VERSION'])
+            ConfigKeys.Keys._set('APP_WIDTH', data['APP_WIDTH'])
+            ConfigKeys.Keys._set('APP_HEIGHT', data['APP_HEIGHT'])
+            ConfigKeys.Keys._set('CONFIG_DIR', data['CONFIG_DIR'])
+            ConfigKeys.Keys._set('PREFERENCE_FILE', data['PREFERENCE_FILE'])
+            ConfigKeys.Keys._set('LOG_FILE', data['LOG_FILE'])
+            ConfigKeys.Keys._set('MENUITEM_BUGREPORT', data['MenuItems']['BugReport'])
+            ConfigKeys.Keys._set('MENUITEM_EXIT', data['MenuItems']['Exit'])
+            ConfigKeys.Keys._set('MENUITEM_HOME', data['MenuItems']['Home'])
+            ConfigKeys.Keys._set('MENUITEM_THEME', data['MenuItems']['Theme'])
+            ConfigKeys.Keys._set('MENUITEM_SCALING', data['MenuItems']['Scaling'])
+            ConfigKeys.Keys._set('MENUITEM_APPEARANCE', data['MenuItems']['Appearance'])
+            ConfigKeys.Keys._set('MENUITEM_SHARE', data['MenuItems']['Share'])
+            ConfigKeys.Keys._set('MENUITEM_DONATE', data['MenuItems']['Donate'])
+            ConfigKeys.Keys._set('HOMEBUTTONS_MESSAGESECTION', data['HomeButtons']['MessageSection'])
+            ConfigKeys.Keys._set('HOMEBUTTONS_GITHUB', data['HomeButtons']['Github'])
+            ConfigKeys.Keys._set('HOMEBUTTONS_BUYMEACOFFE', data['HomeButtons']['BuyMeACoffe'])
+            ConfigKeys.Keys._set('HOMEBUTTONS_PAYPAL', data['HomeButtons']['Paypal'])
+            ConfigKeys.Keys._set('GRAPH_TIMEOUT', data['GraphTimeout']['value']) 
 
-            # Flatten the dictionary
-            flat_data = ConfigKeys.flatten_dict(data)
-
-            # Update Keys values for matching keys
-            for key, value in flat_data.items():
-                enum_key = key.upper().replace('.', '_')
-                ConfigKeys.Keys.set(enum_key, value)
-
-        except (FileNotFoundError, json.JSONDecodeError, ValueError) as e:
-            print(f"Error loading or processing JSON file: {e}")
+        except (FileNotFoundError, KeyError, json.JSONDecodeError) as e:
+            print(f"Error loading log type values from JSON: {e}")
             raise

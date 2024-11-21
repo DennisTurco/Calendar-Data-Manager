@@ -4,9 +4,8 @@ import json
 
 from ConfigKeys import ConfigKeys
 
-CONFIG_PATH = "./config/config.json"
-ConfigKeys.load_and_set_keys(CONFIG_PATH)
-FILE_PATH = (str)(ConfigKeys.Keys.get('CONFIG_DIR')) + (str)(ConfigKeys.Keys.get('LOG_FILE'))
+ConfigKeys.load_values_from_json()
+FILE_PATH = ConfigKeys.Keys.CONFIG_DIR.value + ConfigKeys.Keys.LOG_FILE.value
 
 class Logger:
     class LogType(Enum):
@@ -31,7 +30,7 @@ class Logger:
         Load log type values from a JSON file and update the LogType enum.
         """
         try:
-            with open(CONFIG_PATH, 'r') as file:
+            with open(ConfigKeys.Keys.CONFIG_DIR.value + ConfigKeys.Keys.CONFIG_FILE.value, 'r') as file:
                 data = json.load(file)  # Parse JSON file content
 
             # Update LogType enum values

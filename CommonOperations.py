@@ -103,7 +103,7 @@ class CommonOperations():
         button_copy.grid(row=1, column=1, padx=5, pady=(0, 10), sticky="nsew")
 
         # Button to report the exception
-        button_report = ctk.CTkButton(self.toplevel_window, text="Report Exception", command=lambda: webbrowser.open(ConfigKeys.Keys.get('GITHUB_ISSUES_LINK')))
+        button_report = ctk.CTkButton(self.toplevel_window, text="Report Exception", command=lambda: webbrowser.open(ConfigKeys.Keys.GITHUB_ISSUES_LINK.value))
         button_report.grid(row=1, column=2, padx=5, pady=(0, 10), sticky="nsew")
 
         # Insert text into the box

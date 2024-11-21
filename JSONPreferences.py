@@ -2,8 +2,8 @@ import json
 
 from ConfigKeys import ConfigKeys
 
-ConfigKeys.load_and_set_keys("./config/config.json")
-JSON_PATH = (str)(ConfigKeys.Keys.get('CONFIG_DIR')) + (str)(ConfigKeys.Keys.get('PREFERENCE_FILE'))
+ConfigKeys.load_values_from_json()
+JSON_PATH = ConfigKeys.Keys.CONFIG_DIR.value + ConfigKeys.Keys.PREFERENCE_FILE.value
 
 class JSONPreferences:
     @staticmethod
