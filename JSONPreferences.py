@@ -1,9 +1,8 @@
-from enum import Enum
 import json
-import os
 
 from ConfigKeys import ConfigKeys
 
+ConfigKeys.load_and_set_keys("./config/config.json")
 JSON_PATH = (str)(ConfigKeys.Keys.get('CONFIG_DIR')) + (str)(ConfigKeys.Keys.get('PREFERENCE_FILE'))
 
 class JSONPreferences:

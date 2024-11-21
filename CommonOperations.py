@@ -29,7 +29,6 @@ import webbrowser
 DATE_FORMATTER: Final[str] = '%d-%m-%Y %H:%M'
 DAY_FORMATTER: Final[str] = "%m/%d/%y" # use this only for calendar picker
 
-
 # singleton class
 class CommonOperations():
     _instance = None
@@ -111,7 +110,8 @@ class CommonOperations():
         file_viewer.insert(tkinter.END, str(error))
 
         self.toplevel_window.attributes("-topmost", False)  # Focus on this window
-    
+        CommonOperations.centerTopLevel(self.toplevel_window)
+        
     @staticmethod
     def copy_to_clipboard(error_text: str):
         pyperclip.copy(error_text)  
@@ -178,7 +178,7 @@ class CommonOperations():
         if toplevel_window is None or not toplevel_window.winfo_exists():
             toplevel_window = ctk.CTkToplevel() # create window if its None or destroyed
             toplevel_window.after(200, lambda: toplevel_window.iconbitmap('./imgs/calendar.ico')) # i have to delay the icon because it' buggy on windows
-            
+
             calendar = Calendar(toplevel_window)
             calendar.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
             hours_label = ctk.CTkLabel(toplevel_window, text="hours:")
@@ -218,6 +218,8 @@ class CommonOperations():
             
             toplevel_window.attributes("-topmost", True) # focus to this windows
             toplevel_window.resizable(False, False)
+
+            CommonOperations.centerTopLevel(toplevel_window)
         else:
             toplevel_window.focus()  # if window exists focus it
         
@@ -269,6 +271,7 @@ class CommonOperations():
 
             toplevel_window.attributes("-topmost", True) # focus to this windows
             CommonOperations.write_log(log_box, f"file '{filepath}' opened")
+            CommonOperations.centerTopLevel(toplevel_window)
         else:
             toplevel_window.focus()  # if window exists focus it
         
@@ -310,7 +313,7 @@ class CommonOperations():
 
             toplevel_window.attributes("-topmost", True)  # focus to this window
             CommonOperations.write_log(log_box, f"file '{filepath}' opened")
-            
+            CommonOperations.centerTopLevel(toplevel_window)
         else:
             toplevel_window.focus()  # if window exists, focus it
 
@@ -385,6 +388,19 @@ class CommonOperations():
         
         root.geometry(f'{app_width}x{app_height}+{int(x)}+{int(y)}')
     
+    @staticmethod
+    def centerTopLevel(toplevel: ctk.CTkToplevel):
+        toplevel.update_idletasks()  # Ensure all geometry changes take effect
+        screen_width = toplevel.winfo_screenwidth()
+        screen_height = toplevel.winfo_screenheight()
+        window_width = toplevel.winfo_width()
+        window_height = toplevel.winfo_height()
+
+        x_position = (screen_width // 2) - (window_width // 2)
+        y_position = (screen_height // 2) - (window_height // 2)
+
+        toplevel.geometry(f"+{x_position}+{y_position}")  # Position the window at the center 
+
     def set_frames(self, frames):
         self._frames = frames
 
