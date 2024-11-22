@@ -2,7 +2,7 @@ import customtkinter as ctk
 from GUI import *
 
 def show_frame(frame):
-    print(f"Raising: {frame}")
+    Logger.write_log(f"Raising frame: {frame}", Logger.LogType.INFO)
     frame.tkraise()
 
 def page_controller(master, root, common: CommonOperations):

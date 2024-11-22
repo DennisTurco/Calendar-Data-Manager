@@ -9,6 +9,8 @@ from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 
+from Logger import Logger
+
 class CalendarEventsManager:
     
     SCOPE = [
@@ -25,7 +27,9 @@ class CalendarEventsManager:
 
         name = user_info.get('name')
         email = user_info.get('email')
-        picture_url = user_info.get('picture') 
+        picture_url = user_info.get('picture')
+
+        Logger.write_log(f"User '{name}' logged with email '{email}'", Logger.LogType.INFO)
 
         return name, email, picture_url
     

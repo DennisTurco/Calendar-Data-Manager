@@ -73,6 +73,8 @@ class Logger:
         else:
             new_log_entry = f"{str(datetime.now())} [{log_type.name}] {message}\n"
 
+        print(new_log_entry.replace("\n", ""))
+
         # Read existing content from the log file
         try:
             with open(FILE_PATH, "r") as file:

@@ -18,6 +18,7 @@ import CalendarEventsManager as gc
 import Plotter
 from DataEditor import DataCSV
 import pandas as pandas
+import warnings
 
 import tkinter
 from tkinter import filedialog
@@ -35,12 +36,12 @@ import GUIWidgets
 import FrameController
 
 # consts
-EVENT_COLOR: Final[dict] = {"Light Blue": "#7986cb", "Green": "#33b679", "Purple": "#8e24aa", "Pink": "#e67c73", "Yellow": "#f6bf26", "Orange": "#f4511e", "Blue": "#039be5", "Grey": "#616161", "Dark Blue": "#3f51b5", "Dark Green": "#0b8043", "Red": "#d50000"}
 TIMEZONE: Final[List[str]] = ['Africa/Abidjan', 'Africa/Accra', 'Africa/Algiers', 'Africa/Bissau', 'Africa/Cairo', 'Africa/Casablanca', 'Africa/Ceuta', 'Africa/El_Aaiun', 'Africa/Juba', 'Africa/Khartoum', 'Africa/Lagos', 'Africa/Maputo', 'Africa/Monrovia', 'Africa/Nairobi', 'Africa/Ndjamena', 'Africa/Sao_Tome', 'Africa/Tripoli', 'Africa/Tunis', 'Africa/Windhoek', 'America/Adak', 'America/Anchorage', 'America/Araguaina', 'America/Argentina/Buenos_Aires', 'America/Argentina/Catamarca', 'America/Argentina/Cordoba', 'America/Argentina/Jujuy', 'America/Argentina/La_Rioja', 'America/Argentina/Mendoza', 'America/Argentina/Rio_Gallegos', 'America/Argentina/Salta', 'America/Argentina/San_Juan', 'America/Argentina/San_Luis', 'America/Argentina/Tucuman', 'America/Argentina/Ushuaia', 'America/Asuncion', 'America/Atikokan', 'America/Bahia', 'America/Bahia_Banderas', 'America/Barbados', 'America/Belem', 'America/Belize', 'America/Blanc-Sablon', 'America/Boa_Vista', 'America/Bogota', 'America/Boise', 'America/Cambridge_Bay', 'America/Campo_Grande', 'America/Cancun', 'America/Caracas', 'America/Cayenne', 'America/Chicago', 'America/Chihuahua', 'America/Costa_Rica', 'America/Creston', 'America/Cuiaba', 'America/Curacao', 'America/Danmarkshavn', 'America/Dawson', 'America/Dawson_Creek', 'America/Denver', 'America/Detroit', 'America/Edmonton', 'America/Eirunepe', 'America/El_Salvador', 'America/Fort_Nelson', 'America/Fortaleza', 'America/Glace_Bay', 'America/Godthab', 'America/Goose_Bay', 'America/Grand_Turk', 'America/Guatemala', 'America/Guayaquil', 'America/Guyana', 'America/Halifax', 'America/Havana', 'America/Hermosillo', 'America/Indiana/Indianapolis', 'America/Indiana/Knox', 'America/Indiana/Marengo', 'America/Indiana/Petersburg', 'America/Indiana/Tell_City', 'America/Indiana/Vevay', 'America/Indiana/Vincennes', 'America/Indiana/Winamac', 'America/Inuvik', 'America/Iqaluit', 'America/Jamaica', 'America/Juneau', 'America/Kentucky/Louisville', 'America/Kentucky/Monticello', 'America/Kralendijk', 'America/La_Paz', 'America/Lima', 'America/Los_Angeles', 'America/Louisville', 'America/Lower_Princes', 'America/Maceio', 'America/Managua', 'America/Manaus', 'America/Marigot', 'America/Martinique', 'America/Matamoros', 'America/Mazatlan', 'America/Menominee', 'America/Merida', 'America/Metlakatla', 'America/Mexico_City', 'America/Miquelon', 'America/Moncton', 'America/Monterrey', 'America/Montevideo', 'America/Montreal', 'America/Montserrat', 'America/Nassau', 'America/New_York', 'America/Nipigon', 'America/Nome', 'America/Noronha', 'America/North_Dakota/Beulah', 'America/North_Dakota/Center', 'America/North_Dakota/New_Salem', 'America/Nuuk', 'America/Ojinaga', 'America/Panama', 'America/Pangnirtung', 'America/Paramaribo', 'America/Phoenix', 'America/Port-au-Prince', 'America/Port_of_Spain', 'America/Porto_Acre', 'America/Porto_Velho', 'America/Puerto_Rico', 'America/Punta_Arenas', 'America/Rainy_River', 'America/Rankin_Inlet', 'America/Recife', 'America/Regina', 'America/Resolute', 'America/Rio_Branco', 'America/Santarem', 'America/Santiago', 'America/Santo_Domingo', 'America/Sao_Paulo', 'America/Scoresbysund', 'America/Sitka', 'America/St_Barthelemy', 'America/St_Johns', 'America/St_Kitts', 'America/St_Lucia', 'America/St_Thomas', 'America/St_Vincent', 'America/Swift_Current', 'America/Tegucigalpa', 'America/Thule', 'America/Thunder_Bay', 'America/Tijuana', 'America/Toronto', 'America/Tortola', 'America/Vancouver', 'America/Whitehorse', 'America/Winnipeg', 'America/Yakutat', 'America/Yellowknife', 'Antarctica/Casey', 'Antarctica/Davis', 'Antarctica/DumontDUrville', 'Antarctica/Macquarie', 'Antarctica/Mawson', 'Antarctica/McMurdo', 'Antarctica/Palmer', 'Antarctica/Rothera', 'Antarctica/Syowa', 'Antarctica/Troll', 'Antarctica/Vostok', 'Arctic/Longyearbyen', 'Asia/Aden', 'Asia/Almaty', 'Asia/Amman', 'Asia/Anadyr', 'Asia/Aqtau', 'Asia/Aqtobe', 'Asia/Ashgabat', 'Asia/Atyrau', 'Asia/Baghdad', 'Asia/Bahrain', 'Asia/Baku', 'Asia/Bangkok', 'Asia/Barnaul', 'Asia/Beirut', 'Asia/Bishkek', 'Asia/Brunei', 'Asia/Chita', 'Asia/Choibalsan', 'Asia/Colombo', 'Asia/Damascus', 'Asia/Dhaka', 'Asia/Dili', 'Asia/Dubai', 'Asia/Dushanbe', 'Asia/Famagusta', 'Asia/Gaza', 'Asia/Hebron', 'Asia/Ho_Chi_Minh', 'Asia/Hong_Kong', 'Asia/Hovd', 'Asia/Irkutsk', 'Asia/Istanbul', 'Asia/Jakarta', 'Asia/Jayapura', 'Asia/Jerusalem', 'Asia/Kabul', 'Asia/Kamchatka', 'Asia/Karachi', 'Asia/Kathmandu', 'Asia/Khandyga', 'Asia/Kolkata', 'Asia/Krasnoyarsk', 'Asia/Kuala_Lumpur', 'Asia/Kuching', 'Asia/Kuwait', 'Asia/Macau', 'Asia/Magadan', 'Asia/Makassar', 'Asia/Manila', 'Asia/Muscat', 'Asia/Nicosia', 'Asia/Novokuznetsk', 'Asia/Novosibirsk', 'Asia/Omsk', 'Asia/Oral', 'Asia/Phnom_Penh', 'Asia/Pontianak', 'Asia/Pyongyang', 'Asia/Qatar', 'Asia/Qostanay', 'Asia/Qyzylorda', 'Asia/Riyadh', 'Asia/Sakhalin', 'Asia/Samarkand', 'Asia/Seoul', 'Asia/Shanghai', 'Asia/Singapore', 'Asia/Srednekolymsk', 'Asia/Taipei', 'Asia/Tashkent', 'Asia/Tbilisi', 'Asia/Tehran', 'Asia/Thimphu', 'Asia/Tokyo', 'Asia/Tomsk', 'Asia/Ulaanbaatar', 'Asia/Urumqi', 'Asia/Ust-Nera', 'Asia/Vientiane', 'Asia/Vladivostok', 'Asia/Yakutsk', 'Asia/Yangon', 'Asia/Yekaterinburg', 'Asia/Yerevan', 'Atlantic/Azores', 'Atlantic/Bermuda', 'Atlantic/Canary', 'Atlantic/Cape_Verde', 'Atlantic/Faroe', 'Atlantic/Madeira', 'Atlantic/Reykjavik', 'Atlantic/South_Georgia', 'Atlantic/St_Helena', 'Atlantic/Stanley', 'Australia/Adelaide', 'Australia/Brisbane', 'Australia/Broken_Hill', 'Australia/Currie', 'Australia/Darwin', 'Australia/Eucla', 'Australia/Hobart', 'Australia/Lindeman', 'Australia/Lord_Howe', 'Australia/Melbourne', 'Australia/Perth', 'Australia/Sydney', 'Canada/Atlantic', 'Canada/Central', 'Canada/Eastern', 'Canada/Mountain', 'Canada/Newfoundland', 'Canada/Pacific', 'Europe/Amsterdam', 'Europe/Andorra', 'Europe/Astrakhan', 'Europe/Athens', 'Europe/Belgrade', 'Europe/Berlin', 'Europe/Bratislava', 'Europe/Brussels', 'Europe/Bucharest', 'Europe/Budapest', 'Europe/Busingen', 'Europe/Chisinau', 'Europe/Copenhagen', 'Europe/Dublin', 'Europe/Gibraltar', 'Europe/Guernsey', 'Europe/Helsinki', 'Europe/Isle_of_Man', 'Europe/Istanbul', 'Europe/Jersey', 'Europe/Kaliningrad', 'Europe/Kiev', 'Europe/Kirov', 'Europe/Lisbon', 'Europe/Ljubljana', 'Europe/London', 'Europe/Luxembourg', 'Europe/Madrid', 'Europe/Malta', 'Europe/Mariehamn', 'Europe/Minsk', 'Europe/Monaco', 'Europe/Moscow', 'Europe/Oslo', 'Europe/Paris', 'Europe/Podgorica', 'Europe/Prague', 'Europe/Riga', 'Europe/Rome', 'Europe/Samara', 'Europe/San_Marino', 'Europe/Sarajevo', 'Europe/Saratov', 'Europe/Simferopol', 'Europe/Skopje', 'Europe/Sofia', 'Europe/Stockholm', 'Europe/Tallinn', 'Europe/Tirane', 'Europe/Ulyanovsk', 'Europe/Uzhgorod', 'Europe/Vaduz', 'Europe/Vatican', 'Europe/Vienna', 'Europe/Vilnius', 'Europe/Volgograd', 'Europe/Warsaw', 'Europe/Zagreb', 'Europe/Zaporozhye', 'Europe/Zurich', 'GMT', 'Indian/Antananarivo', 'Indian/Chagos', 'Indian/Christmas', 'Indian/Cocos', 'Indian/Comoro', 'Indian/Kerguelen', 'Indian/Mahe', 'Indian/Maldives', 'Indian/Mauritius', 'Indian/Mayotte', 'Indian/Reunion', 'Pacific/Apia', 'Pacific/Auckland', 'Pacific/Bougainville', 'Pacific/Chatham', 'Pacific/Chuuk', 'Pacific/Easter', 'Pacific/Efate', 'Pacific/Enderbury', 'Pacific/Fakaofo', 'Pacific/Fiji', 'Pacific/Funafuti', 'Pacific/Galapagos', 'Pacific/Gambier', 'Pacific/Guadalcanal', 'Pacific/Guam', 'Pacific/Honolulu', 'Pacific/Kiritimati', 'Pacific/Kosrae', 'Pacific/Kwajalein', 'Pacific/Majuro', 'Pacific/Marquesas', 'Pacific/Midway', 'Pacific/Nauru', 'Pacific/Niue', 'Pacific/Norfolk', 'Pacific/Noumea', 'Pacific/Pago_Pago', 'Pacific/Palau', 'Pacific/Pitcairn', 'Pacific/Pohnpei', 'Pacific/Port_Moresby', 'Pacific/Rarotonga', 'Pacific/Saipan', 'Pacific/Tahiti', 'Pacific/Tarawa', 'Pacific/Tongatapu', 'Pacific/Wake', 'Pacific/Wallis', 'UTC']
 
 DATE_FORMATTER: Final[str] = '%d-%m-%Y %H:%M'
 DAY_FORMATTER: Final[str] = "%m/%d/%y" # use this only for calendar picker
 
+warnings.filterwarnings("ignore", category=UserWarning, message=".*Given image is not CTkImage.*")
 #?###########################################################
 class NewEventsFrame(ctk.CTkFrame):
     main_class = None
@@ -71,7 +72,7 @@ class NewEventsFrame(ctk.CTkFrame):
         self.sidebar_button_2.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[EditEventsFrame]))
         self.sidebar_button_3.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GetEventsFrame]))
         self.sidebar_button_4.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GraphFrame]))
-        self.google_calendar_link.configure(command=lambda: webbrowser.open(ConfigKeys.Keys.GOOGLE_CALENDAR_LINK))
+        self.google_calendar_link.configure(command=lambda: webbrowser.open(ConfigKeys.Keys.GOOGLE_CALENDAR_LINK.value))
         
         # create main panel
         section_message = '''The Create New Event section allows you to quickly add events to your Google Calendar with customized details. Here's how to use it:
@@ -111,8 +112,8 @@ Once you've filled in the event details, simply click Create to add the event to
         self.label_color = ctk.CTkLabel(self.main_frame, text="Color:")
         self.label_color.grid(row=2, column=0, padx=10, pady=(10, 0), sticky="e")
         self.multi_selection = ctk.CTkComboBox(self.main_frame, state="readonly")
-        CTkScrollableDropdown(self.multi_selection, values=list(EVENT_COLOR.keys()), button_color="transparent", command=self.combobox_callback)
-        self.multi_selection.configure(button_color=EVENT_COLOR.get("Light Blue"))
+        CTkScrollableDropdown(self.multi_selection, values=list(ConfigKeys.Keys.EVENT_COLOR.value.keys()), button_color="transparent", command=self.combobox_callback)
+        self.multi_selection.configure(button_color=ConfigKeys.Keys.EVENT_COLOR.value.get("Light Blue"))
         self.multi_selection.set("Light Blue")
         self.multi_selection.grid(row=2, column=1, padx=0, pady=(10, 10), sticky="w")        
 
@@ -140,6 +141,7 @@ Once you've filled in the event details, simply click Create to add the event to
         self.log_box.grid(row=4, column=1, columnspan=2, padx=(0, 0), pady=(20, 0), sticky="nsew")
     
     def create_event(self):
+        Logger.write_log("Creating event", Logger.LogType.INFO)
         summary = self.entry_summary.get()
         date_from = self.entry_date_from.get()
         date_to = self.entry_date_to.get()
@@ -165,7 +167,7 @@ Once you've filled in the event details, simply click Create to add the event to
             return
         
         # get color index
-        color_index = self._common.get_color_id(EVENT_COLOR, self.multi_selection.get())
+        color_index = self._common.get_color_id(ConfigKeys.Keys.EVENT_COLOR.value, self.multi_selection.get())
         
         try: 
             gc.CalendarEventsManager.createEvent(self._common.get_credentials(), summary, self.entry_description.get("0.0", tkinter.END), date_from, date_to, color_index, timeZone=time_zone)
@@ -189,7 +191,7 @@ Once you've filled in the event details, simply click Create to add the event to
             self._common.write_log(self.log_box, f"Generic error: {str(error)}")   
         
     def combobox_callback(self, color):
-        self.multi_selection.configure(button_color=EVENT_COLOR.get(color))
+        self.multi_selection.configure(button_color=ConfigKeys.Keys.EVENT_COLOR.value.get(color))
         self.multi_selection.set(color)
         Logger.write_log(f"color '{color}' selected", Logger.LogType.INFO)
         self._common.write_log(self.log_box, f"color '{color}' selected")
@@ -204,8 +206,8 @@ class EditEventsFrame(ctk.CTkFrame):
     _common = CommonOperations()
     toplevel_window: ctk.CTkToplevel = None
     date_picker_window = None
-    event_color_from = EVENT_COLOR
-    event_color_to = EVENT_COLOR
+    event_color_from = ConfigKeys.Keys.EVENT_COLOR.value
+    event_color_to = ConfigKeys.Keys.EVENT_COLOR.value
     
     def __init__(self, parent, main_class):
         ctk.CTkFrame.__init__(self, parent)
@@ -274,7 +276,7 @@ Once you've set your filters and new values, click the Edit button to apply the 
         self.label_color_old.grid(row=3, column=0, padx=10, pady=5, sticky="e")
         self.multi_selection_old = ctk.CTkComboBox(self.old_values_frame, state="readonly")
         CTkScrollableDropdown(self.multi_selection_old, values=list(self.event_color_from.keys()), button_color="transparent", command=self.combobox_callback_color1)
-        self.multi_selection_old.configure(button_color=EVENT_COLOR.get("No Color Filtering"))
+        self.multi_selection_old.configure(button_color=self.event_color_from.get("No Color Filtering"))
         self.multi_selection_old.set("No Color Filtering")
         self.multi_selection_old.grid(row=3, column=1, padx=0, pady=5, sticky="w")
         
@@ -299,7 +301,7 @@ Once you've set your filters and new values, click the Edit button to apply the 
         self.label_color_new.grid(row=3, column=0, padx=10, pady=5, sticky="e")
         self.multi_selection_new = ctk.CTkComboBox(self.new_values_frame, state="readonly")
         CTkScrollableDropdown(self.multi_selection_new, values=list(self.event_color_to.keys()), button_color="transparent", command=self.combobox_callback_color2)
-        self.multi_selection_new.configure(button_color=EVENT_COLOR.get("Light Blue"))
+        self.multi_selection_new.configure(button_color=ConfigKeys.Keys.EVENT_COLOR.value.get("Light Blue"))
         self.multi_selection_new.set("Light Blue")
         self.multi_selection_new.grid(row=3, column=1, padx=0, pady=5, sticky="w")
         
@@ -332,7 +334,9 @@ Once you've set your filters and new values, click the Edit button to apply the 
     def date_picker(self, type):
         self.date_picker_window = CommonOperations.date_picker_window(type, self.date_picker_window, self.entry_date_from, self.entry_date_to, self.log_box)
     
-    def edit_events(self):        
+    def edit_events(self):
+        Logger.write_log("Editing events", Logger.LogType.INFO)
+
         # Get OLD values
         summary_old = self.entry_summary_old.get()
         description_old = self.entry_description_old.get('0.0', tkinter.END)
@@ -425,18 +429,21 @@ Once you've set your filters and new values, click the Edit button to apply the 
     def combobox_callback_color1(self, color):
         self.multi_selection_old.configure(button_color=self.event_color_from.get(color))
         self.multi_selection_old.set(color)
+        Logger.write_log(f"Old color '{color}' selected", Logger.LogType.INFO)
         CommonOperations.write_log(self.log_box, f"color '{color}' selected")
 
     def combobox_callback_color2(self, color):
         self.multi_selection_new.configure(button_color=self.event_color_to.get(color))
         self.multi_selection_new.set(color)
-        Logger.write_log(f"color '{color}' selected", Logger.LogType.INFO)
+        Logger.write_log(f"New color '{color}' selected", Logger.LogType.INFO)
         CommonOperations.write_log(self.log_box, f"color '{color}' selected")
         
     def update_events(self, old_events: dict, summary_new: str, description_new: str, color_index_new, date_from: str, date_to: str, time_zone: str):
         # Apply updates to the events
         msg = CTkMessagebox(title="Edit events", message=f"Are you sure you want to confirm the changes?\n{len(old_events)} events will be changed.", icon="question", option_1="No", option_2="Yes")
         if msg.get() == "Yes":
+            Logger.write_log(f"Old events edited: {old_events}", Logger.LogType.INFO)
+
             updated_events = gc.CalendarEventsManager.editEvent(
                 self._common.get_credentials(),
                 old_events,
@@ -457,6 +464,8 @@ Once you've set your filters and new values, click the Edit button to apply the 
         self.toplevel_window.destroy()    
     
     def events_list_viewer_window(self, old_events: dict, new_events: dict, summary_new: str, description_new: str, color_index_new, date_from, date_to, time_zone):
+        Logger.write_log("Events list viewer", Logger.LogType.INFO)
+        
         # Create a new window if it doesn't exist
         if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
             self.toplevel_window = ctk.CTkToplevel()
@@ -498,6 +507,7 @@ Once you've set your filters and new values, click the Edit button to apply the 
 
             # Bring the window to the front
             self.toplevel_window.attributes("-topmost", True)
+            CommonOperations.centerTopLevel(self.toplevel_window)
         else:
             self.toplevel_window.focus()  # Focus the window if it already exists
 
@@ -542,10 +552,13 @@ class GetEventsFrame(ctk.CTkFrame):
     data = None
     events = None
     _common = CommonOperations()
-    
+    event_color = ConfigKeys.Keys.EVENT_COLOR.value
+
     def __init__(self, parent, main_class):
         ctk.CTkFrame.__init__(self, parent)
         self.main_class = main_class
+
+        self.event_color["No Color Filtering"] = ""
         
         # load images
         calendar_image = tkinter.PhotoImage(file='./imgs/calendar.png')
@@ -612,8 +625,8 @@ Once you've configured your filters, click Get to retrieve the data or Get and P
         self.label_color = ctk.CTkLabel(self.main_frame, text="Color:")
         self.label_color.grid(row=3, column=0, padx=10, pady=5, sticky="e")
         self.multi_selection = ctk.CTkComboBox(self.main_frame, state="readonly")
-        CTkScrollableDropdown(self.multi_selection, values=list(EVENT_COLOR.keys()), button_color="transparent", command=self.combobox_callback)
-        self.multi_selection.configure(button_color=EVENT_COLOR.get("No Color Filtering"))
+        CTkScrollableDropdown(self.multi_selection, values=list(self.event_color.keys()), button_color="transparent", command=self.combobox_callback)
+        self.multi_selection.configure(button_color=self.event_color.get("No Color Filtering"))
         self.multi_selection.set("No Color Filtering")
         self.multi_selection.grid(row=3, column=1, padx=0, pady=5, sticky="w")
         
@@ -707,7 +720,7 @@ Once you've configured your filters, click Get to retrieve the data or Get and P
             return
         
         # get color index
-        color_index = self._common.get_color_id(EVENT_COLOR, self.multi_selection.get())
+        color_index = self._common.get_color_id(ConfigKeys.Keys.EVENT_COLOR.value, self.multi_selection.get())
         
         try: 
             self.events = gc.CalendarEventsManager.getEvents(creds=self._common.get_credentials(), title=summary, start_date=date_from, end_date=date_to, color_id=color_index, description=description, time_zone=time_zone)
@@ -761,6 +774,8 @@ Once you've configured your filters, click Get to retrieve the data or Get and P
         self.go_to_graph_frame()
     
     def events_list_viewer_window(self):  
+        Logger.write_log("Events list viewer", Logger.LogType.INFO)
+
         if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
             self.toplevel_window = ctk.CTkToplevel()
             self.toplevel_window.after(200, lambda: self.toplevel_window.iconbitmap('./imgs/list.ico')) # i have to delay the icon because it' buggy on windows
@@ -818,13 +833,13 @@ Once you've configured your filters, click Get to retrieve the data or Get and P
                 event_list_file_viewer.insert(tkinter.END, event_info_str)
     
             self.toplevel_window.attributes("-topmost", True) # focus to this windows
+            CommonOperations.centerTopLevel(self.toplevel_window)
         else:
             self.toplevel_window.focus()  # if window exists focus it
         
         return self.toplevel_window
     
     def get_filepath_to_save_results(self):
-        
         if self.file_path != None and len(self.file_path.get()) != 0:
             self.save_results_to_file() 
             return
@@ -924,7 +939,7 @@ Once you've configured your filters, click Get to retrieve the data or Get and P
         self.toplevel_entry_window.destroy()
         
     def combobox_callback(self, color):
-        self.multi_selection.configure(button_color=EVENT_COLOR.get(color))
+        self.multi_selection.configure(button_color=ConfigKeys.Keys.EVENT_COLOR.value.get(color))
         self.multi_selection.set(color)
         Logger.write_log(f"color '{color}' selected", Logger.LogType.INFO)
         CommonOperations.write_log(log_box=self.log_box, message=f"color '{color}' selected")
@@ -1427,6 +1442,7 @@ class App():
             self._button_5.grid_forget()
             
     def log_out(self):
+        Logger.write_log(f"Logging out", Logger.LogType.INFO)
         self.forgetUsernameMenuItem()
         FrameController.show_frame(self._common.get_frames()[LoginFrame])
     
@@ -1435,6 +1451,8 @@ class App():
         self.change_app_appearance_profile(mode)
 
     def change_app_appearance_profile(self, appearance: str = ''):
+        Logger.write_log(f"Changing appearance to {appearance}", Logger.LogType.INFO)
+
         # edit color text button following the style apperance
         if appearance is None or appearance == '':
             appearance = self._common.get_appearance()

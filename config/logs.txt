@@ -1,3 +1,158 @@
+2024-11-22 10:50:47.542599 [INFO] Raising frame: .!ctkframe.!mainframe
+2024-11-22 10:50:47.534663 [INFO] Changing appearance to 
+2024-11-22 10:50:47.437534 [INFO] User 'Dennis Turco' logged with email 'dennisturco@gmail.com'
+2024-11-22 10:50:47.326773 [INFO] User 'Dennis Turco' logged with email 'dennisturco@gmail.com'
+2024-11-22 10:50:45.486590 [INFO] Raising frame: .!ctkframe.!loginframe
+2024-11-22 10:50:39.992510 [INFO] Changing color theme to: green
+2024-11-22 10:50:39.980606 [INFO] Application started
+2024-11-22 10:50:26.294575 [INFO] Raising frame: .!ctkframe.!mainframe
+2024-11-22 10:50:26.286611 [INFO] Changing appearance to 
+2024-11-22 10:50:26.173027 [INFO] User 'Dennis Turco' logged with email 'dennisturco@gmail.com'
+2024-11-22 10:50:26.046771 [INFO] User 'Dennis Turco' logged with email 'dennisturco@gmail.com'
+2024-11-22 10:50:24.540418 [INFO] Raising frame: .!ctkframe.!loginframe
+2024-11-22 10:50:18.888960 [INFO] Changing color theme to: green
+2024-11-22 10:50:18.876560 [INFO] Application started
+2024-11-22 10:48:53.672543 [INFO] Raising frame: .!ctkframe.!loginframe
+2024-11-22 10:48:48.162949 [INFO] Changing color theme to: green
+2024-11-22 10:48:48.149060 [INFO] Application started
+2024-11-22 10:46:51.353607 [INFO] Changing appearance to dark
+2024-11-22 10:46:28.665072 [INFO] Changing appearance to light
+2024-11-22 10:46:01.839455 [INFO] Raising frame: .!ctkframe.!graphframe
+2024-11-22 10:46:00.520990 [INFO] Raising frame: .!ctkframe.!mainframe
+2024-11-22 10:46:00.513067 [INFO] Changing appearance to 
+2024-11-22 10:46:00.425260 [INFO] User 'Dennis Turco' logged with email 'dennisturco@gmail.com'
+2024-11-22 10:46:00.318981 [INFO] User 'Dennis Turco' logged with email 'dennisturco@gmail.com'
+2024-11-22 10:45:59.406457 [INFO] Raising frame: .!ctkframe.!loginframe
+2024-11-22 10:45:53.669665 [INFO] Changing color theme to: green
+2024-11-22 10:45:53.658257 [INFO] Application started
+2024-11-22 10:44:23.536421 [INFO] Raising frame: .!ctkframe.!graphframe
+2024-11-22 10:44:22.566015 [INFO] Raising frame: .!ctkframe.!mainframe
+2024-11-22 10:44:22.557583 [INFO] Changing appearance to 
+2024-11-22 10:44:22.448524 [INFO] User 'Dennis Turco' logged with email 'dennisturco@gmail.com'
+2024-11-22 10:44:22.336719 [INFO] User 'Dennis Turco' logged with email 'dennisturco@gmail.com'
+2024-11-22 10:44:20.874027 [INFO] Raising frame: .!ctkframe.!loginframe
+2024-11-22 10:44:15.440291 [INFO] Changing color theme to: green
+2024-11-22 10:44:15.428883 [INFO] Application started
+2024-11-22 10:29:55.994395 [INFO] Raising frame: .!ctkframe.!mainframe
+2024-11-22 10:29:55.873734 [INFO] User 'Dennis Turco' logged with email 'dennisturco@gmail.com'
+2024-11-22 10:29:55.762000 [INFO] User 'Dennis Turco' logged with email 'dennisturco@gmail.com'
+2024-11-22 10:29:52.320738 [INFO] Raising frame: .!ctkframe.!loginframe
+2024-11-22 10:29:46.934050 [INFO] Changing color theme to: green
+2024-11-22 10:29:46.922827 [INFO] Application started
+2024-11-22 10:12:33.016893 [INFO] Raising frame: .!ctkframe.!geteventsframe
+2024-11-22 10:12:32.257503 [INFO] Raising frame: .!ctkframe.!graphframe
+2024-11-22 10:12:29.199045 [INFO] Raising frame: .!ctkframe.!geteventsframe
+2024-11-22 10:11:23.711086 [INFO] New color 'Orange' selected
+2024-11-22 10:11:22.276652 [INFO] Old color 'Orange' selected
+2024-11-22 10:11:20.331694 [INFO] Old color 'Pink' selected
+2024-11-22 10:11:18.799604 [INFO] Raising frame: .!ctkframe.!editeventsframe
+2024-11-22 10:11:18.095128 [INFO] Raising frame: .!ctkframe.!geteventsframe
+2024-11-22 10:11:16.192907 [INFO] Raising frame: .!ctkframe.!graphframe
+2024-11-22 10:11:11.399855 [INFO] color 'Purple' selected
+2024-11-22 10:11:07.534517 [INFO] Raising frame: .!ctkframe.!geteventsframe
+2024-11-22 10:11:06.133241 [INFO] Raising frame: .!ctkframe.!mainframe
+2024-11-22 10:11:04.940943 [INFO] Raising frame: .!ctkframe.!loginframe
+2024-11-22 10:10:59.570347 [INFO] Application started
+2024-11-22 10:09:31.056431 [INFO] Date Selected To: 22-11-2024 11:00
+2024-11-22 10:09:30.034280 [INFO] Opening date picker
+2024-11-22 10:09:27.170533 [INFO] Date Selected From: 22-11-2024 10:00
+2024-11-22 10:09:24.765115 [INFO] Opening date picker
+2024-11-22 10:09:02.261757 [INFO] color 'Orange' selected
+2024-11-22 10:09:00.547026 [INFO] color 'Purple' selected
+2024-11-22 10:08:56.658232 [INFO] Raising frame: .!ctkframe.!editeventsframe
+2024-11-22 10:08:52.340823 [INFO] Raising frame: .!ctkframe.!mainframe
+2024-11-22 10:08:48.790869 [INFO] Raising frame: .!ctkframe.!loginframe
+2024-11-22 10:08:43.252512 [INFO] Application started
+2024-11-22 10:07:46.474216 [INFO] color 'Pink' selected
+2024-11-22 10:07:38.721691 [INFO] Raising frame: .!ctkframe.!editeventsframe
+2024-11-22 10:07:30.601555 [INFO] Opening date picker
+2024-11-22 10:07:28.129080 [INFO] Opening date picker
+2024-11-22 10:07:25.297961 [INFO] Raising frame: .!ctkframe.!neweventsframe
+2024-11-22 10:07:21.364495 [INFO] Raising frame: .!ctkframe.!mainframe
+2024-11-22 10:07:16.303774 [INFO] Raising frame: .!ctkframe.!loginframe
+2024-11-22 10:07:10.383617 [INFO] Application started
+2024-11-22 10:06:59.695636 [INFO] file '' selected
+2024-11-22 10:06:42.160357 [INFO] ERROR: file path is missing
+2024-11-22 10:06:38.350844 [INFO] Raising frame: .!ctkframe.!graphframe
+2024-11-22 10:06:34.688087 [INFO] Raising frame: .!ctkframe.!geteventsframe
+2024-11-22 10:06:17.024432 [INFO] Events list viewer
+2024-11-22 10:06:16.708613 [INFO] Editing events
+2024-11-22 10:06:06.318541 [INFO] Events list viewer
+2024-11-22 10:06:05.897165 [INFO] Editing events
+2024-11-22 10:06:04.145450 [INFO] Date Selected To: 23-11-2024 18:00
+2024-11-22 10:05:57.941775 [INFO] Opening date picker
+2024-11-22 10:05:57.291856 [INFO] Date Selected From: 23-11-2024 16:00
+2024-11-22 10:05:53.437800 [INFO] Opening date picker
+2024-11-22 10:05:40.325235 [INFO] Raising frame: .!ctkframe.!editeventsframe
+2024-11-22 10:03:12.167541 [INFO] Opening date picker
+2024-11-22 10:03:09.063836 [INFO] Raising frame: .!ctkframe.!neweventsframe
+2024-11-22 10:03:03.986860 [INFO] Raising frame: .!ctkframe.!mainframe
+2024-11-22 10:03:02.582831 [INFO] Raising frame: .!ctkframe.!loginframe
+2024-11-22 10:02:57.054867 [INFO] Application started
+2024-11-22 10:00:33.508101 [INFO] Events list viewer
+2024-11-22 10:00:33.171722 [INFO] Editing events
+2024-11-22 10:00:27.451945 [INFO] No events found
+2024-11-22 10:00:27.158306 [INFO] Editing events
+2024-11-22 09:58:44.728932 [INFO] 2 event(s) successfully updated!
+2024-11-22 09:58:44.029155 [INFO] Old events edited: [{'kind': 'calendar#event', 'etag': '"3464531713950000"', 'id': '32ft2ihid8h79trh3kos55lae7', 'status': 'confirmed', 'htmlLink': 'https://www.google.com/calendar/event?eid=MzJmdDJpaGlkOGg3OXRyaDNrb3M1NWxhZTcgZGVubmlzdHVyY29AbQ&ctz=Europe/Rome', 'created': '2024-11-22T08:56:11.000Z', 'updated': '2024-11-22T08:57:36.975Z', 'summary': 'test', 'description': 'asdasd d', 'location': 'Fidenza, 43036 Fidenza PR, Italia', 'creator': {'email': 'dennisturco@gmail.com', 'self': True}, 'organizer': {'email': 'dennisturco@gmail.com', 'self': True}, 'start': {'dateTime': '2024-11-23T17:00:00+01:00', 'timeZone': 'Europe/Rome'}, 'end': {'dateTime': '2024-11-23T18:00:00+01:00', 'timeZone': 'Europe/Rome'}, 'iCalUID': '32ft2ihid8h79trh3kos55lae7@google.com', 'sequence': 0, 'reminders': {'useDefault': True}, 'eventType': 'default'}, {'kind': 'calendar#event', 'etag': '"3464531697774000"', 'id': '7f3o5pffplr3eenbimf2qer00t', 'status': 'confirmed', 'htmlLink': 'https://www.google.com/calendar/event?eid=N2YzbzVwZmZwbHIzZWVuYmltZjJxZXIwMHQgZGVubmlzdHVyY29AbQ&ctz=Europe/Rome', 'created': '2024-11-22T08:56:15.000Z', 'updated': '2024-11-22T08:57:28.887Z', 'summary': 'test1', 'description': 'saddasdsa sad ds', 'creator': {'email': 'dennisturco@gmail.com', 'self': True}, 'organizer': {'email': 'dennisturco@gmail.com', 'self': True}, 'start': {'dateTime': '2024-11-23T18:00:00+01:00', 'timeZone': 'Europe/Rome'}, 'end': {'dateTime': '2024-11-23T19:00:00+01:00', 'timeZone': 'Europe/Rome'}, 'iCalUID': '7f3o5pffplr3eenbimf2qer00t@google.com', 'sequence': 0, 'reminders': {'useDefault': True}, 'eventType': 'default'}]
+2024-11-22 09:58:31.462958 [INFO] Events list viewer
+2024-11-22 09:58:31.056224 [INFO] Editing events
+2024-11-22 09:58:24.018468 [INFO] No events found
+2024-11-22 09:58:23.815104 [INFO] Editing events
+2024-11-22 09:57:48.607315 [INFO] No events found
+2024-11-22 09:57:48.435415 [INFO] Editing events
+2024-11-22 09:57:15.072428 [INFO] color 'Pink' selected
+2024-11-22 09:56:57.797777 [INFO] Date Selected To: 22-11-2024 19:00
+2024-11-22 09:56:53.002110 [INFO] Date Selected From: 23-11-2024 16:00
+2024-11-22 09:55:59.987767 [INFO] Raising frame: .!ctkframe.!editeventsframe
+2024-11-22 09:55:34.999526 [INFO] Raising frame: .!ctkframe.!mainframe
+2024-11-22 09:55:28.254325 [INFO] Raising frame: .!ctkframe.!loginframe
+2024-11-22 09:55:22.851177 [INFO] Application started
+2024-11-22 09:45:50.517529 [INFO] Raising frame: .!ctkframe.!graphframe
+2024-11-22 09:45:48.365648 [INFO] Raising frame: .!ctkframe.!mainframe
+2024-11-22 09:45:37.722124 [INFO] Raising frame: .!ctkframe.!loginframe
+2024-11-22 09:45:32.329420 [INFO] Application started
+2024-11-22 09:18:11.964476 [INFO] file 'C:/Users/Utente/Desktop/lezioni/test.csv' opened
+2024-11-22 09:18:10.483215 [INFO] file 'C:/Users/Utente/Desktop/lezioni/test.csv' opened
+2024-11-22 09:17:53.163944 [INFO] file 'C:/Users/Utente/Desktop/lezioni/test.csv' opened
+2024-11-22 09:17:51.976730 [INFO] file 'C:/Users/Utente/Desktop/lezioni/test.csv' selected
+2024-11-22 09:17:38.669190 [INFO] Application started
+2024-11-22 09:17:18.711154 [INFO] file 'C:/Users/Utente/Desktop/lezioni/test.csv' opened
+2024-11-22 09:17:16.102311 [INFO] file 'C:/Users/Utente/Desktop/lezioni/test.csv' selected
+2024-11-22 09:16:59.426074 [INFO] Application started
+2024-11-22 09:16:40.727768 [INFO] file 'C:/Users/Utente/Desktop/lezioni/test.csv' opened
+2024-11-22 09:16:40.336343 [INFO] file 'C:/Users/Utente/Desktop/lezioni/test.csv' selected
+2024-11-22 09:16:34.430060 [INFO] file '' selected
+2024-11-22 09:16:18.270669 [INFO] Application started
+2024-11-22 09:16:01.149245 [INFO] file 'C:/Users/Utente/Desktop/lezioni/test.csv' opened
+2024-11-22 09:15:59.838427 [INFO] 7 event(s) added to file C:/Users/Utente/Desktop/lezioni/test.csv
+2024-11-22 09:15:56.686920 [INFO] 7 Event(s) obtained succesfully!
+2024-11-22 09:14:25.120771 [INFO] Generating chart
+2024-11-22 09:13:54.849262 [INFO] all chart types deselected
+2024-11-22 09:12:33.604163 [INFO] 64 event(s) added to file C:/Users/Utente/Desktop/lezioni/test.csv
+2024-11-22 09:12:29.943445 [INFO] 64 Event(s) obtained succesfully!
+2024-11-22 09:12:12.378280 [INFO] No events obtained
+2024-11-22 09:12:09.492400 [INFO] file 'C:/Users/Utente/Desktop/lezioni/test.csv' selected
+2024-11-22 09:11:57.781032 [INFO] color 'Yellow' selected
+2024-11-22 09:11:33.940348 [INFO] Date Selected To: 22-11-2024 23:00
+2024-11-22 09:11:28.963733 [INFO] Date Selected From: 19-10-2024 00:00
+2024-11-22 09:10:25.573356 [INFO] Application started
+2024-11-21 23:49:32.650490 [INFO] Application started
+2024-11-21 23:46:52.861665 [INFO] Application started
+2024-11-21 23:45:07.202005 [INFO] color 'Orange' selected
+2024-11-21 23:45:06.175186 [INFO] color 'Light Blue' selected
+2024-11-21 23:44:43.679844 [INFO] color 'Dark Green' selected
+2024-11-21 23:44:42.401735 [INFO] color 'Dark Blue' selected
+2024-11-21 23:44:28.399733 [INFO] Application started
+2024-11-21 23:43:54.007176 [INFO] Application started
+2024-11-21 23:43:42.263354 [INFO] Application started
+2024-11-21 23:42:57.566829 [INFO] Application started
+2024-11-21 23:41:10.371074 [INFO] Application started
+2024-11-21 23:40:35.730381 [INFO] Application started
+2024-11-21 23:40:01.513741 [INFO] Application started
+2024-11-21 23:34:32.568654 [INFO] color 'Pink' selected
+2024-11-21 23:34:30.551821 [INFO] color 'Purple' selected
+2024-11-21 23:34:20.308728 [INFO] Application started
 2024-11-21 23:18:12.384256 [INFO] Application started
 2024-11-21 22:30:51.268912 [INFO] color 'Green' selected
 2024-11-21 22:30:14.260626 [INFO] Application started

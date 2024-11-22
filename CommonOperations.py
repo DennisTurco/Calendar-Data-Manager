@@ -77,6 +77,8 @@ class CommonOperations():
         if msg.get() == "View Details": self.messagebox_exception_error_window(error_message)
            
     def messagebox_exception_error_window(self, error):
+        Logger.write_log(f"Opening message exception error window", Logger.LogType.INFO)
+        
         if hasattr(self, "toplevel_window") and self.toplevel_window.winfo_exists():
             self.toplevel_window.focus()  # If window exists, focus it
             return
@@ -145,8 +147,8 @@ class CommonOperations():
         file_path = filedialog.askopenfilename(title="Select file where do you want to save data", filetypes=(("CSV files", "*.csv"), ("TXT files", "*.txt"), ("All files", "*.*")))
         entry.delete("0", tkinter.END)
         entry.insert("0", file_path)
-        Logger.write_log(f"file '{file_path}' selected", Logger.LogType.INFO)
-        CommonOperations.write_log(logbox, f"file '{file_path}' selected")
+        Logger.write_log(f"File '{file_path}' selected", Logger.LogType.INFO)
+        CommonOperations.write_log(logbox, f"File '{file_path}' selected")
         return file_path
     
     @staticmethod
@@ -181,6 +183,8 @@ class CommonOperations():
     
     @staticmethod
     def date_picker_window(type, toplevel_window, entry_date_from, entry_date_to, log_box):
+        Logger.write_log("Opening date picker", Logger.LogType.INFO)
+        
         if toplevel_window is None or not toplevel_window.winfo_exists():
             toplevel_window = ctk.CTkToplevel() # create window if its None or destroyed
             toplevel_window.after(200, lambda: toplevel_window.iconbitmap('./imgs/calendar.ico')) # i have to delay the icon because it' buggy on windows
@@ -341,6 +345,7 @@ class CommonOperations():
     @staticmethod
     def change_color_theme(color_theme: str):
         if color_theme == None: return
+        Logger.write_log(f"Changing color theme to: {color_theme}", Logger.LogType.INFO)
         ctk.set_default_color_theme(color_theme) 
         js.JSONPreferences.WriteColorThemeToJSON(color_theme)
 
@@ -352,6 +357,8 @@ class CommonOperations():
 
     @staticmethod
     def open_info_section_dialog(root, title: str, section_message):
+        Logger.write_log(f"Opening info section '{title}'", Logger.LogType.INFO)
+
         # Create a dialog window with a CTkTextbox
         dialog = ctk.CTkToplevel(root)
         dialog.title(title)
