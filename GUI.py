@@ -60,6 +60,7 @@ class NewEventsFrame(ctk.CTkFrame):
         edit_image = tkinter.PhotoImage(file='./imgs/edit.png')
         chart_image = tkinter.PhotoImage(file='./imgs/chart.png')
         info_image = tkinter.PhotoImage(file='./imgs/information.png')
+        icon = tkinter.PhotoImage(file='./imgs/icon.png')
         
         # configure grid layout (4x4)
         self.grid_columnconfigure(1, weight=1)
@@ -67,7 +68,7 @@ class NewEventsFrame(ctk.CTkFrame):
         self.grid_rowconfigure((0, 1, 2), weight=1)
 
         # create sidebar frame with widgets
-        (self.sidebar_button_1, self.sidebar_button_2, self.sidebar_button_3, self.sidebar_button_4, self.google_calendar_link) = GUIWidgets.create_side_bar_frame(self, plus_image, edit_image, list_image, chart_image, google_image)
+        (self.sidebar_button_1, self.sidebar_button_2, self.sidebar_button_3, self.sidebar_button_4, self.google_calendar_link) = GUIWidgets.create_side_bar_frame(self, plus_image, edit_image, list_image, chart_image, google_image, icon)
         self.sidebar_button_1.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[NewEventsFrame]))
         self.sidebar_button_2.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[EditEventsFrame]))
         self.sidebar_button_3.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GetEventsFrame]))
@@ -224,6 +225,7 @@ class EditEventsFrame(ctk.CTkFrame):
         chart_image = tkinter.PhotoImage(file='./imgs/chart.png')
         arrow_image = tkinter.PhotoImage(file='./imgs/arrow-right2.png')
         info_image = tkinter.PhotoImage(file='./imgs/information.png')
+        icon = tkinter.PhotoImage(file='./imgs/icon.png')
         
         # configure grid layout (4x4)
         self.grid_columnconfigure(1, weight=1)
@@ -231,7 +233,7 @@ class EditEventsFrame(ctk.CTkFrame):
         self.grid_rowconfigure((0, 1, 2), weight=1)
 
         # create sidebar frame with widgets
-        (self.sidebar_button_1, self.sidebar_button_2, self.sidebar_button_3, self.sidebar_button_4, self.google_calendar_link) = GUIWidgets.create_side_bar_frame(self, plus_image, edit_image, list_image, chart_image, google_image)
+        (self.sidebar_button_1, self.sidebar_button_2, self.sidebar_button_3, self.sidebar_button_4, self.google_calendar_link) = GUIWidgets.create_side_bar_frame(self, plus_image, edit_image, list_image, chart_image, google_image, icon)
         self.sidebar_button_1.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[NewEventsFrame]))
         self.sidebar_button_2.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[EditEventsFrame]))
         self.sidebar_button_3.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GetEventsFrame]))
@@ -571,6 +573,7 @@ class GetEventsFrame(ctk.CTkFrame):
         table_image = tkinter.PhotoImage(file='./imgs/table.png')
         chart_image = tkinter.PhotoImage(file='./imgs/chart.png')
         info_image = tkinter.PhotoImage(file='./imgs/information.png')
+        icon = tkinter.PhotoImage(file='./imgs/icon.png')
         
         # configure grid layout (4x4)
         self.grid_columnconfigure(1, weight=1)
@@ -578,12 +581,12 @@ class GetEventsFrame(ctk.CTkFrame):
         self.grid_rowconfigure((0, 1, 2, 3), weight=1)
         
         # create sidebar frame with widgets
-        (self.sidebar_button_1, self.sidebar_button_2, self.sidebar_button_3, self.sidebar_button_4, self.google_calendar_link) = GUIWidgets.create_side_bar_frame(self, plus_image, edit_image, list_image, chart_image, google_image)
+        (self.sidebar_button_1, self.sidebar_button_2, self.sidebar_button_3, self.sidebar_button_4, self.google_calendar_link) = GUIWidgets.create_side_bar_frame(self, plus_image, edit_image, list_image, chart_image, google_image, icon)
         self.sidebar_button_1.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[NewEventsFrame]))
         self.sidebar_button_2.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[EditEventsFrame]))
         self.sidebar_button_3.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GetEventsFrame]))
         self.sidebar_button_4.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GraphFrame]))
-        self.google_calendar_link.configure(command=lambda: webbrowser.open(ConfigKeys.Keys.GOOGLE_CALENDAR_LINK))
+        self.google_calendar_link.configure(command=lambda: webbrowser.open(ConfigKeys.Keys.GOOGLE_CALENDAR_LINK.value))
         
         section_message = '''This section of the Calendar Data Manager allows you to efficiently retrieve and analyze your Google Calendar events. Here's what you can do:
 
@@ -985,6 +988,7 @@ class GraphFrame(ctk.CTkFrame):
         square_image = tkinter.PhotoImage(file='./imgs/square.png')
         square_check_image = tkinter.PhotoImage(file='./imgs/square-check.png')
         info_image = tkinter.PhotoImage(file='./imgs/information.png')
+        icon = tkinter.PhotoImage(file='./imgs/icon.png')
         
         # configure grid layout (4x4)
         self.grid_columnconfigure(1, weight=1)
@@ -992,12 +996,12 @@ class GraphFrame(ctk.CTkFrame):
         self.grid_rowconfigure((0, 1, 2), weight=1)
         
         # create sidebar frame with widgets
-        (self.sidebar_button_1, self.sidebar_button_2, self.sidebar_button_3, self.sidebar_button_4, self.google_calendar_link) = GUIWidgets.create_side_bar_frame(self, plus_image, edit_image, list_image, chart_image, google_image)
+        (self.sidebar_button_1, self.sidebar_button_2, self.sidebar_button_3, self.sidebar_button_4, self.google_calendar_link) = GUIWidgets.create_side_bar_frame(self, plus_image, edit_image, list_image, chart_image, google_image, icon)
         self.sidebar_button_1.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[NewEventsFrame]))
         self.sidebar_button_2.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[EditEventsFrame]))
         self.sidebar_button_3.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GetEventsFrame]))
         self.sidebar_button_4.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GraphFrame]))
-        self.google_calendar_link.configure(command=lambda: webbrowser.open(ConfigKeys.Keys.GOOGLE_CALENDAR_LINK))
+        self.google_calendar_link.configure(command=lambda: webbrowser.open(ConfigKeys.Keys.GOOGLE_CALENDAR_LINK.value))
         
         # create main panel
         (self.file_path, self.button_file_path, self.button_open_file, self.button_open_events_table_preview) = GUIWidgets.create_file_path_scroll_frame_for_graph_frame(self, folder_image, file_image, table_image, info_image)
@@ -1159,7 +1163,6 @@ class MainFrame(ctk.CTkFrame):
         icon = tkinter.PhotoImage(file='./imgs/icon.png')
     
         # custom font
-        #! TODO: set custom font
         title_font = ctk.CTkFont(family="Georgia", weight='bold', slant='italic', size=45)
         
         # main

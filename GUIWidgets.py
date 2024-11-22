@@ -4,22 +4,25 @@ import customtkinter as ctk
 from CTkScrollableDropdown import *
 from CommonOperations import CommonOperations
 
-def create_side_bar_frame(master, plus_image: PhotoImage, edit_image: PhotoImage, list_image: PhotoImage, chart_image: PhotoImage, google_image: PhotoImage):
+def create_side_bar_frame(master, plus_image: PhotoImage, edit_image: PhotoImage, list_image: PhotoImage, chart_image: PhotoImage, google_image: PhotoImage, logo_app: PhotoImage):
     sidebar_frame = ctk.CTkFrame(master, width=140, corner_radius=0)
     sidebar_frame.grid(row=0, column=0, rowspan=6, sticky="nsew")
-    sidebar_frame.grid_rowconfigure(5, weight=1)
+    sidebar_frame.grid_rowconfigure(6, weight=1)
+    resized_logo = logo_app.subsample(2, 2)
+    logo_label = ctk.CTkLabel(sidebar_frame, text="", image=resized_logo, width=32, height=32, fg_color="transparent")
+    logo_label.grid(row=0, column=0, padx=(20, 20), pady=(10, 20))
     title_label = ctk.CTkLabel(sidebar_frame, text="Other Options", font=ctk.CTkFont(size=20, weight="bold"))
-    title_label.grid(row=0, column=0, padx=20, pady=(20, 10))
+    title_label.grid(row=1, column=0, padx=20, pady=(20, 10))
     sidebar_button_1 = ctk.CTkButton(sidebar_frame, image=plus_image, text="New Events")
-    sidebar_button_1.grid(row=1, column=0, padx=20, pady=10)
+    sidebar_button_1.grid(row=2, column=0, padx=20, pady=10)
     sidebar_button_2 = ctk.CTkButton(sidebar_frame, image=edit_image, text="Edit Events")
-    sidebar_button_2.grid(row=2, column=0, padx=20, pady=10)
+    sidebar_button_2.grid(row=3, column=0, padx=20, pady=10)
     sidebar_button_3 = ctk.CTkButton(sidebar_frame, image=list_image, text="Get Events List")
-    sidebar_button_3.grid(row=3, column=0, padx=20, pady=10)
+    sidebar_button_3.grid(row=4, column=0, padx=20, pady=10)
     sidebar_button_4 = ctk.CTkButton(sidebar_frame, image=chart_image, text="Graph")
-    sidebar_button_4.grid(row=4, column=0, padx=20, pady=10)
+    sidebar_button_4.grid(row=5, column=0, padx=20, pady=10)
     google_calendar_link = ctk.CTkButton(sidebar_frame, image=google_image, text="Google Calendar")
-    google_calendar_link.grid(row=6, column=0, padx=20, pady=(10, 10))
+    google_calendar_link.grid(row=7, column=0, padx=20, pady=(10, 10))
     return (sidebar_button_1, sidebar_button_2, sidebar_button_3, sidebar_button_4, google_calendar_link)
 
 def create_date_interval_scroll_frame(master, calendar_image: PhotoImage, timezone: list[str]):
