@@ -19,7 +19,7 @@ class ConfigKeys:
         CONFIG_FILE = "config.json"
         PREFERENCE_FILE = "preferences.json"
         LOG_FILE = "logs.txt"
-        GRAPH_TIMEOUT = 5
+        GRAPH_TIMEOUT = 10
         HOMEBUTTONS_MESSAGESECTION = True
         HOMEBUTTONS_GITHUB = True
         HOMEBUTTONS_BUYMEACOFFE = True

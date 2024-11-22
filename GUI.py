@@ -1069,7 +1069,7 @@ class GraphFrame(ctk.CTkFrame):
         self._common.write_log(self.log_box, f"all chart types deselected")
         
     # Timeout function to stop the chart generation
-    def generate_chart_with_timeout(self, chart_function, data, timeout=10):
+    def generate_chart_with_timeout(self, chart_function, data, timeout=ConfigKeys.Keys.GRAPH_TIMEOUT.value):
         def target():
             try:
                 if not self.stop_event.is_set():  # Check if timeout occurred
