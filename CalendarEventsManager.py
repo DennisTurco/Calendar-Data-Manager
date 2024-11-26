@@ -334,7 +334,10 @@ class CalendarEventsManager:
                     fields="items"
                 ).execute()
 
-                events += [event for event in events_result.get('items', []) if title.lower() in event.get('summary', '').lower()]
+                if title != None and len(title) > 0:
+                    events += [event for event in events_result.get('items', []) if title.lower() in event.get('summary', '').lower()]
+                else:
+                    events += [event for event in events_result.get('items', [])]
 
                 if len(events) == 0:
                     return None
@@ -348,7 +351,7 @@ class CalendarEventsManager:
                 start_date_time = end_date_time_search
 
             # Filter events by color_id
-            if color_id != -1:
+            if color_id != -1 and color_id != 0:
                 events = [event for event in events if event.get('colorId') == str(color_id)]
 
             # Filter events by description

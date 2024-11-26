@@ -302,7 +302,7 @@ Once you've set your filters and new values, click the Edit button to apply the 
         self.label_color_new = ctk.CTkLabel(self.new_values_frame, text="Color:")
         self.label_color_new.grid(row=3, column=0, padx=10, pady=5, sticky="e")
         self.multi_selection_new = ctk.CTkComboBox(self.new_values_frame, state="readonly")
-        CTkScrollableDropdown(self.multi_selection_new, values=list(self.event_color_to.keys()), button_color="transparent", command=self.combobox_callback_color2)
+        CTkScrollableDropdown(self.multi_selection_new, values=list(ConfigKeys.Keys.EVENT_COLOR.value.keys()), button_color="transparent", command=self.combobox_callback_color2)
         self.multi_selection_new.configure(button_color=ConfigKeys.Keys.EVENT_COLOR.value.get("Light Blue"))
         self.multi_selection_new.set("Light Blue")
         self.multi_selection_new.grid(row=3, column=1, padx=0, pady=5, sticky="w")
@@ -435,7 +435,7 @@ Once you've set your filters and new values, click the Edit button to apply the 
         CommonOperations.write_log(self.log_box, f"color '{color}' selected")
 
     def combobox_callback_color2(self, color):
-        self.multi_selection_new.configure(button_color=self.event_color_to.get(color))
+        self.multi_selection_new.configure(button_color=ConfigKeys.Keys.EVENT_COLOR.value.get(color))
         self.multi_selection_new.set(color)
         Logger.write_log(f"New color '{color}' selected", Logger.LogType.INFO)
         CommonOperations.write_log(self.log_box, f"color '{color}' selected")
@@ -861,6 +861,7 @@ Once you've configured your filters, click Get to retrieve the data or Get and P
                 
             self.toplevel_entry_window.resizable(False, False)
             self.toplevel_entry_window.attributes("-topmost", False) # focus to this windows
+            CommonOperations.centerTopLevel(self.toplevel_entry_window)
         else:
             self.toplevel_entry_window.focus()  # if window exists focus it
         
@@ -942,7 +943,7 @@ Once you've configured your filters, click Get to retrieve the data or Get and P
         self.toplevel_entry_window.destroy()
         
     def combobox_callback(self, color):
-        self.multi_selection.configure(button_color=ConfigKeys.Keys.EVENT_COLOR.value.get(color))
+        self.multi_selection.configure(button_color=self.event_color.get(color))
         self.multi_selection.set(color)
         Logger.write_log(f"color '{color}' selected", Logger.LogType.INFO)
         CommonOperations.write_log(log_box=self.log_box, message=f"color '{color}' selected")
