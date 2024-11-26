@@ -39,4 +39,4 @@ Don't worry, it is not a long process and I will guide you step by step through 
     * You must now enable your account. To do this, go to the *OAuth consent screen* screen, then to the "Test Users" section, press the *ADD USERS* button and add your account.
     ![](./imgs/screen6.png)
 
-Once you have completed all these steps, you can use the credentials.json file to complete the "Initial Setup" of the program.
+4. Download the credentials .json file and rename it to "credentials.json". Place it in the settings folder located at the root of the project (create the folder if it does not already exist).
