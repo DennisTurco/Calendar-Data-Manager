@@ -31,7 +31,7 @@
         "Paypal": true
     },
     "GraphTimeout": {
-        "value": 5,
+        "value": 10,
         "type": "int",
         "description": "Timeout in seconds for generating charts"
     },

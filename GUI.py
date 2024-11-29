@@ -1,6 +1,8 @@
 from ast import List
 from datetime import datetime
+import glob
 from io import BytesIO
+import tempfile
 from Logger import Logger
 import threading
 from typing import Final, List
@@ -652,8 +654,8 @@ Once you've configured your filters, click Get to retrieve the data or Get and P
         # get list button
         self.get_button = ctk.CTkButton(self.container_frame2, image=list_image, text="Get", border_width=2, command=self.get_and_preview)
         self.get_button.grid(row=0, column=0, padx=5, pady=10, sticky="e")
-        self.get_button = ctk.CTkButton(self.container_frame2, image=chart_image, text="Get and plot", border_width=2, command=self.get_and_plot)
-        self.get_button.grid(row=0, column=1, padx=5, pady=10, sticky="w")
+        self.get_and_plot_button = ctk.CTkButton(self.container_frame2, image=chart_image, text="Get and plot", border_width=2, command=self.get_and_plot)
+        self.get_and_plot_button.grid(row=0, column=1, padx=5, pady=10, sticky="w")
         
         # Tooltips
         CTkToolTip(self.entry_id, delay=0.3, message="(Optional) Enter event id This is a very specific field;\n if you want to get a specific event and you know the specific event id, you can enter it and ignore the fields below.\n Otherwise you can ignore it and proceed to fill in the other fields.")
@@ -667,12 +669,15 @@ Once you've configured your filters, click Get to retrieve the data or Get and P
         CTkToolTip(self.overwrite_mode, delay=0.3, message="If it is enabled, it overwrites the contents of the file with the newly obtained events.\n Otherwise, it adds the newly obtained events without deleting anything.")
         CTkToolTip(self.button_open_file, delay=0.3, message="Open file preview")
         CTkToolTip(self.button_open_events_table_preview, delay=0.3, message="Open file preview in table")
-        CTkToolTip(self.get_button, delay=0.3, message="Get events")
+        CTkToolTip(self.get_button, delay=0.3, message="Get and save events.")
+        CTkToolTip(self.get_and_plot_button, delay=0.3, message="Get and plot events without saving to a file.")
         
         # create log textbox
         self.log_box = ctk.CTkTextbox(self, width=250, height=100)
         self.log_box.bind("<Key>", lambda e: "break")  # set the textbox readonly
         self.log_box.grid(row=5, column=1, columnspan=2, padx=(0, 0), pady=(20, 0), sticky="nsew")
+
+        self.cleanup_temp_files()
 
     # returns the number of events obtained
     def get_events(self):
@@ -770,11 +775,38 @@ Once you've configured your filters, click Get to retrieve the data or Get and P
     def get_and_plot(self):
         events_count = self.get_events()
         
-        if (events_count == 0): 
-            return;
+        if events_count == 0: 
+            return
         
-        self.events_list_viewer_window()
-        self.go_to_graph_frame()
+        # save results to a temp file
+        tmp = tempfile.NamedTemporaryFile(delete=False)  # Prevent automatic deletion
+        try:
+            self.file_path.delete("0", tkinter.END)
+            self.file_path.insert("0", string=tmp.name)
+            self.save_results_to_file()
+
+            # open graph frame
+            FrameController.show_frame(self._common.get_frames()[GraphFrame])
+            
+            # edit file field to add temp file
+            GraphFrame.set_file_path(self._common.get_frames()[GraphFrame], text=tmp.name)
+        except Exception as e:
+            raise e
+        
+    def cleanup_temp_files(self):
+        """Delete temp files of the previus sessions"""
+        temp_dir = tempfile.gettempdir() 
+        app_temp_files = glob.glob(os.path.join(temp_dir, 'tmp*'))  # 'tmp' prefix
+
+        # delete all temp files
+        for temp_file in app_temp_files:
+            try:
+                os.unlink(temp_file)  
+            except PermissionError:
+                pass  # skip if I'm using the file
+            except FileNotFoundError:
+                pass
+            
     
     def events_list_viewer_window(self):  
         Logger.write_log("Events list viewer", Logger.LogType.INFO)
@@ -801,34 +833,7 @@ Once you've configured your filters, click Get to retrieve the data or Get and P
              
             event_list_file_viewer.delete(1.0, tkinter.END)
 
-            # obtain only important informations about the event
-            event_dict = {}
-            events_info = []
-            index = 1
-            for event in self.events:
-                
-                # somethimes the event doesn't have 'dateTime'
-                try:
-                    start_date = event['start']['dateTime']
-                    end_date = event['end']['dateTime']
-                except:
-                    start_date = event['start']['date']
-                    end_date = event['end']['date']
-                
-                start_datetime = datetime.fromisoformat(start_date)
-                end_datetime = datetime.fromisoformat(end_date)
-                duration = end_datetime - start_datetime
-                
-                event_dict = {
-                    'index': index,
-                    'ID': event['id'],
-                    'summary': event['summary'],
-                    'start': start_date,
-                    'end': end_date,
-                    'duration': duration
-                }
-                events_info.append(event_dict)
-                index += 1 
+            events_info = self.format_events_content()
             
             # print event after event
             for event in events_info:
@@ -842,6 +847,38 @@ Once you've configured your filters, click Get to retrieve the data or Get and P
         
         return self.toplevel_window
     
+    def format_events_content(self):
+        # obtain only important informations about the event
+        event_dict = {}
+        events_info = []
+        index = 1
+        for event in self.events:
+            
+            # somethimes the event doesn't have 'dateTime'
+            try:
+                start_date = event['start']['dateTime']
+                end_date = event['end']['dateTime']
+            except:
+                start_date = event['start']['date']
+                end_date = event['end']['date']
+            
+            start_datetime = datetime.fromisoformat(start_date)
+            end_datetime = datetime.fromisoformat(end_date)
+            duration = end_datetime - start_datetime
+            
+            event_dict = {
+                'index': index,
+                'ID': event['id'],
+                'summary': event['summary'],
+                'start': start_date,
+                'end': end_date,
+                'duration': duration
+            }
+            events_info.append(event_dict)
+            index += 1 
+        
+        return events_info
+
     def get_filepath_to_save_results(self):
         if self.file_path != None and len(self.file_path.get()) != 0:
             self.save_results_to_file() 
@@ -1039,6 +1076,10 @@ class GraphFrame(ctk.CTkFrame):
         Logger.write_log(f"file '{file_path}' selected", Logger.LogType.INFO)
         self._common.write_log(self.log_box, f"file '{file_path}' selected")
     
+    def set_file_path(self, text: str):
+        self.file_path.delete("0", tkinter.END)
+        self.file_path.insert("0", string=text)
+
     def set_logbox_text(self, text):
         self.log_box.delete("0.0", tkinter.END)
         self.log_box.insert("0.0", text)
@@ -1090,7 +1131,7 @@ class GraphFrame(ctk.CTkFrame):
         # If the thread is still alive after the timeout, set the stop event
         if chart_thread.is_alive():
             self.stop_event.set()
-            Logger.write_log(f"Chart generation timed out.", Logger.LogType.INFO)
+            Logger.write_log(f"Chart generation timed out.", Logger.LogType.WARN)
             self._common.write_log(self.log_box, "Chart generation timed out.")
             CTkMessagebox(title="Chart Generation Error", message="One or more charts were cancelled due to a timeout. Please try again later.", icon="cancel", option_1="OK")
 
