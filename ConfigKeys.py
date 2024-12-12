@@ -12,6 +12,8 @@ class ConfigKeys:
         GITHUB_PAGE_LINK = "https://github.com/DennisTurco/Calendar-Data-Manager"
         DONATE_BUYMEACOFFE_PAGE_LINK = "https://www.buymeacoffee.com/denno"
         DONATE_PAYPAL_PAGE_LINK = "https://www.paypal.com/donate/?hosted_button_id=M7CJXS929334U"
+        SHARD_WEBSITE = "https://www.shardpc.it/"
+        SHARD_EMAIL = "assistenza.shard@gmail.com"
         VERSION = "1.0.3"
         APP_WIDTH = 1100
         APP_HEIGHT = 900
@@ -25,8 +27,8 @@ class ConfigKeys:
         HOMEBUTTONS_BUYMEACOFFE = True
         HOMEBUTTONS_PAYPAL = True
         MENUITEM_BUGREPORT = True
+        MENUITEM_SUPPORT = True
         MENUITEM_EXIT = True
-        MENUITEM_HOME = True
         MENUITEM_THEME = True
         MENUITEM_SCALING = True
         MENUITEM_APPEARANCE = True
@@ -56,6 +58,8 @@ class ConfigKeys:
             ConfigKeys.Keys._set('GITHUB_PAGE_LINK', data['GITHUB_PAGE_LINK'])
             ConfigKeys.Keys._set('DONATE_BUYMEACOFFE_PAGE_LINK', data['DONATE_BUYMEACOFFE_PAGE_LINK'])
             ConfigKeys.Keys._set('DONATE_PAYPAL_PAGE_LINK', data['DONATE_PAYPAL_PAGE_LINK'])
+            ConfigKeys.Keys._set('SHARD_WEBSITE', data['SHARD_WEBSITE'])
+            ConfigKeys.Keys._set('SHARD_EMAIL', data['SHARD_EMAIL'])
             ConfigKeys.Keys._set('VERSION', data['VERSION'])
             ConfigKeys.Keys._set('APP_WIDTH', data['APP_WIDTH'])
             ConfigKeys.Keys._set('APP_HEIGHT', data['APP_HEIGHT'])
@@ -65,8 +69,8 @@ class ConfigKeys:
             ConfigKeys.Keys._set('EVENT_COLOR', data['EVENT_COLOR'])
             ConfigKeys.Keys._set('TIMEZONE', data['TIMEZONE'])
             ConfigKeys.Keys._set('MENUITEM_BUGREPORT', data['MenuItems']['BugReport'])
+            ConfigKeys.Keys._set('MENUITEM_SUPPORT', data['MenuItems']['Support'])
             ConfigKeys.Keys._set('MENUITEM_EXIT', data['MenuItems']['Exit'])
-            ConfigKeys.Keys._set('MENUITEM_HOME', data['MenuItems']['Home'])
             ConfigKeys.Keys._set('MENUITEM_THEME', data['MenuItems']['Theme'])
             ConfigKeys.Keys._set('MENUITEM_SCALING', data['MenuItems']['Scaling'])
             ConfigKeys.Keys._set('MENUITEM_APPEARANCE', data['MenuItems']['Appearance'])

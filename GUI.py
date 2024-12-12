@@ -70,12 +70,13 @@ class NewEventsFrame(ctk.CTkFrame):
         self.grid_rowconfigure((0, 1, 2), weight=1)
 
         # create sidebar frame with widgets
-        (self.sidebar_button_1, self.sidebar_button_2, self.sidebar_button_3, self.sidebar_button_4, self.google_calendar_link) = GUIWidgets.create_side_bar_frame(self, plus_image, edit_image, list_image, chart_image, google_image, icon)
-        self.sidebar_button_1.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[NewEventsFrame]))
-        self.sidebar_button_2.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[EditEventsFrame]))
-        self.sidebar_button_3.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GetEventsFrame]))
-        self.sidebar_button_4.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GraphFrame]))
-        self.google_calendar_link.configure(command=lambda: webbrowser.open(ConfigKeys.Keys.GOOGLE_CALENDAR_LINK.value))
+        (sidebar_button_1, sidebar_button_2, sidebar_button_3, sidebar_button_4, google_calendar_link, logo_button) = GUIWidgets.create_side_bar_frame(self, plus_image, edit_image, list_image, chart_image, google_image, icon)
+        sidebar_button_1.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[NewEventsFrame]))
+        sidebar_button_2.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[EditEventsFrame]))
+        sidebar_button_3.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GetEventsFrame]))
+        sidebar_button_4.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GraphFrame]))
+        logo_button.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[MainFrame]))
+        google_calendar_link.configure(command=lambda: webbrowser.open(ConfigKeys.Keys.GOOGLE_CALENDAR_LINK.value))
         
         # create main panel
         section_message = '''The Create New Event section allows you to quickly add events to your Google Calendar with customized details. Here's how to use it:
@@ -90,7 +91,7 @@ class NewEventsFrame(ctk.CTkFrame):
     - Timezone: (Optional) Select the timezone in which the event will occur (default is UTC).
 
 Once you've filled in the event details, simply click Create to add the event to your calendar. This tool makes it easy to create events quickly and organize your calendar effectively.
-'''  
+'''
 
         # create main panel
         title_frame = ctk.CTkFrame(self, fg_color="transparent")
@@ -235,12 +236,13 @@ class EditEventsFrame(ctk.CTkFrame):
         self.grid_rowconfigure((0, 1, 2), weight=1)
 
         # create sidebar frame with widgets
-        (self.sidebar_button_1, self.sidebar_button_2, self.sidebar_button_3, self.sidebar_button_4, self.google_calendar_link) = GUIWidgets.create_side_bar_frame(self, plus_image, edit_image, list_image, chart_image, google_image, icon)
-        self.sidebar_button_1.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[NewEventsFrame]))
-        self.sidebar_button_2.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[EditEventsFrame]))
-        self.sidebar_button_3.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GetEventsFrame]))
-        self.sidebar_button_4.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GraphFrame]))
-        self.google_calendar_link.configure(command=lambda: webbrowser.open(ConfigKeys.Keys.GOOGLE_CALENDAR_LINK.value))
+        (sidebar_button_1, sidebar_button_2, sidebar_button_3, sidebar_button_4, google_calendar_link, logo_button) = GUIWidgets.create_side_bar_frame(self, plus_image, edit_image, list_image, chart_image, google_image, icon)
+        sidebar_button_1.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[NewEventsFrame]))
+        sidebar_button_2.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[EditEventsFrame]))
+        sidebar_button_3.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GetEventsFrame]))
+        sidebar_button_4.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GraphFrame]))
+        logo_button.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[MainFrame]))
+        google_calendar_link.configure(command=lambda: webbrowser.open(ConfigKeys.Keys.GOOGLE_CALENDAR_LINK.value))
 
         section_message = '''This section of the Calendar Data Manager enables you to update multiple events in your Google Calendar simultaneously, saving you time and effort. Here's how it works:
 
@@ -583,12 +585,13 @@ class GetEventsFrame(ctk.CTkFrame):
         self.grid_rowconfigure((0, 1, 2, 3), weight=1)
         
         # create sidebar frame with widgets
-        (self.sidebar_button_1, self.sidebar_button_2, self.sidebar_button_3, self.sidebar_button_4, self.google_calendar_link) = GUIWidgets.create_side_bar_frame(self, plus_image, edit_image, list_image, chart_image, google_image, icon)
-        self.sidebar_button_1.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[NewEventsFrame]))
-        self.sidebar_button_2.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[EditEventsFrame]))
-        self.sidebar_button_3.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GetEventsFrame]))
-        self.sidebar_button_4.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GraphFrame]))
-        self.google_calendar_link.configure(command=lambda: webbrowser.open(ConfigKeys.Keys.GOOGLE_CALENDAR_LINK.value))
+        (sidebar_button_1, sidebar_button_2, sidebar_button_3, sidebar_button_4, google_calendar_link, logo_button) = GUIWidgets.create_side_bar_frame(self, plus_image, edit_image, list_image, chart_image, google_image, icon)
+        sidebar_button_1.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[NewEventsFrame]))
+        sidebar_button_2.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[EditEventsFrame]))
+        sidebar_button_3.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GetEventsFrame]))
+        sidebar_button_4.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GraphFrame]))
+        logo_button.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[MainFrame]))
+        google_calendar_link.configure(command=lambda: webbrowser.open(ConfigKeys.Keys.GOOGLE_CALENDAR_LINK.value))
         
         section_message = '''This section of the Calendar Data Manager allows you to efficiently retrieve and analyze your Google Calendar events. Here's what you can do:
 
@@ -805,8 +808,7 @@ Once you've configured your filters, click Get to retrieve the data or Get and P
             except PermissionError:
                 pass  # skip if I'm using the file
             except FileNotFoundError:
-                pass
-            
+                pass          
     
     def events_list_viewer_window(self):  
         Logger.write_log("Events list viewer", Logger.LogType.INFO)
@@ -1034,12 +1036,13 @@ class GraphFrame(ctk.CTkFrame):
         self.grid_rowconfigure((0, 1, 2), weight=1)
         
         # create sidebar frame with widgets
-        (self.sidebar_button_1, self.sidebar_button_2, self.sidebar_button_3, self.sidebar_button_4, self.google_calendar_link) = GUIWidgets.create_side_bar_frame(self, plus_image, edit_image, list_image, chart_image, google_image, icon)
-        self.sidebar_button_1.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[NewEventsFrame]))
-        self.sidebar_button_2.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[EditEventsFrame]))
-        self.sidebar_button_3.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GetEventsFrame]))
-        self.sidebar_button_4.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GraphFrame]))
-        self.google_calendar_link.configure(command=lambda: webbrowser.open(ConfigKeys.Keys.GOOGLE_CALENDAR_LINK.value))
+        (sidebar_button_1, sidebar_button_2, sidebar_button_3, sidebar_button_4, google_calendar_link, logo_button) = GUIWidgets.create_side_bar_frame(self, plus_image, edit_image, list_image, chart_image, google_image, icon)
+        sidebar_button_1.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[NewEventsFrame]))
+        sidebar_button_2.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[EditEventsFrame]))
+        sidebar_button_3.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GetEventsFrame]))
+        sidebar_button_4.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GraphFrame]))
+        logo_button.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[MainFrame]))
+        google_calendar_link.configure(command=lambda: webbrowser.open(ConfigKeys.Keys.GOOGLE_CALENDAR_LINK.value))
         
         # create main panel
         (self.file_path, self.button_file_path, self.button_open_file, self.button_open_events_table_preview) = GUIWidgets.create_file_path_scroll_frame_for_graph_frame(self, folder_image, file_image, table_image, info_image)
@@ -1187,12 +1190,10 @@ class GraphFrame(ctk.CTkFrame):
 
 #?###########################################################
 class MainFrame(ctk.CTkFrame):
-    main_class = None
     _common = CommonOperations()
     
     def __init__(self, parent, main_class):
         ctk.CTkFrame.__init__(self, parent)
-        self.main_class = main_class
         
         # load images
         plus_image = tkinter.PhotoImage(file='./imgs/plus.png')
@@ -1202,13 +1203,13 @@ class MainFrame(ctk.CTkFrame):
         buymeacoffe_donation_image = tkinter.PhotoImage(file='./imgs/donation.png')
         paypal_donation_image = tkinter.PhotoImage(file='./imgs/paypal.png')
         github_image = tkinter.PhotoImage(file='./imgs/github.png')
-        icon = tkinter.PhotoImage(file='./imgs/icon.png')
+        icon_image = tkinter.PhotoImage(file='./imgs/icon.png')
     
         # custom font
         title_font = ctk.CTkFont(family="Georgia", weight='bold', slant='italic', size=45)
         
         # main
-        ctk.CTkLabel(self, text="", image=icon, fg_color="transparent").pack(padx=20, pady=(50, 20))
+        ctk.CTkLabel(self, text="", image=icon_image, fg_color="transparent").pack(padx=20, pady=(50, 20))
         ctk.CTkLabel(self, text="Calendar Data Manager", font=title_font, text_color='#e06c29', fg_color="transparent").pack(padx=20, pady=50)
         #ctk.CTkLabel(self, text="Choose the action", fg_color="transparent", font=("Arial", 32)).pack(padx=20, pady=20)
         ctk.CTkButton(master=self, image=plus_image, text="New Events", command=lambda: FrameController.show_frame(self._common.get_frames()[NewEventsFrame])).pack(padx=20, pady=10, anchor='center')
@@ -1376,14 +1377,12 @@ class App():
         button_1 = self._menu.add_cascade("File")
         button_3 = self._menu.add_cascade("Settings")
         button_4 = self._menu.add_cascade("About")
+        button_6 = self._menu.add_cascade("Help")
                         
         if self._common.get_credentials() is not None:
             self.updateUsernameMenuItem()
 
         dropdown1 = CustomDropdownMenu(widget=button_1)
-
-        if (ConfigKeys.Keys.MENUITEM_HOME.value):
-            dropdown1.add_option(option="Home", command=lambda: FrameController.show_frame(self._common.get_frames()[MainFrame]))
         
         if (ConfigKeys.Keys.MENUITEM_EXIT.value):
             dropdown1.add_option(option="Exit", command=lambda: exit())
@@ -1413,15 +1412,22 @@ class App():
             sub_menu4.add_option(option="Green", command=lambda: CommonOperations.set_color_theme("green"))
 
         dropdown4 = CustomDropdownMenu(widget=button_4)
+        if (ConfigKeys.Keys.SHARD_WEBSITE.value):
+            dropdown4.add_option(option="Website", command=lambda: webbrowser.open(ConfigKeys.Keys.SHARD_WEBSITE.value))
         if (ConfigKeys.Keys.MENUITEM_SHARE.value):
             dropdown4.add_option(option="Share", command=lambda: webbrowser.open(ConfigKeys.Keys.GITHUB_PAGE_LINK.value))
-        if (ConfigKeys.Keys.MENUITEM_BUGREPORT.value):
-            dropdown4.add_option(option="Report a bug", command=lambda: webbrowser.open(ConfigKeys.Keys.GITHUB_ISSUES_LINK.value))
         if (ConfigKeys.Keys.MENUITEM_DONATE.value):
             sub_menu4 = dropdown4.add_submenu("Support this project")
             sub_menu4.add_option(option="Donate with \"Buy me a coffe\"", command=lambda: webbrowser.open(ConfigKeys.Keys.DONATE_BUYMEACOFFE_PAGE_LINK.value))
             sub_menu4.add_option(option="Donate with \"Paypal\"", command=lambda: webbrowser.open(ConfigKeys.Keys.DONATE_PAYPAL_PAGE_LINK.value))
-    
+
+        dropdown6 = CustomDropdownMenu(widget=button_6)
+        if (ConfigKeys.Keys.MENUITEM_SUPPORT.value):
+            subject: str = "Calendar Data Manager - Support"
+            dropdown6.add_option(option="Support", command=lambda: webbrowser.open(f"mailto:{ConfigKeys.Keys.SHARD_EMAIL.value}?subject={subject}"))
+        if (ConfigKeys.Keys.MENUITEM_BUGREPORT.value):
+            dropdown6.add_option(option="Report a bug", command=lambda: webbrowser.open(ConfigKeys.Keys.GITHUB_ISSUES_LINK.value))
+
     def updateUsernameMenuItem(self):
         (_, email, picture_url) = gc.CalendarEventsManager.get_user_info(self._common.get_credentials())
         

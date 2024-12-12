@@ -8,9 +8,13 @@ def create_side_bar_frame(master, plus_image: PhotoImage, edit_image: PhotoImage
     sidebar_frame = ctk.CTkFrame(master, width=140, corner_radius=0)
     sidebar_frame.grid(row=0, column=0, rowspan=6, sticky="nsew")
     sidebar_frame.grid_rowconfigure(6, weight=1)
+    
     resized_logo = logo_app.subsample(2, 2)
-    logo_label = ctk.CTkLabel(sidebar_frame, text="", image=resized_logo, width=32, height=32, fg_color="transparent")
-    logo_label.grid(row=0, column=0, padx=(20, 20), pady=(10, 20))
+    # logo_label = ctk.CTkLabel(sidebar_frame, text="", image=resized_logo, width=32, height=32, fg_color="transparent")
+    # logo_label.grid(row=0, column=0, padx=(20, 20), pady=(10, 20))
+    logo_button = ctk.CTkButton(sidebar_frame, text="", width=32, height=32, fg_color="transparent", image=resized_logo)
+    logo_button.grid(row=0, column=0, padx=(20, 20), pady=(10, 20))
+    
     title_label = ctk.CTkLabel(sidebar_frame, text="Other Options", font=ctk.CTkFont(size=20, weight="bold"))
     title_label.grid(row=1, column=0, padx=20, pady=(20, 10))
     sidebar_button_1 = ctk.CTkButton(sidebar_frame, image=plus_image, text="New Events")
@@ -23,7 +27,7 @@ def create_side_bar_frame(master, plus_image: PhotoImage, edit_image: PhotoImage
     sidebar_button_4.grid(row=5, column=0, padx=20, pady=10)
     google_calendar_link = ctk.CTkButton(sidebar_frame, image=google_image, text="Google Calendar")
     google_calendar_link.grid(row=7, column=0, padx=20, pady=(10, 10))
-    return (sidebar_button_1, sidebar_button_2, sidebar_button_3, sidebar_button_4, google_calendar_link)
+    return (sidebar_button_1, sidebar_button_2, sidebar_button_3, sidebar_button_4, google_calendar_link, logo_button)
 
 def create_date_interval_scroll_frame(master, calendar_image: PhotoImage, timezone: list[str]):
     date_frame = ctk.CTkScrollableFrame(master, label_text="Date Interval")

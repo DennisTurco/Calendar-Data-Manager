@@ -1,5 +1,7 @@
 import customtkinter as ctk
-from GUI import *
+from GUI import LoginFrame, MainFrame, NewEventsFrame, EditEventsFrame, GetEventsFrame, GraphFrame
+from Logger import Logger
+from CommonOperations import CommonOperations
 
 def show_frame(frame):
     Logger.write_log(f"Raising frame: {frame}", Logger.LogType.INFO)

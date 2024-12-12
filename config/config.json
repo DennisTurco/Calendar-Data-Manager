@@ -7,6 +7,8 @@
     "GITHUB_PAGE_LINK": "https://github.com/DennisTurco/Calendar-Data-Manager",
     "DONATE_BUYMEACOFFE_PAGE_LINK": "https://www.buymeacoffee.com/denno",
     "DONATE_PAYPAL_PAGE_LINK": "https://www.paypal.com/donate/?hosted_button_id=M7CJXS929334U",
+    "SHARD_WEBSITE": "https://www.shardpc.it/",
+    "SHARD_EMAIL": "assistenza.shard@gmail.com",
     "PREFERENCE_FILE": "preferences.json",
     "CONFIG_FILE": "config.json",
     "LOG_FILE": "logs.txt",
@@ -17,12 +19,12 @@
     "MenuItems": {
         "BugReport": true,
         "Exit": true,
-        "Home": true,
         "Theme": true,
         "Scaling": true,
         "Appearance": true,
         "Share": true,
-        "Donate": true
+        "Donate": true,
+        "Support": true
     },
     "HomeButtons": {
         "MessageSection": true,

@@ -1,0 +1,48 @@
+2024-12-12 17:24:48.231389 [INFO] Raising frame: .!ctkframe.!geteventsframe
+2024-12-12 17:24:42.093303 [INFO] Raising frame: .!ctkframe.!mainframe
+2024-12-12 17:24:41.182104 [INFO] Raising frame: .!ctkframe.!graphframe
+2024-12-12 17:24:40.811345 [INFO] Raising frame: .!ctkframe.!geteventsframe
+2024-12-12 17:24:40.449810 [INFO] Raising frame: .!ctkframe.!neweventsframe
+2024-12-12 17:24:40.104686 [INFO] Raising frame: .!ctkframe.!editeventsframe
+2024-12-12 17:24:38.862214 [INFO] Raising frame: .!ctkframe.!neweventsframe
+2024-12-12 17:24:38.086239 [INFO] Raising frame: .!ctkframe.!mainframe
+2024-12-12 17:24:37.557576 [INFO] Raising frame: .!ctkframe.!graphframe
+2024-12-12 17:24:36.891468 [INFO] Raising frame: .!ctkframe.!mainframe
+2024-12-12 17:24:36.332168 [INFO] Raising frame: .!ctkframe.!editeventsframe
+2024-12-12 17:24:35.497266 [INFO] Raising frame: .!ctkframe.!mainframe
+2024-12-12 17:24:34.761117 [INFO] Raising frame: .!ctkframe.!geteventsframe
+2024-12-12 17:24:33.640350 [INFO] Raising frame: .!ctkframe.!mainframe
+2024-12-12 17:24:33.632914 [INFO] Changing appearance to 
+2024-12-12 17:24:33.501382 [INFO] User 'Dennis Turco' logged with email 'dennisturco@gmail.com'
+2024-12-12 17:24:33.366499 [INFO] User 'Dennis Turco' logged with email 'dennisturco@gmail.com'
+2024-12-12 17:24:30.040993 [INFO] Raising frame: .!ctkframe.!loginframe
+2024-12-12 17:24:24.171615 [INFO] Changing color theme to: green
+2024-12-12 17:24:24.154703 [INFO] Application started
+2024-12-12 17:21:28.469990 [INFO] Raising frame: .!ctkframe.!graphframe
+2024-12-12 17:21:27.498400 [INFO] Raising frame: .!ctkframe.!mainframe
+2024-12-12 17:21:26.041708 [INFO] Raising frame: .!ctkframe.!graphframe
+2024-12-12 17:21:25.010759 [INFO] Raising frame: .!ctkframe.!mainframe
+2024-12-12 17:21:25.003314 [INFO] Changing appearance to 
+2024-12-12 17:21:24.881885 [INFO] User 'Dennis Turco' logged with email 'dennisturco@gmail.com'
+2024-12-12 17:21:24.752320 [INFO] User 'Dennis Turco' logged with email 'dennisturco@gmail.com'
+2024-12-12 17:21:23.393335 [INFO] Raising frame: .!ctkframe.!loginframe
+2024-12-12 17:21:17.374077 [INFO] Changing color theme to: green
+2024-12-12 17:21:17.362668 [INFO] Application started
+2024-12-12 17:19:39.205248 [INFO] Raising frame: .!ctkframe.!graphframe
+2024-12-12 17:19:36.636826 [INFO] Raising frame: .!ctkframe.!mainframe
+2024-12-12 17:19:36.629411 [INFO] Changing appearance to 
+2024-12-12 17:19:36.483860 [INFO] User 'Dennis Turco' logged with email 'dennisturco@gmail.com'
+2024-12-12 17:19:36.374244 [INFO] User 'Dennis Turco' logged with email 'dennisturco@gmail.com'
+2024-12-12 17:19:32.035616 [INFO] Raising frame: .!ctkframe.!loginframe
+2024-12-12 17:19:26.382001 [INFO] Changing color theme to: green
+2024-12-12 17:19:26.377040 [INFO] Application started
+2024-12-12 17:12:20.384798 [INFO] Raising frame: .!ctkframe.!geteventsframe
+2024-12-12 17:12:19.909892 [INFO] Raising frame: .!ctkframe.!editeventsframe
+2024-12-12 17:12:07.318841 [INFO] Raising frame: .!ctkframe.!neweventsframe
+2024-12-12 17:12:04.525424 [INFO] Raising frame: .!ctkframe.!mainframe
+2024-12-12 17:12:04.518015 [INFO] Changing appearance to 
+2024-12-12 17:12:04.316626 [INFO] User 'Dennis Turco' logged with email 'dennisturco@gmail.com'
+2024-12-12 17:12:04.212288 [INFO] User 'Dennis Turco' logged with email 'dennisturco@gmail.com'
+2024-12-12 17:12:02.828034 [INFO] Raising frame: .!ctkframe.!loginframe
+2024-12-12 17:11:57.187914 [INFO] Changing color theme to: green
+2024-12-12 17:11:56.938675 [INFO] Application started
