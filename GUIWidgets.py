@@ -144,7 +144,9 @@ def create_graph_types_scroll_frame(master, square_check_image: PhotoImage, squa
     total_hours_per_year_by_summary.grid(row=3, column=0, padx=10, pady=10, sticky="ew")
     total_hours_per_month_by_summary = ctk.CTkCheckBox(graph_types_frame, text="Hours per Month By Summary", onvalue="on", offvalue="off")
     total_hours_per_month_by_summary.grid(row=3, column=1, padx=10, pady=10, sticky="ew")
-    return(button_select_all, button_deselect_all, total_hours_per_year, total_hours_per_month, total_hours_by_summary, total_hours_by_summary2, total_hours_per_year_by_summary, total_hours_per_month_by_summary)
+    total_hours_per_month_grouped_by_year = ctk.CTkCheckBox(graph_types_frame, text="Hours per Month Grouped By Year", onvalue="on", offvalue="off")
+    total_hours_per_month_grouped_by_year.grid(row=4, column=0, padx=10, pady=10, sticky="ew")
+    return(button_select_all, button_deselect_all, total_hours_per_year, total_hours_per_month, total_hours_by_summary, total_hours_by_summary2, total_hours_per_year_by_summary, total_hours_per_month_by_summary, total_hours_per_month_grouped_by_year)
 
 def create_date_selection_for_events_list_scroll_frame(master, timezone: list[str], calendar_image: PhotoImage):
     date_frame = ctk.CTkScrollableFrame(master, label_text="Date Interval")

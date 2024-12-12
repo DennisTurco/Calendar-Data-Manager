@@ -1051,7 +1051,7 @@ class GraphFrame(ctk.CTkFrame):
         self.button_open_events_table_preview.configure(command=self.events_table_preview)
         
         # Graph types
-        (self.button_select_all, self.button_deselect_all, self.total_hours_per_year, self.total_hours_per_month, self.total_hours_by_summary, self.total_hours_by_summary2, self.total_hours_per_year_by_summary, self.total_hours_per_month_by_summary) = GUIWidgets.create_graph_types_scroll_frame(self, square_check_image, square_image)
+        (self.button_select_all, self.button_deselect_all, self.total_hours_per_year, self.total_hours_per_month, self.total_hours_by_summary, self.total_hours_by_summary2, self.total_hours_per_year_by_summary, self.total_hours_per_month_by_summary, self.total_hours_per_month_grouped_by_year) = GUIWidgets.create_graph_types_scroll_frame(self, square_check_image, square_image)
         self.button_select_all.configure(command=self.select_all)
         self.button_deselect_all.configure(command=self.deselect_all)
 
@@ -1100,6 +1100,7 @@ class GraphFrame(ctk.CTkFrame):
         self.total_hours_by_summary2.select()
         self.total_hours_per_year_by_summary.select()
         self.total_hours_per_month_by_summary.select()
+        self.total_hours_per_month_grouped_by_year.select()
         Logger.write_log(f"all chart types selected", Logger.LogType.INFO)
         self._common.write_log(self.log_box, f"all chart types selected")
         
@@ -1110,6 +1111,7 @@ class GraphFrame(ctk.CTkFrame):
         self.total_hours_by_summary2.deselect()
         self.total_hours_per_year_by_summary.deselect()
         self.total_hours_per_month_by_summary.deselect()
+        self.total_hours_per_month_grouped_by_year.deselect()
         Logger.write_log(f"all chart types deselected", Logger.LogType.INFO)
         self._common.write_log(self.log_box, f"all chart types deselected")
         
@@ -1166,6 +1168,8 @@ class GraphFrame(ctk.CTkFrame):
                 self.generate_chart_with_timeout(Plotter.Plotter.chart_TotalHoursPerYearBySummary, data)
             if self.total_hours_per_month_by_summary.get() == "on":
                 self.generate_chart_with_timeout(Plotter.Plotter.chart_TotalHoursPerMonthBySummary, data)
+            if self.total_hours_per_month_grouped_by_year.get() == "on":
+                self.generate_chart_with_timeout(Plotter.Plotter.chart_TotalHoursPerMonthGroupedByYear, data)
 
         except FileNotFoundError as error:
             Logger.write_log(f"Error, the file '{self.file_path.get()}' doesn't exist", Logger.LogType.ERROR, error)

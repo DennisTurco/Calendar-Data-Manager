@@ -220,6 +220,56 @@ class Plotter:
         # Show the plot
         fig.show()
         ####################
+        
+    @staticmethod
+    def chart_TotalHoursPerMonthGroupedByYear(data):
+        #################### Total Hours per Month Grouped by Year
+        # Extract time data
+        data = Plotter.__extractTimeData(data)
+
+        # Group by month, year, and calculate the sum of hours
+        monthly_hours_by_year = data.groupby(['Month', 'Year'])['Duration'].sum().reset_index()
+
+        # Create a bar chart with Plotly, color by 'Year'
+        fig = px.bar(
+            monthly_hours_by_year,
+            x='Month',
+            y='Duration',
+            color='Year',
+            labels={'Month': 'Month', 'Duration': 'Total Hours'},
+            title='Total Hours per Month Grouped by Year',
+            text_auto=True  # Automatically align values
+        )
+
+        # Ensure text annotations are centered inside each bar segment
+        fig.for_each_trace(lambda trace: trace.update(
+            textposition='inside',  # Position text inside the bar
+            textfont=dict(size=12),  # Adjust font size for better readability
+        ))
+
+        # Customize layout
+        fig.update_layout(
+            xaxis=dict(
+                tickmode='array',
+                tickvals=monthly_hours_by_year['Month'].unique(),
+                ticktext=[f"Month {i}" for i in monthly_hours_by_year['Month'].unique()]
+            ),
+            yaxis=dict(
+                title="Total Hours"
+            ),
+            coloraxis_colorbar=dict(
+                tickvals=sorted(monthly_hours_by_year['Year'].unique()),  # Unique year ticks
+                title="Year"
+            ),
+            title=dict(
+                text='Total Hours per Month Grouped by Year',
+                x=0.5  # Center the title
+            )
+        )
+
+        # Show the plot
+        fig.show()
+        ####################
     
     @staticmethod
     def chart_TotalHoursBySummary(data):
