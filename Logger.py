@@ -83,7 +83,7 @@ class Logger:
             existing_content = []  # Initialize if the file doesn't exist
 
         # Check if we need to trim the log file
-        if len(existing_content) >= Logger.LogType.MAX_LINES.value: 
+        if len(existing_content) >= Logger.LogType.MAX_LINES.value:
             existing_content = existing_content[-Logger.LogType.LINES_TO_KEEP_AFTER_FILE_CLEAR.value:]
 
         # Write the new log entry to the top of the file

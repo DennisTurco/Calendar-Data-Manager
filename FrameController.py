@@ -9,11 +9,11 @@ def show_frame(frame):
 
 def page_controller(master, root, common: CommonOperations):
     # Create a container
-    container = ctk.CTkFrame(root) 
+    container = ctk.CTkFrame(root)
     container.pack(side="top", fill="both", expand=True)
 
     container.grid_rowconfigure(0, weight=1)
-    container.grid_columnconfigure(0, weight=1)        
+    container.grid_columnconfigure(0, weight=1)
 
     # Store frame instances in master (APP class)
     master.frames = {}  # Ensure you are storing the frames in master

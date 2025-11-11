@@ -1,7 +1,6 @@
 from enum import Enum
 import json
 
-
 class ConfigKeys:
     class Keys(Enum):
         EVENT_COLOR = {"Light Blue": "#7986cb", "Green": "#33b679", "Purple": "#8e24aa", "Pink": "#e67c73", "Yellow": "#f6bf26", "Orange": "#f4511e", "Blue": "#039be5", "Grey": "#616161", "Dark Blue": "#3f51b5", "Dark Green": "#0b8043", "Red": "#d50000"}

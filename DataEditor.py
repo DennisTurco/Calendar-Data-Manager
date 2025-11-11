@@ -1,10 +1,10 @@
-from typing import List, Set, Tuple, Dict
+from typing import List, Dict
 
 class DataCSV:
     @staticmethod
-    def saveDataToFile(data: Dict[str, List[str]], filepath: str, delimeter: str = "|", encodingType: str = None):
+    def saveDataToFile(data: Dict[str, List[str]], filepath: str, delimeter: str = "|", encodingType: str = ""):
         if filepath == None or len(filepath) == 0: raise ValueError("File path can't be null")
-        
+
         file = open(filepath, "w", encoding=encodingType)
         counter = 0
         for ID in data.keys():
@@ -16,11 +16,11 @@ class DataCSV:
             file.write(line)
             counter += 1
         file.close()
-    
+
     @staticmethod
     def loadDataFromFile(filepath: str, delimeter: str = "|") -> Dict[str, List[str]]:
         if filepath == None or len(filepath) == 0: raise ValueError("File path can't be null")
-        
+
         file = open(filepath, "r")
         data = dict()
         lines = file.readlines()
@@ -30,12 +30,11 @@ class DataCSV:
             data[ID] = elem
         file.close()
         return data
-    
-    
+
     @staticmethod
     def addData(data: Dict[str, List[str]], ID: str, data_list: List[str]) -> bool:
         if ID == None: ValueError("ID can't be null")
-        
+
         if ID not in data:
             data[ID] = data_list
             return True
