@@ -3,13 +3,14 @@ from datetime import datetime
 import glob
 from io import BytesIO
 import tempfile
+from ExceptionHandler import ExceptionHandler
+from InformationMessages import InformationMessages
 from Logger import Logger
 import threading
 from typing import Final, List
 import webbrowser
 import os
 
-from googleapiclient.errors import HttpError
 from googleapiclient.discovery import build
 import requests
 from PIL import Image as pilImage, ImageTk, ImageDraw
@@ -90,19 +91,7 @@ class NewEventsFrame(ctk.CTkFrame):
         google_calendar_link.configure(command=lambda: webbrowser.open(ConfigKeys.Keys.GOOGLE_CALENDAR_LINK.value))
 
         # create main panel
-        section_message = '''The Create New Event section allows you to quickly add events to your Google Calendar with customized details. Here's how to use it:
-
-• Event Information:
-    - Summary: (Required) Enter a brief title or name for your event.
-    - Description: (Optional) Add more details to describe the event. This can be helpful for further context, such as the agenda or any notes.
-    - Color: (Required) Choose a color to visually categorize your event for easy identification on your calendar.
-• Date Interval:
-    - From: (Optional) Set the starting date and time for the event.
-    - To: (Optional) Set the ending date and time for the event.
-    - Timezone: (Optional) Select the timezone in which the event will occur (default is UTC).
-
-Once you've filled in the event details, simply click Create to add the event to your calendar. This tool makes it easy to create events quickly and organize your calendar effectively.
-'''
+        section_message = InformationMessages.new_event_info_message
 
         # create main panel
         title_frame = ctk.CTkFrame(self, fg_color="transparent")
@@ -188,22 +177,8 @@ Once you've filled in the event details, simply click Create to add the event to
             gc.CalendarEventsManager.createEvent(self._common.get_credentials(), summary, self.entry_description.get("0.0", tkinter.END), date_from, date_to, color_index, timeZone=time_zone)
             Logger.write_log(f"Event '{summary}' created succesfully!", Logger.LogType.INFO)
             self._common.write_log(self.log_box, f"Event '{summary}' created succesfully!")
-        except FileNotFoundError as file_not_found_error:
-            self._common.messagebox_exception(file_not_found_error)
-            Logger.write_log(f"File not found error: {str(file_not_found_error)}", Logger.LogType.ERROR, file_not_found_error)
-            self._common.write_log(self.log_box, f"File not found error: {str(file_not_found_error)}")
-        except PermissionError as permission_error:
-            self._common.messagebox_exception(permission_error)
-            Logger.write_log(f"Permission error: {str(permission_error)}", Logger.LogType.ERROR, permission_error)
-            self._common.write_log(self.log_box, f"Permission error: {str(permission_error)}")
-        except HttpError as http_error:
-            self._common.messagebox_exception(http_error)
-            Logger.write_log(f"HTTP error: {str(http_error)}", Logger.LogType.ERROR, http_error)
-            self._common.write_log(self.log_box, f"HTTP error: {str(http_error)}")
         except Exception as error:
-            self._common.messagebox_exception(error)
-            Logger.write_log(f"Generic error: {str(error)}", Logger.LogType.ERROR, error)
-            self._common.write_log(self.log_box, f"Generic error: {str(error)}")
+                ExceptionHandler.handle_exception(self._common, self.log_box, error)
 
     def combobox_callback(self, color):
         self.multi_selection.configure(button_color=ConfigKeys.Keys.EVENT_COLOR.value.get(color))
@@ -223,7 +198,7 @@ class EditEventsFrame(ctk.CTkFrame):
     event_color_from = ConfigKeys.Keys.EVENT_COLOR.value
     event_color_to = ConfigKeys.Keys.EVENT_COLOR.value
 
-    def __init__(self, parent, main_class):
+    def __init__(self, parent, _):
         ctk.CTkFrame.__init__(self, parent)
         img = Images()
 
@@ -243,13 +218,7 @@ class EditEventsFrame(ctk.CTkFrame):
         logo_button.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[MainFrame]))
         google_calendar_link.configure(command=lambda: webbrowser.open(ConfigKeys.Keys.GOOGLE_CALENDAR_LINK.value))
 
-        section_message = '''This section of the Calendar Data Manager enables you to update multiple events in your Google Calendar simultaneously, saving you time and effort. Here's how it works:
-
-• Filter Existing Events: Use fields such as Summary, Description, Color, and a Date Interval to select the events you want to edit. You can refine your search by combining these criteria.
-• Apply New Values: Define the updates you want to make, such as changing the summary, description, or event color.
-• Edit with Precision: Specify the date range and timezone to ensure that only the desired events within that period are modified.
-
-Once you've set your filters and new values, click the Edit button to apply the changes instantly across all matching events. This tool ensures a seamless way to manage your calendar efficiently.'''
+        section_message = InformationMessages.update_events_info_message
 
         # create main panel
         title_frame = ctk.CTkFrame(self, fg_color="transparent")
@@ -390,7 +359,7 @@ Once you've set your filters and new values, click the Edit button to apply the 
                 time_zone=time_zone,
                 color_id=color_index_old
             )
-            
+
             if not old_events:
                 Logger.write_log("No events found", Logger.LogType.INFO)
                 CommonOperations.write_log(self.log_box, "No events found")
@@ -410,22 +379,8 @@ Once you've set your filters and new values, click the Edit button to apply the 
                 self.events_list_viewer_window(old_events, new_events, summary_new, description_new, color_index_new, date_from, date_to, time_zone)
 
         # Handle various exceptions
-        except FileNotFoundError as e:
-            self._common.messagebox_exception(e)
-            Logger.write_log(f"File not found error: {str(e)}", Logger.LogType.ERROR, e)
-            CommonOperations.write_log(self.log_box, f"File not found error: {str(e)}")
-        except PermissionError as e:
-            self._common.messagebox_exception(e)
-            Logger.write_log(f"Permission error: {str(e)}", Logger.LogType.ERROR, e)
-            CommonOperations.write_log(self.log_box, f"Permission error: {str(e)}")
-        except ValueError as e:
-            self._common.messagebox_exception(e)
-            Logger.write_log(f"Value error: {str(e)}", Logger.LogType.ERROR, e)
-            CommonOperations.write_log(self.log_box, f"Value error: {str(e)}")
-        except Exception as e:
-            self._common.messagebox_exception(e)
-            Logger.write_log(f"Generic error: {str(e)}", Logger.LogType.ERROR, e)
-            CommonOperations.write_log(self.log_box, f"Generic error: {str(e)}")
+        except Exception as error:
+            ExceptionHandler.handle_exception(self._common, self.log_box, error)
 
     def combobox_callback_color1(self, color):
         self.multi_selection_old.configure(button_color=self.event_color_from.get(color))
@@ -571,14 +526,7 @@ class GetEventsFrame(ctk.CTkFrame):
         logo_button.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[MainFrame]))
         google_calendar_link.configure(command=lambda: webbrowser.open(ConfigKeys.Keys.GOOGLE_CALENDAR_LINK.value))
 
-        section_message = '''This section of the Calendar Data Manager allows you to efficiently retrieve and analyze your Google Calendar events. Here's what you can do:
-
-• Filter by Date Interval: Specify a time range to narrow down the events you want to retrieve. You can set the start and end dates, along with the timezone, for precise filtering.
-• Save Results: Export the retrieved events list to a file in `.csv` or `.txt` format for further analysis or sharing. You can choose the file location, name, and whether to overwrite an existing file.
-• Preview Results or Visualize Data: Quickly preview the events in a table or generate graphs directly from the exported file. This feature enables you to gain insights and statistics about your calendar activities.
-
-Once you've configured your filters, click Get to retrieve the data or Get and Plot to visualize it right away!
-        '''
+        section_message = InformationMessages.get_events_info_message
 
         # create main panel
         title_frame = ctk.CTkFrame(self, fg_color="transparent")
@@ -672,22 +620,8 @@ Once you've configured your filters, click Get to retrieve the data or Get and P
                 Logger.write_log(f"Event obtained succesfully!", Logger.LogType.INFO)
                 self._common.write_log(self.log_box, f"Event obtained succesfully!")
                 return
-            except FileNotFoundError as file_not_found_error:
-                self._common.messagebox_exception(file_not_found_error)
-                Logger.write_log(f"File not found error: {str(file_not_found_error)}", Logger.LogType.ERROR, file_not_found_error)
-                self._common.write_log(self.log_box, f"File not found error: {str(file_not_found_error)}")
-            except PermissionError as permission_error:
-                self._common.messagebox_exception(permission_error)
-                Logger.write_log(f"Permission error: {str(permission_error)}", Logger.LogType.ERROR, permission_error)
-                self._common.write_log(self.log_box, f"Permission error: {str(permission_error)}")
-            except ValueError as value_error:
-                self._common.messagebox_exception(value_error)
-                Logger.write_log(f"Value error: {str(value_error)}", Logger.LogType.ERROR, value_error)
-                self._common.write_log(self.log_box, f"Value error: {str(value_error)}")
             except Exception as error:
-                self._common.messagebox_exception(error)
-                Logger.write_log(f"Generic error: {str(error)}", Logger.LogType.ERROR, error)
-                self._common.write_log(self.log_box, f"Generic error: {str(error)}")
+                ExceptionHandler.handle_exception(self._common, self.log_box, error)
 
         summary = self.entry_summary.get()
         date_from = self.entry_date_from.get()
@@ -719,28 +653,8 @@ Once you've configured your filters, click Get to retrieve the data or Get and P
             Logger.write_log(f"{len(self.events)} Event(s) obtained succesfully!", Logger.LogType.INFO)
             self._common.write_log(self.log_box, f"{len(self.events)} Event(s) obtained succesfully!")
             return len(self.events)
-        except FileNotFoundError as file_not_found_error:
-            self._common.messagebox_exception(file_not_found_error)
-            Logger.write_log(f"File not found error: {str(file_not_found_error)}", Logger.LogType.ERROR, file_not_found_error)
-            self._common.write_log(self.log_box, f"File not found error: {str(file_not_found_error)}")
-        except PermissionError as permission_error:
-            self._common.messagebox_exception(permission_error)
-            Logger.write_log(f"Permission error: {str(permission_error)}", Logger.LogType.ERROR, permission_error)
-            self._common.write_log(self.log_box, f"Permission error: {str(permission_error)}")
-        except ValueError as value_error:
-            self._common.messagebox_exception(value_error)
-            Logger.write_log(f"Value error: {str(value_error)}", Logger.LogType.ERROR, value_error)
-            self._common.write_log(self.log_box, f"Value error: {str(value_error)}")
-        # except GoogleCalendarConnectionError as connection_error:
-        #     self._common.messagebox_exception(connection_error)
-        #     CommonOperations.write_log(self.log_box, f"Connection error: {str(connection_error)}")
-        # except GoogleCalendarAPIError as api_error:
-        #     self._common.messagebox_exception(api_error)
-        #     CommonOperations.write_log(self.log_box, f"Google Calendar API error: {str(api_error)}")
         except Exception as error:
-            self._common.messagebox_exception(error)
-            Logger.write_log(f"Generic error: {str(error)}", Logger.LogType.ERROR, error)
-            self._common.write_log(self.log_box, f"Generic error: {str(error)}")
+                ExceptionHandler.handle_exception(self._common, self.log_box, error)
 
     def get_and_preview(self):
         events_count = self.get_events()
@@ -920,26 +834,8 @@ Once you've configured your filters, click Get to retrieve the data or Get and P
             Logger.write_log(f"{counter} event(s) added to file {self.file_path.get()}", Logger.LogType.INFO)
             self._common.write_log(self.log_box, f"{counter} event(s) added to file {self.file_path.get()}")
 
-        except FileNotFoundError as file_not_found_error:
-            self._common.messagebox_exception(file_not_found_error)
-            Logger.write_log(f"File not found error: {str(file_not_found_error)}", Logger.LogType.ERROR, file_not_found_error)
-            self._common.write_log(self.log_box, f"File not found error: {str(file_not_found_error)}")
-        except PermissionError as permission_error:
-            self._common.messagebox_exception(permission_error)
-            Logger.write_log(f"Permission error: {str(permission_error)}", Logger.LogType.ERROR, permission_error)
-            self._common.write_log(self.log_box, f"Permission error: {str(permission_error)}")
-        except ValueError as value_error:
-            self._common.messagebox_exception(value_error)
-            Logger.write_log(f"Value error: {str(value_error)}", Logger.LogType.ERROR, value_error)
-            self._common.write_log(self.log_box, f"Value error: {str(value_error)}")
-        except KeyError as key_error:
-            self._common.messagebox_exception(key_error)
-            Logger.write_log(f"Key error: {str(key_error)}", Logger.LogType.ERROR, key_error)
-            self._common.write_log(self.log_box, f"Key error: {str(key_error)}")
         except Exception as error:
-            self._common.messagebox_exception(error)
-            Logger.write_log(f"Generic error: {str(error)}", Logger.LogType.ERROR, error)
-            self._common.write_log(self.log_box, f"Generic error: {str(error)}")
+                ExceptionHandler.handle_exception(self._common, self.log_box, error)
 
     def save_results_to_file2(self, entry):
         self.file_path.delete("0", tkinter.END)
@@ -1126,24 +1022,8 @@ class GraphFrame(ctk.CTkFrame):
             if self.total_hours_per_month_grouped_by_year.get() == "on":
                 self.generate_chart_with_timeout(Plotter.Plotter.chart_TotalHoursPerMonthGroupedByYear, data)
 
-        except FileNotFoundError as error:
-            Logger.write_log(f"Error, the file '{self.file_path.get()}' doesn't exist", Logger.LogType.ERROR, error)
-            self._common.write_log(self.log_box, f"Error, the file '{self.file_path.get()}' doesn't exist")
-        except pandas.errors.EmptyDataError as error:
-            Logger.write_log(f"Error, the file '{self.file_path.get()}' is empty", Logger.LogType.ERROR, error)
-            self._common.write_log(self.log_box, f"Error, the file '{self.file_path.get()}' is empty")
-        except PermissionError as permission_error:
-            Logger.write_log(f"Permission error: {str(permission_error)}", Logger.LogType.ERROR, permission_error)
-            self._common.messagebox_exception(permission_error)
-            self._common.write_log(self.log_box, f"Permission error: {str(permission_error)}")
-        except ValueError as value_error:
-            Logger.write_log(f"Value error: {str(value_error)}", Logger.LogType.ERROR, value_error)
-            self._common.messagebox_exception(value_error)
-            self._common.write_log(self.log_box, f"Value error: {str(value_error)}")
         except Exception as error:
-            Logger.write_log(f"Generic error: {str(error)}", Logger.LogType.ERROR, error)
-            self._common.messagebox_exception(error)
-            self._common.write_log(self.log_box, f"Generic error: {str(error)}")
+            ExceptionHandler.handle_exception(self._common, self.log_box, error)
 
 #?###########################################################
 

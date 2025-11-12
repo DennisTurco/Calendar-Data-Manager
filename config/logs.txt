@@ -1,3 +1,13 @@
+2025-11-12 21:29:50.823546 [INFO] Opening info section 'Edit Events'
+2025-11-12 21:29:49.905813 [INFO] Raising frame: .!ctkframe.!editeventsframe
+2025-11-12 21:29:48.299843 [INFO] Raising frame: .!ctkframe.!editeventsframe
+2025-11-12 21:29:47.411809 [INFO] Raising frame: .!ctkframe.!mainframe
+2025-11-12 21:29:47.402260 [INFO] Changing appearance to 
+2025-11-12 21:29:47.225588 [INFO] User 'Dennis Turco' logged with email 'dennisturco@gmail.com'
+2025-11-12 21:29:46.868578 [INFO] User 'Dennis Turco' logged with email 'dennisturco@gmail.com'
+2025-11-12 21:26:59.089835 [INFO] Raising frame: .!ctkframe.!loginframe
+2025-11-12 21:26:51.551289 [INFO] Changing color theme to: green
+2025-11-12 21:26:51.365100 [INFO] Application started
 2025-11-11 22:47:28.845958 [INFO] Raising frame: .!ctkframe.!graphframe
 2025-11-11 22:47:28.163912 [INFO] Raising frame: .!ctkframe.!geteventsframe
 2025-11-11 22:47:27.817380 [INFO] Raising frame: .!ctkframe.!editeventsframe

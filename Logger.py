@@ -1,6 +1,7 @@
 from datetime import datetime
 from enum import Enum
 import json
+from typing import Optional
 
 from ConfigKeys import ConfigKeys
 
@@ -46,7 +47,7 @@ class Logger:
             raise
 
     @staticmethod
-    def write_log(message: str, log_type: LogType = LogType.INFO, exception: Exception = None):
+    def write_log(message: str, log_type: LogType = LogType.INFO, exception: Optional[Exception] = None):
         """
         Write a log entry to the file, always adding it to the top of the log file.
 
