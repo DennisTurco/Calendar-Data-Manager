@@ -182,7 +182,7 @@ class CommonOperations():
         toplevel_window.destroy()
 
     @staticmethod
-    def date_picker_window(type, toplevel_window, entry_date_from, entry_date_to, log_box):
+    def date_picker_window(type, toplevel_window, entry_date_from, entry_date_to, log_box) -> ctk.CTkToplevel:
         Logger.write_log("Opening date picker", Logger.LogType.INFO)
 
         if toplevel_window is None or not toplevel_window.winfo_exists():

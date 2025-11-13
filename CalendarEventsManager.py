@@ -34,7 +34,7 @@ class CalendarEventsManager:
         return name, email, picture_url
 
     @staticmethod
-    def connectionSetup(credentials_path: str, scopes: str, token_path: str):
+    def connectionSetup(credentials_path: str, scopes: list[str], token_path: str):
         if token_path == None or len(token_path) == 0: raise ValueError("Token path can't be empty")
         if credentials_path == None or len(credentials_path) == 0: raise ValueError("Credentials path can't be empty")
         if scopes == None or len(scopes) == 0: raise ValueError("Scopes link can't be empty")
@@ -89,7 +89,7 @@ class CalendarEventsManager:
             print("Error refreshing access token:", response.text)
 
     @staticmethod
-    def createEvent(creds: Credentials, summary: str, description: str, start_date: datetime, end_date: datetime, color_event_id: int = 1, timeZone: str = 'UTC'):
+    def createEvent(creds: Credentials, summary: str, description: str, start_date: datetime.datetime, end_date: datetime.datetime, color_event_id: int = 1, timeZone: str = 'UTC'):
         if creds == None: raise ValueError("Credentials can't be null")
 
         service = build("calendar", "v3", credentials=creds)
@@ -275,7 +275,7 @@ class CalendarEventsManager:
             raise Exception(f"An error occurred: {str(generic_exception)}")
 
     @staticmethod
-    def getEventByID(creds: Credentials, ID: str) -> list[Any] | None:
+    def getEventByID(creds: Credentials, ID: str) -> list[Any]:
         if creds == None: raise ValueError("Credentials can't be null")
         if ID == None: raise ValueError("ID can't be null")
 
@@ -287,7 +287,7 @@ class CalendarEventsManager:
             if event is not None:
                 return [event]  # Wrap the event in a list
             else:
-                return None
+                return []
         except HttpError as http_error:
             raise HttpError(f"HTTP error occurred: {str(http_error)}", None)
         except Exception as generic_exception:
@@ -295,7 +295,7 @@ class CalendarEventsManager:
 
     # TODO: add like mode for title and description
     @staticmethod
-    def getEvents(creds: Credentials, title: Optional[str] = None, like_mode: bool = False, description: Optional[str] = None, start_date: Optional[str] = None, end_date: Optional[str] = None, time_zone: str = 'UTC', color_id: int = -1):
+    def getEvents(creds: Credentials, title: Optional[str] = None, like_mode: bool = False, description: Optional[str] = None, start_date: Optional[datetime.datetime] = None, end_date: Optional[datetime.datetime] = None, time_zone: str = 'UTC', color_id: int = -1) -> list[Any]:
         if creds is None: raise ValueError("Credentials can't be null")
 
         try:
@@ -339,7 +339,7 @@ class CalendarEventsManager:
                     events += [event for event in events_result.get('items', [])]
 
                 if len(events) == 0:
-                    return None
+                    return []
 
                 # Exit if all events are found (when the date of the last element inside the list is the same for two times)
                 if events[-1]['end'].get('dateTime') == end_date_time_search:
@@ -360,7 +360,7 @@ class CalendarEventsManager:
             if events:
                 return events
             else:
-                return None
+                return []
         except HttpError as http_error:
             raise HttpError(f"HTTP error occurred: {str(http_error)}", None)
         except Exception as generic_exception:
