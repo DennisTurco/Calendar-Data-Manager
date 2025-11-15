@@ -1,6 +1,6 @@
 from googleapiclient.errors import HttpError
 import pandas as pandas
-from Logger import Logger
+from LogService import LogService
 
 class ExceptionHandler:
 
@@ -21,5 +21,7 @@ class ExceptionHandler:
         base_msg = error_map.get(error_type, "Generic error")
         msg = f"{base_msg}: {str(error)}"
 
-        Logger.write_log(msg, Logger.LogType.ERROR, error)
+        logger = LogService.get_logger(__name__)
+        logger.error(msg)
+
         common.write_log(log_box, msg)

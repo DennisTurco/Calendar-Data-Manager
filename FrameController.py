@@ -1,10 +1,11 @@
 import customtkinter as ctk
 from GUI import LoginFrame, MainFrame, NewEventsFrame, EditEventsFrame, GetEventsFrame, GraphFrame
-from Logger import Logger
+from LogService import LogService
 from CommonOperations import CommonOperations
 
 def show_frame(frame):
-    Logger.write_log(f"Raising frame: {frame}", Logger.LogType.INFO)
+    logger = LogService.get_logger(__name__)
+    logger.info(f"Raising frame: {frame}")
     frame.tkraise()
 
 def page_controller(master, root, common: CommonOperations):

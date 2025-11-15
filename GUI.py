@@ -5,7 +5,7 @@ from io import BytesIO
 import tempfile
 from ExceptionHandler import ExceptionHandler
 from InformationMessages import InformationMessages
-from Logger import Logger
+from LogService import LogService
 import threading
 from typing import Any, Final, List, Optional
 import webbrowser
@@ -71,6 +71,7 @@ class Images:
 class NewEventsFrame(ctk.CTkFrame):
     toplevel_window = None
     _common = CommonOperations()
+    _logger = LogService.get_logger(__name__)
 
     def __init__(self, parent, _):
         ctk.CTkFrame.__init__(self, parent)
@@ -145,7 +146,7 @@ class NewEventsFrame(ctk.CTkFrame):
         self.log_box.grid(row=4, column=1, columnspan=2, padx=(0, 0), pady=(20, 0), sticky="nsew")
 
     def create_event(self):
-        Logger.write_log("Creating event", Logger.LogType.INFO)
+        self._logger.info("Creating event")
         summary = self.entry_summary.get()
         date_from = self.entry_date_from.get()
         date_to = self.entry_date_to.get()
@@ -155,18 +156,18 @@ class NewEventsFrame(ctk.CTkFrame):
         self._common.set_timezone(time_zone)
 
         if len(summary.replace(" ", "")) == 0:
-            Logger.write_log(f"Error on creating event: summary is missing", Logger.LogType.WARN)
+            self._logger.warning(f"Error on creating event: summary is missing")
             self._common.write_log(self.log_box, f"Error on creating event: summary is missing")
             return
         if len(date_from.replace(" ", "")) == 0 or len(date_to.replace(" ", "")) == 0:
-            Logger.write_log(f"Error on creating event: date is missing", Logger.LogType.WARN)
+            self._logger.warning(f"Error on creating event: date is missing")
             self._common.write_log(self.log_box, f"Error on creating event: date is missing")
             return
         try:
             date_from = datetime.strptime(date_from, DATE_FORMATTER)
             date_to = datetime.strptime(date_to, DATE_FORMATTER)
         except ValueError as error:
-            Logger.write_log(f"Error on creating event: date format is not correct", Logger.LogType.ERROR, error)
+            self._logger.error(f"Error on creating event: date format is not correct")
             self._common.write_log(self.log_box, f"Error on creating event: date format is not correct")
             return
 
@@ -175,7 +176,7 @@ class NewEventsFrame(ctk.CTkFrame):
 
         try:
             gc.CalendarEventsManager.createEvent(self._common.get_credentials(), summary, self.entry_description.get("0.0", tkinter.END), date_from, date_to, color_index, timeZone=time_zone)
-            Logger.write_log(f"Event '{summary}' created succesfully!", Logger.LogType.INFO)
+            self._logger.info(f"Event '{summary}' created succesfully!")
             self._common.write_log(self.log_box, f"Event '{summary}' created succesfully!")
         except Exception as error:
                 ExceptionHandler.handle_exception(self._common, self.log_box, error)
@@ -183,7 +184,7 @@ class NewEventsFrame(ctk.CTkFrame):
     def combobox_callback(self, color):
         self.multi_selection.configure(button_color=ConfigKeys.Keys.EVENT_COLOR.value.get(color))
         self.multi_selection.set(color)
-        Logger.write_log(f"color '{color}' selected", Logger.LogType.INFO)
+        self._logger.info(f"color '{color}' selected")
         self._common.write_log(self.log_box, f"color '{color}' selected")
 
     def date_picker(self, type):
@@ -193,6 +194,7 @@ class NewEventsFrame(ctk.CTkFrame):
 #?###########################################################
 class EditEventsFrame(ctk.CTkFrame):
     _common = CommonOperations()
+    _logger = LogService.get_logger(__name__)
     toplevel_window: Optional[ctk.CTkToplevel] = None
     date_picker_window: Optional[ctk.CTkToplevel] = None
     event_color_from: dict[str, str] = ConfigKeys.Keys.EVENT_COLOR.value
@@ -309,7 +311,7 @@ class EditEventsFrame(ctk.CTkFrame):
         self.date_picker_window = CommonOperations.date_picker_window(type, self.date_picker_window, self.entry_date_from, self.entry_date_to, self.log_box)
 
     def edit_events(self):
-        Logger.write_log("Editing events", Logger.LogType.INFO)
+        self._logger.info("Editing events")
 
         # Get OLD values
         summary_old = self.entry_summary_old.get()
@@ -323,11 +325,11 @@ class EditEventsFrame(ctk.CTkFrame):
 
         # Validate input data
         if not summary_old:
-            Logger.write_log("ERROR: Missing old summary", Logger.LogType.WARN)
+            self._logger.warning("ERROR: Missing old summary")
             CommonOperations.write_log(self.log_box, "ERROR: Missing old summary")
             return
         if not summary_new:
-            Logger.write_log("ERROR: Missing new summary", Logger.LogType.WARN)
+            self._logger.warning("ERROR: Missing new summary")
             CommonOperations.write_log(self.log_box, "ERROR: Missing new summary")
             return
 
@@ -341,7 +343,7 @@ class EditEventsFrame(ctk.CTkFrame):
             if date_to:
                 date_to = datetime.strptime(date_to, DATE_FORMATTER)
         except ValueError:
-            Logger.write_log("ERROR: Invalid date format", Logger.LogType.ERROR)
+            self._logger.error("ERROR: Invalid date format")
             CommonOperations.write_log(self.log_box, "ERROR: Invalid date format")
             return
 
@@ -361,7 +363,7 @@ class EditEventsFrame(ctk.CTkFrame):
             )
 
             if not old_events:
-                Logger.write_log("No events found", Logger.LogType.INFO)
+                self._logger.info("No events found")
                 CommonOperations.write_log(self.log_box, "No events found")
             else:
                 # Simulate event updates without applying them
@@ -385,20 +387,20 @@ class EditEventsFrame(ctk.CTkFrame):
     def combobox_callback_color1(self, color):
         self.multi_selection_old.configure(button_color=self.event_color_from.get(color))
         self.multi_selection_old.set(color)
-        Logger.write_log(f"Old color '{color}' selected", Logger.LogType.INFO)
+        self._logger.info(f"Old color '{color}' selected")
         CommonOperations.write_log(self.log_box, f"color '{color}' selected")
 
     def combobox_callback_color2(self, color):
         self.multi_selection_new.configure(button_color=ConfigKeys.Keys.EVENT_COLOR.value.get(color))
         self.multi_selection_new.set(color)
-        Logger.write_log(f"New color '{color}' selected", Logger.LogType.INFO)
+        self._logger.info(f"New color '{color}' selected")
         CommonOperations.write_log(self.log_box, f"color '{color}' selected")
 
     def update_events(self, old_events: dict, summary_new: str, description_new: str, color_index_new, date_from: str, date_to: str, time_zone: str):
         # Apply updates to the events
         msg = CTkMessagebox(title="Edit events", message=f"Are you sure you want to confirm the changes?\n{len(old_events)} events will be changed.", icon="question", option_1="No", option_2="Yes")
         if msg.get() == "Yes":
-            Logger.write_log(f"Old events edited: {old_events}", Logger.LogType.INFO)
+            self._logger.info(f"Old events edited: {old_events}")
 
             updated_events = gc.CalendarEventsManager.editEvent(
                 self._common.get_credentials(),
@@ -412,7 +414,7 @@ class EditEventsFrame(ctk.CTkFrame):
             )
             if updated_events is None: return
 
-            Logger.write_log(f"{len(updated_events)} event(s) successfully updated!", Logger.LogType.INFO)
+            self._logger.info(f"{len(updated_events)} event(s) successfully updated!")
             CommonOperations.write_log(self.log_box, f"{len(updated_events)} event(s) successfully updated!")
             self.close_top_frame_window()
 
@@ -420,7 +422,7 @@ class EditEventsFrame(ctk.CTkFrame):
         self.toplevel_window.destroy()
 
     def events_list_viewer_window(self, old_events: dict, new_events: dict, summary_new: str, description_new: str, color_index_new, date_from, date_to, time_zone):
-        Logger.write_log("Events list viewer", Logger.LogType.INFO)
+        self._logger.info("Events list viewer")
 
         # Create a new window if it doesn't exist
         if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
@@ -504,6 +506,7 @@ class GetEventsFrame(ctk.CTkFrame):
     events_preview_in_table = None
     data = None
     events: list[Any] = []
+    _logger = LogService.get_logger(__name__)
     _common = CommonOperations()
     event_color = ConfigKeys.Keys.EVENT_COLOR.value
 
@@ -617,7 +620,7 @@ class GetEventsFrame(ctk.CTkFrame):
             try:
                 self.events = gc.CalendarEventsManager.getEventByID(self._common.get_credentials(), id)
                 #self.events_list_viewer_window()
-                Logger.write_log(f"Event obtained succesfully!", Logger.LogType.INFO)
+                self._logger.info(f"Event obtained succesfully!")
                 self._common.write_log(self.log_box, f"Event obtained succesfully!")
                 return
             except Exception as error:
@@ -635,7 +638,7 @@ class GetEventsFrame(ctk.CTkFrame):
             date_from = datetime.strptime(date_from, DATE_FORMATTER) if (len(date_from) != 0) else None
             date_to = datetime.strptime(date_to, DATE_FORMATTER) if (len(date_to) != 0) else None
         except ValueError as error:
-            Logger.write_log(f"Error on creating event: date format is not correct", Logger.LogType.ERROR, error)
+            self._logger.error(f"Error on creating event: date format is not correct")
             self._common.write_log(self.log_box, f"Error on creating event: date format is not correct")
             return
 
@@ -643,12 +646,12 @@ class GetEventsFrame(ctk.CTkFrame):
             color_index = self._common.get_color_id(ConfigKeys.Keys.EVENT_COLOR.value, self.multi_selection.get())
             self.events = gc.CalendarEventsManager.getEvents(creds=self._common.get_credentials(), title=summary, start_date=date_from, end_date=date_to, color_id=color_index, description=description, time_zone=time_zone)
             if len(self.events) == 0:
-                Logger.write_log(f"No events obtained", Logger.LogType.INFO)
+                self._logger.info(f"No events obtained")
                 self._common.write_log(self.log_box, f"No events obtained")
                 return 0
 
             #self.events_list_viewer_window() # i have to truncate the list for performances reason
-            Logger.write_log(f"{len(self.events)} Event(s) obtained succesfully!", Logger.LogType.INFO)
+            self._logger.info(f"{len(self.events)} Event(s) obtained succesfully!")
             self._common.write_log(self.log_box, f"{len(self.events)} Event(s) obtained succesfully!")
             return len(self.events)
         except Exception as error:
@@ -695,7 +698,7 @@ class GetEventsFrame(ctk.CTkFrame):
                 pass
 
     def events_list_viewer_window(self):
-        Logger.write_log("Events list viewer", Logger.LogType.INFO)
+        self._logger.info("Events list viewer")
 
         if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
             self.toplevel_window = ctk.CTkToplevel()
@@ -826,7 +829,7 @@ class GetEventsFrame(ctk.CTkFrame):
             # save all into data
             DataCSV.saveDataToFile(data, self.file_path.get(), '|', 'utf-8')
 
-            Logger.write_log(f"{counter} event(s) added to file {self.file_path.get()}", Logger.LogType.INFO)
+            self._logger.info(f"{counter} event(s) added to file {self.file_path.get()}")
             self._common.write_log(self.log_box, f"{counter} event(s) added to file {self.file_path.get()}")
 
         except Exception as error:
@@ -847,7 +850,7 @@ class GetEventsFrame(ctk.CTkFrame):
     def combobox_callback(self, color):
         self.multi_selection.configure(button_color=self.event_color.get(color))
         self.multi_selection.set(color)
-        Logger.write_log(f"color '{color}' selected", Logger.LogType.INFO)
+        self._logger.info(f"color '{color}' selected")
         CommonOperations.write_log(log_box=self.log_box, message=f"color '{color}' selected")
 
     def _get_file_path(self, entry):
@@ -868,6 +871,7 @@ class GraphFrame(ctk.CTkFrame):
     file_viewer_window = None
     events_preview_in_table = None
     _common = CommonOperations()
+    _logger = LogService.get_logger(__name__)
     stop_event = threading.Event()
 
     def __init__(self, parent, _):
@@ -918,7 +922,7 @@ class GraphFrame(ctk.CTkFrame):
         file_path = filedialog.askopenfilename(title="Select file where do you want to save data", filetypes=(("CSV files", "*.csv"), ("TXT files", "*.txt"), ("All files", "*.*")))
         self.file_path.delete("0", tkinter.END)
         self.file_path.insert("0", file_path)
-        Logger.write_log(f"file '{file_path}' selected", Logger.LogType.INFO)
+        self._logger.info(f"file '{file_path}' selected")
         self._common.write_log(self.log_box, f"file '{file_path}' selected")
 
     def set_file_path(self, text: str):
@@ -939,7 +943,7 @@ class GraphFrame(ctk.CTkFrame):
         self.total_hours_per_year_by_summary.select()
         self.total_hours_per_month_by_summary.select()
         self.total_hours_per_month_grouped_by_year.select()
-        Logger.write_log(f"all chart types selected", Logger.LogType.INFO)
+        self._logger.info(f"all chart types selected")
         self._common.write_log(self.log_box, f"all chart types selected")
 
     def _deselect_all(self):
@@ -950,7 +954,7 @@ class GraphFrame(ctk.CTkFrame):
         self.total_hours_per_year_by_summary.deselect()
         self.total_hours_per_month_by_summary.deselect()
         self.total_hours_per_month_grouped_by_year.deselect()
-        Logger.write_log(f"all chart types deselected", Logger.LogType.INFO)
+        self._logger.info(f"all chart types deselected")
         self._common.write_log(self.log_box, f"all chart types deselected")
 
     # Timeout function to stop the chart generation
@@ -961,7 +965,7 @@ class GraphFrame(ctk.CTkFrame):
                     chart_function(data)
             except Exception as ex:
                 self._common.messagebox_exception(ex)
-                Logger.write_log(f"An error occurred during setting timeout for chart generation", Logger.LogType.INFO)
+                self._logger.info(f"An error occurred during setting timeout for chart generation")
                 self._common.write_log(self.log_box, f"An error occurred during setting timeout for chart generation")
 
         # Create and start the thread
@@ -974,7 +978,7 @@ class GraphFrame(ctk.CTkFrame):
         # If the thread is still alive after the timeout, set the stop event
         if chart_thread.is_alive():
             self.stop_event.set()
-            Logger.write_log(f"Chart generation timed out.", Logger.LogType.WARN)
+            self._logger.warning(f"Chart generation timed out.")
             self._common.write_log(self.log_box, "Chart generation timed out.")
             CTkMessagebox(title="Chart Generation Error", message="One or more charts were cancelled due to a timeout. Please try again later.", icon="cancel", option_1="OK")
 
@@ -986,7 +990,7 @@ class GraphFrame(ctk.CTkFrame):
             return
 
         try:
-            Logger.write_log(f"Generating chart", Logger.LogType.INFO)
+            self._logger.info(f"Generating chart")
             self._common.write_log(self.log_box, "Generating chart")
             data = Plotter.Plotter.loadData(self.file_path.get())
             Plotter.Plotter.allStats(data)
@@ -1060,6 +1064,7 @@ class MainFrame(ctk.CTkFrame):
 #*###########################################################
 class App():
     _common = CommonOperations()
+    _logger = LogService.get_logger(__name__)
 
     def __init__(self):
         self.root = ctk.CTk()
@@ -1067,9 +1072,8 @@ class App():
         self._button_5: ctk.CTkButton = None
 
         ConfigKeys.load_values_from_json()
-        Logger.load_values_from_json()
 
-        Logger.write_log("Application started", Logger.LogType.INFO)
+        self._logger.info("Application started")
 
         # read data from json to get path from last session
         listRes = js.JSONPreferences.ReadFromJSON()
@@ -1225,7 +1229,7 @@ class App():
             self._button_5.grid_forget()
 
     def _log_out(self):
-        Logger.write_log(f"Logging out", Logger.LogType.INFO)
+        self._logger.info(f"Logging out")
         self._forget_username_menu_item()
         FrameController.show_frame(self._common.get_frames()[LoginFrame])
 
@@ -1234,7 +1238,7 @@ class App():
         self._change_app_appearance_profile(mode)
 
     def _change_app_appearance_profile(self, appearance: str = ''):
-        Logger.write_log(f"Changing appearance to {appearance}", Logger.LogType.INFO)
+        self._logger.info(f"Changing appearance to {appearance}")
 
         if appearance is None or appearance == '':
             appearance = self._common.get_appearance()

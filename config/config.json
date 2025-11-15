@@ -11,7 +11,7 @@
     "SHARD_EMAIL": "assistenza.shard@gmail.com",
     "PREFERENCE_FILE": "preferences.json",
     "CONFIG_FILE": "config.json",
-    "LOG_FILE": "logs.txt",
+    "LOG_FILE": "logs.log",
     "CONFIG_DIR": "./config/",
     "VERSION": "1.0.3",
     "APP_WIDTH": 1100,
@@ -38,10 +38,7 @@
         "description": "Timeout in seconds for generating charts"
     },
     "LogService": {
-        "ERROR": true,
-        "INFO": true,
-        "WARN": true,
-        "DEBUG": true,
+        "Level": "DEBUG",
         "MaxLines": {
             "value": 10000,
             "type": "int",

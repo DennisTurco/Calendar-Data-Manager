@@ -9,7 +9,7 @@ from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 
-from Logger import Logger
+from LogService import LogService
 
 class CalendarEventsManager:
 
@@ -29,7 +29,7 @@ class CalendarEventsManager:
         email = user_info.get('email')
         picture_url = user_info.get('picture')
 
-        Logger.write_log(f"User '{name}' logged with email '{email}'", Logger.LogType.INFO)
+        LogService.get_logger(__name__).info(f"User '{name}' logged with email '{email}'")
 
         return name, email, picture_url
 
@@ -383,7 +383,7 @@ class CalendarEventsManager:
             raise Exception(f"An error occurred: {str(generic_exception)}")
 
     @staticmethod
-    def editEventsTitleByTitle(creds: Credentials, old_title: str, new_title: str, start_date: Optional[datetime] = None, end_date: Optional[datetime] = None):
+    def editEventsTitleByTitle(creds: Credentials, old_title: str, new_title: str, start_date: Optional[datetime.datetime] = None, end_date: Optional[datetime.datetime] = None):
         if creds == None: raise ValueError("Credentials can't be null")
         if old_title == None: raise ValueError("Old Title can't be empty")
         if new_title == None: raise ValueError("New Title can't be empty")
@@ -420,7 +420,7 @@ class CalendarEventsManager:
 
     # TODO: test me
     @staticmethod
-    def editEventDateByID(creds: Credentials, ID: str, start_date: datetime, end_date: datetime, timeZone: str = 'UTC'):
+    def editEventDateByID(creds: Credentials, ID: str, start_date: datetime.datetime, end_date: datetime.datetime, timeZone: str = 'UTC'):
         if creds == None: raise ValueError("Credentials can't be null")
         if ID == None: raise ValueError("ID can't be null")
         if start_date == None or end_date == None: raise ValueError("Date can't be empty")

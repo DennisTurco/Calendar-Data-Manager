@@ -12,7 +12,7 @@ import traceback
 import tempfile
 
 import tkinter
-from Logger import Logger
+from LogService import LogService
 from tkinter import filedialog
 import customtkinter as ctk
 from CTkScrollableDropdown import *
@@ -38,6 +38,7 @@ class CommonOperations():
     credentials: Optional[Credentials]
     credentials_path: Optional[str]
     _frames = {}
+    _logger = LogService.get_logger(__name__)
 
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
@@ -77,7 +78,7 @@ class CommonOperations():
         if msg.get() == "View Details": self.messagebox_exception_error_window(error_message)
 
     def messagebox_exception_error_window(self, error):
-        Logger.write_log(f"Opening message exception error window", Logger.LogType.INFO)
+        self._logger.info(f"Opening message exception error window")
 
         if hasattr(self, "toplevel_window") and self.toplevel_window.winfo_exists():
             self.toplevel_window.focus()  # If window exists, focus it
@@ -133,12 +134,12 @@ class CommonOperations():
     @staticmethod
     def check_file_path_errors(log_box, filepath):
         if filepath is None or len(filepath) == 0:
+            LogService.get_logger(__name__).warning("ERROR: file path is missing")
             CommonOperations.write_log(log_box, f"ERROR: file path is missing")
-            Logger.write_log("ERROR: file path is missing", Logger.LogType.WARN)
             return True
 
         if not os.path.exists(filepath):
-            Logger.write_log(f"ERROR: file '{filepath}' doesn't found", Logger.LogType.WARN)
+            LogService.get_logger(__name__).warning(f"ERROR: file '{filepath}' doesn't found")
             CommonOperations.write_log(log_box, f"ERROR: file '{filepath}' doesn't found")
             return True
 
@@ -147,7 +148,7 @@ class CommonOperations():
         file_path = filedialog.askopenfilename(title="Select file where do you want to save data", filetypes=(("CSV files", "*.csv"), ("TXT files", "*.txt"), ("All files", "*.*")))
         entry.delete("0", tkinter.END)
         entry.insert("0", file_path)
-        Logger.write_log(f"File '{file_path}' selected", Logger.LogType.INFO)
+        LogService.get_logger(__name__).info("ERROR: file path is missing")
         CommonOperations.write_log(logbox, f"File '{file_path}' selected")
         return file_path
 
@@ -167,12 +168,12 @@ class CommonOperations():
         full_date_str = full_date.strftime(DATE_FORMATTER)
 
         if type == 1:
-            Logger.write_log(f"Date Selected From: {full_date_str}", Logger.LogType.INFO)
+            LogService.get_logger(__name__).info(f"Date Selected From: {full_date_str}")
             CommonOperations.write_log(log_box, f"Date Selected From: {full_date_str}")
             entry_date_from.delete("0", tkinter.END)
             entry_date_from.insert("0", full_date_str)
         elif type == 2:
-            Logger.write_log(f"Date Selected To: {full_date_str}", Logger.LogType.INFO)
+            LogService.get_logger(__name__).info(f"Date Selected To: {full_date_str}")
             CommonOperations.write_log(log_box, f"Date Selected To: {full_date_str}")
             entry_date_to.delete("0", tkinter.END)
             entry_date_to.insert("0", full_date_str)
@@ -183,7 +184,7 @@ class CommonOperations():
 
     @staticmethod
     def date_picker_window(type, toplevel_window, entry_date_from, entry_date_to, log_box) -> ctk.CTkToplevel:
-        Logger.write_log("Opening date picker", Logger.LogType.INFO)
+        LogService.get_logger(__name__).info("Opening date picker")
 
         if toplevel_window is None or not toplevel_window.winfo_exists():
             toplevel_window = ctk.CTkToplevel() # create window if its None or destroyed
@@ -279,7 +280,7 @@ class CommonOperations():
                 file_viewer.insert(tkinter.END, file_content)
 
             toplevel_window.attributes("-topmost", True) # focus to this windows
-            Logger.write_log(f"file '{filepath}' opened", Logger.LogType.INFO)
+            LogService.get_logger(__name__).info(f"file '{filepath}' opened")
             CommonOperations.write_log(log_box, f"file '{filepath}' opened")
             CommonOperations.centerTopLevel(toplevel_window)
         else:
@@ -305,11 +306,11 @@ class CommonOperations():
                         counter += 1
 
             if len(events) == 0:
-                Logger.write_log(f"file '{filepath}' is empty", Logger.LogType.INFO)
+                LogService.get_logger(__name__).info(f"file '{filepath}' is empty")
                 CommonOperations.write_log(log_box, f"file '{filepath}' is empty")
                 return
             elif len(events) > 200:
-                Logger.write_log(f"unable to display table preview: the file '{filepath}' is too large.", Logger.LogType.INFO)
+                LogService.get_logger(__name__).info(f"unable to display table preview: the file '{filepath}' is too large.")
                 CommonOperations.write_log(log_box, f"unable to display table preview: the file '{filepath}' is too large.")
                 return
 
@@ -324,7 +325,7 @@ class CommonOperations():
             table.pack()
 
             toplevel_window.attributes("-topmost", True)  # focus to this window
-            Logger.write_log(f"file '{filepath}' opened", Logger.LogType.INFO)
+            LogService.get_logger(__name__).info(f"file '{filepath}' opened")
             CommonOperations.write_log(log_box, f"file '{filepath}' opened")
             CommonOperations.centerTopLevel(toplevel_window)
         else:
@@ -344,7 +345,7 @@ class CommonOperations():
     @staticmethod
     def change_color_theme(color_theme: str):
         if color_theme == None: return
-        Logger.write_log(f"Changing color theme to: {color_theme}", Logger.LogType.INFO)
+        LogService.get_logger(__name__).info(f"Changing color theme to: {color_theme}")
         ctk.set_default_color_theme(color_theme)
         js.JSONPreferences.WriteColorThemeToJSON(color_theme)
 
@@ -356,7 +357,7 @@ class CommonOperations():
 
     @staticmethod
     def open_info_section_dialog(root, title: str, section_message):
-        Logger.write_log(f"Opening info section '{title}'", Logger.LogType.INFO)
+        LogService.get_logger(__name__).info(f"Opening info section '{title}'")
 
         # Create a dialog window with a CTkTextbox
         dialog = ctk.CTkToplevel(root)

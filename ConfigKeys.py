@@ -19,7 +19,7 @@ class ConfigKeys:
         CONFIG_DIR = "./config/"
         CONFIG_FILE = "config.json"
         PREFERENCE_FILE = "preferences.json"
-        LOG_FILE = "logs.txt"
+        LOG_FILE = "logs.log"
         GRAPH_TIMEOUT = 10
         HOMEBUTTONS_MESSAGESECTION = True
         HOMEBUTTONS_GITHUB = True
@@ -33,6 +33,9 @@ class ConfigKeys:
         MENUITEM_APPEARANCE = True
         MENUITEM_SHARE = True
         MENUITEM_DONATE = True
+        LOG_SERVICE_LEVEL = "DEBUG"
+        LOG_SERVICE_MAXLINES = 1000
+        LOG_SERVICE_LINESTOKEEP = 3000
 
         @classmethod
         def _set(cls, key: str, value: bool):
@@ -79,7 +82,10 @@ class ConfigKeys:
             ConfigKeys.Keys._set('HOMEBUTTONS_GITHUB', data['HomeButtons']['Github'])
             ConfigKeys.Keys._set('HOMEBUTTONS_BUYMEACOFFE', data['HomeButtons']['BuyMeACoffe'])
             ConfigKeys.Keys._set('HOMEBUTTONS_PAYPAL', data['HomeButtons']['Paypal'])
-            ConfigKeys.Keys._set('GRAPH_TIMEOUT', data['GraphTimeout']['value']) 
+            ConfigKeys.Keys._set('GRAPH_TIMEOUT', data['GraphTimeout']['value'])
+            ConfigKeys.Keys._set('LOG_SERVICE_LEVEL', data['LogService']['Level'])
+            ConfigKeys.Keys._set('LOG_SERVICE_MAXLINES', data['LogService']['MaxLines']['value'])
+            ConfigKeys.Keys._set('LOG_SERVICE_LINESTOKEEP', data['LogService']['LinesToKeepAfterFileClear']['value'])
 
         except (FileNotFoundError, KeyError, json.JSONDecodeError) as e:
             print(f"Error loading log type values from JSON: {e}")
