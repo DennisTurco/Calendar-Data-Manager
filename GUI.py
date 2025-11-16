@@ -3,26 +3,16 @@ from datetime import datetime, timedelta
 import glob
 from io import BytesIO
 import tempfile
-from ExceptionHandler import ExceptionHandler
-from InformationMessages import InformationMessages
-from LogService import LogService
 import threading
 from typing import Any, Final, List, Optional
 import webbrowser
 import os
-
 from googleapiclient.discovery import build
 import requests
 from PIL import Image as pilImage, ImageTk, ImageDraw
-
-from ConfigKeys import ConfigKeys
-import JSONPreferences as js
-import CalendarEventsManager as gc
-import Plotter
 from DataEditor import DataCSV
 import pandas as pandas
 import warnings
-
 import tkinter
 from tkinter import filedialog
 import customtkinter as ctk
@@ -34,11 +24,18 @@ from CTkTable import *
 from CTkScrollableDropdown import *
 from CTkXYFrame import *
 
+from ConfigKeys import ConfigKeys
+from ExceptionHandler import ExceptionHandler
+from InformationMessages import InformationMessages
+from services.EventsService import EventsService
+from entities.EventInfo import EventInfo
+from LogService import LogService
 from CommonOperations import CommonOperations
 import GUIWidgets
 import FrameController
+import JSONPreferences as js
+import Plotter
 
-# consts
 TIMEZONE: Final[List[str]] = ['Africa/Abidjan', 'Africa/Accra', 'Africa/Algiers', 'Africa/Bissau', 'Africa/Cairo', 'Africa/Casablanca', 'Africa/Ceuta', 'Africa/El_Aaiun', 'Africa/Juba', 'Africa/Khartoum', 'Africa/Lagos', 'Africa/Maputo', 'Africa/Monrovia', 'Africa/Nairobi', 'Africa/Ndjamena', 'Africa/Sao_Tome', 'Africa/Tripoli', 'Africa/Tunis', 'Africa/Windhoek', 'America/Adak', 'America/Anchorage', 'America/Araguaina', 'America/Argentina/Buenos_Aires', 'America/Argentina/Catamarca', 'America/Argentina/Cordoba', 'America/Argentina/Jujuy', 'America/Argentina/La_Rioja', 'America/Argentina/Mendoza', 'America/Argentina/Rio_Gallegos', 'America/Argentina/Salta', 'America/Argentina/San_Juan', 'America/Argentina/San_Luis', 'America/Argentina/Tucuman', 'America/Argentina/Ushuaia', 'America/Asuncion', 'America/Atikokan', 'America/Bahia', 'America/Bahia_Banderas', 'America/Barbados', 'America/Belem', 'America/Belize', 'America/Blanc-Sablon', 'America/Boa_Vista', 'America/Bogota', 'America/Boise', 'America/Cambridge_Bay', 'America/Campo_Grande', 'America/Cancun', 'America/Caracas', 'America/Cayenne', 'America/Chicago', 'America/Chihuahua', 'America/Costa_Rica', 'America/Creston', 'America/Cuiaba', 'America/Curacao', 'America/Danmarkshavn', 'America/Dawson', 'America/Dawson_Creek', 'America/Denver', 'America/Detroit', 'America/Edmonton', 'America/Eirunepe', 'America/El_Salvador', 'America/Fort_Nelson', 'America/Fortaleza', 'America/Glace_Bay', 'America/Godthab', 'America/Goose_Bay', 'America/Grand_Turk', 'America/Guatemala', 'America/Guayaquil', 'America/Guyana', 'America/Halifax', 'America/Havana', 'America/Hermosillo', 'America/Indiana/Indianapolis', 'America/Indiana/Knox', 'America/Indiana/Marengo', 'America/Indiana/Petersburg', 'America/Indiana/Tell_City', 'America/Indiana/Vevay', 'America/Indiana/Vincennes', 'America/Indiana/Winamac', 'America/Inuvik', 'America/Iqaluit', 'America/Jamaica', 'America/Juneau', 'America/Kentucky/Louisville', 'America/Kentucky/Monticello', 'America/Kralendijk', 'America/La_Paz', 'America/Lima', 'America/Los_Angeles', 'America/Louisville', 'America/Lower_Princes', 'America/Maceio', 'America/Managua', 'America/Manaus', 'America/Marigot', 'America/Martinique', 'America/Matamoros', 'America/Mazatlan', 'America/Menominee', 'America/Merida', 'America/Metlakatla', 'America/Mexico_City', 'America/Miquelon', 'America/Moncton', 'America/Monterrey', 'America/Montevideo', 'America/Montreal', 'America/Montserrat', 'America/Nassau', 'America/New_York', 'America/Nipigon', 'America/Nome', 'America/Noronha', 'America/North_Dakota/Beulah', 'America/North_Dakota/Center', 'America/North_Dakota/New_Salem', 'America/Nuuk', 'America/Ojinaga', 'America/Panama', 'America/Pangnirtung', 'America/Paramaribo', 'America/Phoenix', 'America/Port-au-Prince', 'America/Port_of_Spain', 'America/Porto_Acre', 'America/Porto_Velho', 'America/Puerto_Rico', 'America/Punta_Arenas', 'America/Rainy_River', 'America/Rankin_Inlet', 'America/Recife', 'America/Regina', 'America/Resolute', 'America/Rio_Branco', 'America/Santarem', 'America/Santiago', 'America/Santo_Domingo', 'America/Sao_Paulo', 'America/Scoresbysund', 'America/Sitka', 'America/St_Barthelemy', 'America/St_Johns', 'America/St_Kitts', 'America/St_Lucia', 'America/St_Thomas', 'America/St_Vincent', 'America/Swift_Current', 'America/Tegucigalpa', 'America/Thule', 'America/Thunder_Bay', 'America/Tijuana', 'America/Toronto', 'America/Tortola', 'America/Vancouver', 'America/Whitehorse', 'America/Winnipeg', 'America/Yakutat', 'America/Yellowknife', 'Antarctica/Casey', 'Antarctica/Davis', 'Antarctica/DumontDUrville', 'Antarctica/Macquarie', 'Antarctica/Mawson', 'Antarctica/McMurdo', 'Antarctica/Palmer', 'Antarctica/Rothera', 'Antarctica/Syowa', 'Antarctica/Troll', 'Antarctica/Vostok', 'Arctic/Longyearbyen', 'Asia/Aden', 'Asia/Almaty', 'Asia/Amman', 'Asia/Anadyr', 'Asia/Aqtau', 'Asia/Aqtobe', 'Asia/Ashgabat', 'Asia/Atyrau', 'Asia/Baghdad', 'Asia/Bahrain', 'Asia/Baku', 'Asia/Bangkok', 'Asia/Barnaul', 'Asia/Beirut', 'Asia/Bishkek', 'Asia/Brunei', 'Asia/Chita', 'Asia/Choibalsan', 'Asia/Colombo', 'Asia/Damascus', 'Asia/Dhaka', 'Asia/Dili', 'Asia/Dubai', 'Asia/Dushanbe', 'Asia/Famagusta', 'Asia/Gaza', 'Asia/Hebron', 'Asia/Ho_Chi_Minh', 'Asia/Hong_Kong', 'Asia/Hovd', 'Asia/Irkutsk', 'Asia/Istanbul', 'Asia/Jakarta', 'Asia/Jayapura', 'Asia/Jerusalem', 'Asia/Kabul', 'Asia/Kamchatka', 'Asia/Karachi', 'Asia/Kathmandu', 'Asia/Khandyga', 'Asia/Kolkata', 'Asia/Krasnoyarsk', 'Asia/Kuala_Lumpur', 'Asia/Kuching', 'Asia/Kuwait', 'Asia/Macau', 'Asia/Magadan', 'Asia/Makassar', 'Asia/Manila', 'Asia/Muscat', 'Asia/Nicosia', 'Asia/Novokuznetsk', 'Asia/Novosibirsk', 'Asia/Omsk', 'Asia/Oral', 'Asia/Phnom_Penh', 'Asia/Pontianak', 'Asia/Pyongyang', 'Asia/Qatar', 'Asia/Qostanay', 'Asia/Qyzylorda', 'Asia/Riyadh', 'Asia/Sakhalin', 'Asia/Samarkand', 'Asia/Seoul', 'Asia/Shanghai', 'Asia/Singapore', 'Asia/Srednekolymsk', 'Asia/Taipei', 'Asia/Tashkent', 'Asia/Tbilisi', 'Asia/Tehran', 'Asia/Thimphu', 'Asia/Tokyo', 'Asia/Tomsk', 'Asia/Ulaanbaatar', 'Asia/Urumqi', 'Asia/Ust-Nera', 'Asia/Vientiane', 'Asia/Vladivostok', 'Asia/Yakutsk', 'Asia/Yangon', 'Asia/Yekaterinburg', 'Asia/Yerevan', 'Atlantic/Azores', 'Atlantic/Bermuda', 'Atlantic/Canary', 'Atlantic/Cape_Verde', 'Atlantic/Faroe', 'Atlantic/Madeira', 'Atlantic/Reykjavik', 'Atlantic/South_Georgia', 'Atlantic/St_Helena', 'Atlantic/Stanley', 'Australia/Adelaide', 'Australia/Brisbane', 'Australia/Broken_Hill', 'Australia/Currie', 'Australia/Darwin', 'Australia/Eucla', 'Australia/Hobart', 'Australia/Lindeman', 'Australia/Lord_Howe', 'Australia/Melbourne', 'Australia/Perth', 'Australia/Sydney', 'Canada/Atlantic', 'Canada/Central', 'Canada/Eastern', 'Canada/Mountain', 'Canada/Newfoundland', 'Canada/Pacific', 'Europe/Amsterdam', 'Europe/Andorra', 'Europe/Astrakhan', 'Europe/Athens', 'Europe/Belgrade', 'Europe/Berlin', 'Europe/Bratislava', 'Europe/Brussels', 'Europe/Bucharest', 'Europe/Budapest', 'Europe/Busingen', 'Europe/Chisinau', 'Europe/Copenhagen', 'Europe/Dublin', 'Europe/Gibraltar', 'Europe/Guernsey', 'Europe/Helsinki', 'Europe/Isle_of_Man', 'Europe/Istanbul', 'Europe/Jersey', 'Europe/Kaliningrad', 'Europe/Kiev', 'Europe/Kirov', 'Europe/Lisbon', 'Europe/Ljubljana', 'Europe/London', 'Europe/Luxembourg', 'Europe/Madrid', 'Europe/Malta', 'Europe/Mariehamn', 'Europe/Minsk', 'Europe/Monaco', 'Europe/Moscow', 'Europe/Oslo', 'Europe/Paris', 'Europe/Podgorica', 'Europe/Prague', 'Europe/Riga', 'Europe/Rome', 'Europe/Samara', 'Europe/San_Marino', 'Europe/Sarajevo', 'Europe/Saratov', 'Europe/Simferopol', 'Europe/Skopje', 'Europe/Sofia', 'Europe/Stockholm', 'Europe/Tallinn', 'Europe/Tirane', 'Europe/Ulyanovsk', 'Europe/Uzhgorod', 'Europe/Vaduz', 'Europe/Vatican', 'Europe/Vienna', 'Europe/Vilnius', 'Europe/Volgograd', 'Europe/Warsaw', 'Europe/Zagreb', 'Europe/Zaporozhye', 'Europe/Zurich', 'GMT', 'Indian/Antananarivo', 'Indian/Chagos', 'Indian/Christmas', 'Indian/Cocos', 'Indian/Comoro', 'Indian/Kerguelen', 'Indian/Mahe', 'Indian/Maldives', 'Indian/Mauritius', 'Indian/Mayotte', 'Indian/Reunion', 'Pacific/Apia', 'Pacific/Auckland', 'Pacific/Bougainville', 'Pacific/Chatham', 'Pacific/Chuuk', 'Pacific/Easter', 'Pacific/Efate', 'Pacific/Enderbury', 'Pacific/Fakaofo', 'Pacific/Fiji', 'Pacific/Funafuti', 'Pacific/Galapagos', 'Pacific/Gambier', 'Pacific/Guadalcanal', 'Pacific/Guam', 'Pacific/Honolulu', 'Pacific/Kiritimati', 'Pacific/Kosrae', 'Pacific/Kwajalein', 'Pacific/Majuro', 'Pacific/Marquesas', 'Pacific/Midway', 'Pacific/Nauru', 'Pacific/Niue', 'Pacific/Norfolk', 'Pacific/Noumea', 'Pacific/Pago_Pago', 'Pacific/Palau', 'Pacific/Pitcairn', 'Pacific/Pohnpei', 'Pacific/Port_Moresby', 'Pacific/Rarotonga', 'Pacific/Saipan', 'Pacific/Tahiti', 'Pacific/Tarawa', 'Pacific/Tongatapu', 'Pacific/Wake', 'Pacific/Wallis', 'UTC']
 
 DATE_FORMATTER: Final[str] = '%d-%m-%Y %H:%M'
@@ -76,6 +73,7 @@ class NewEventsFrame(ctk.CTkFrame):
     def __init__(self, parent, _):
         ctk.CTkFrame.__init__(self, parent)
         img = Images()
+        self.event_service = EventsService(self._common)
 
         # configure grid layout (4x4)
         self.grid_columnconfigure(1, weight=1)
@@ -117,21 +115,20 @@ class NewEventsFrame(ctk.CTkFrame):
         label_color = ctk.CTkLabel(main_frame, text="Color:")
         label_color.grid(row=2, column=0, padx=10, pady=(10, 0), sticky="e")
         self.multi_selection = ctk.CTkComboBox(main_frame, state="readonly")
-        CTkScrollableDropdown(self.multi_selection, values=list(ConfigKeys.Keys.EVENT_COLOR.value.keys()), button_color="transparent", command=self.combobox_callback)
+        CTkScrollableDropdown(self.multi_selection, values=list(ConfigKeys.Keys.EVENT_COLOR.value.keys()), button_color="transparent", command=self.__combobox_callback)
         self.multi_selection.configure(button_color=ConfigKeys.Keys.EVENT_COLOR.value.get("Light Blue"))
         self.multi_selection.set("Light Blue")
         self.multi_selection.grid(row=2, column=1, padx=0, pady=(10, 10), sticky="w")
 
         # date
         (self.entry_date_from, self.entry_date_to, self.timezone_selection, entry_date_button, entry_date_button2) = GUIWidgets.create_date_interval_scroll_frame(self, img.calendar_image, TIMEZONE)
-        entry_date_button.configure(command=lambda: self.date_picker(1))
-        entry_date_button2.configure(command=lambda: self.date_picker(2))
+        entry_date_button.configure(command=lambda: self.__date_picker(1))
+        entry_date_button2.configure(command=lambda: self.__date_picker(2))
 
         # create button
-        self.create_button = ctk.CTkButton(self, image=img.plus_image, text="Create", border_width=2, command=self.create_event)
+        self.create_button = ctk.CTkButton(self, image=img.plus_image, text="Create", border_width=2, command=self.__create_event)
         self.create_button.grid(row=3, column=1, padx=20, pady=20)
 
-        # Tooltips
         CTkToolTip(self.entry_summary, delay=0.3, message="(Required) Insert event title")
         CTkToolTip(self.entry_description, delay=0.3, message="(Optional) Insert event description")
         CTkToolTip(self.multi_selection, delay=0.3, message="(Required) Choose event color")
@@ -145,7 +142,7 @@ class NewEventsFrame(ctk.CTkFrame):
         self.log_box.bind("<Key>", lambda e: "break")  # set the textbox readonly
         self.log_box.grid(row=4, column=1, columnspan=2, padx=(0, 0), pady=(20, 0), sticky="nsew")
 
-    def create_event(self):
+    def __create_event(self):
         self._logger.info("Creating event")
         summary = self.entry_summary.get()
         date_from = self.entry_date_from.get()
@@ -164,30 +161,28 @@ class NewEventsFrame(ctk.CTkFrame):
             self._common.write_log(self.log_box, f"Error on creating event: date is missing")
             return
         try:
-            date_from = datetime.strptime(date_from, DATE_FORMATTER)
-            date_to = datetime.strptime(date_to, DATE_FORMATTER)
+            date_from = datetime.strptime(date_from, DATE_FORMATTER) if (len(date_from) != 0) else None
+            date_to = datetime.strptime(date_to, DATE_FORMATTER) if (len(date_to) != 0) else None
+
+            color_index = self._common.get_color_id(ConfigKeys.Keys.EVENT_COLOR.value, self.multi_selection.get())
+
+            event_info = EventInfo(summary, str(self.entry_description), date_from, date_to, color_index, time_zone)
+            self.event_service.create_event(event_info)
+            self._logger.info(f"Event '{summary}' created succesfully!")
+            self._common.write_log(self.log_box, f"Event '{summary}' created succesfully!")
         except ValueError as error:
             self._logger.error(f"Error on creating event: date format is not correct")
             self._common.write_log(self.log_box, f"Error on creating event: date format is not correct")
-            return
-
-        # get color index
-        color_index = self._common.get_color_id(ConfigKeys.Keys.EVENT_COLOR.value, self.multi_selection.get())
-
-        try:
-            gc.CalendarEventsManager.createEvent(self._common.get_credentials(), summary, self.entry_description.get("0.0", tkinter.END), date_from, date_to, color_index, timeZone=time_zone)
-            self._logger.info(f"Event '{summary}' created succesfully!")
-            self._common.write_log(self.log_box, f"Event '{summary}' created succesfully!")
         except Exception as error:
-                ExceptionHandler.handle_exception(self._common, self.log_box, error)
+            ExceptionHandler.handle_exception(self._common, self.log_box, error)
 
-    def combobox_callback(self, color):
+    def __combobox_callback(self, color):
         self.multi_selection.configure(button_color=ConfigKeys.Keys.EVENT_COLOR.value.get(color))
         self.multi_selection.set(color)
         self._logger.info(f"color '{color}' selected")
         self._common.write_log(self.log_box, f"color '{color}' selected")
 
-    def date_picker(self, type):
+    def __date_picker(self, type):
         self.toplevel_window = self._common.date_picker_window(type, self.toplevel_window, self.entry_date_from, self.entry_date_to, self.log_box)
 #?###########################################################
 
@@ -203,6 +198,7 @@ class EditEventsFrame(ctk.CTkFrame):
     def __init__(self, parent, _):
         ctk.CTkFrame.__init__(self, parent)
         img = Images()
+        self.event_service = EventsService(self._common)
 
         self.event_color_from["No Color Filtering"] = "" # adding a new element inside the dictionary
 
@@ -235,23 +231,23 @@ class EditEventsFrame(ctk.CTkFrame):
         main_frame.grid_columnconfigure((0, 1, 2), weight=1)
 
         # old main values
-        self.old_values_frame = ctk.CTkFrame(main_frame)
-        self.old_values_frame.grid(row=1, column=0, padx=25, pady=10, sticky="ew")
-        self.old_values_frame.grid_columnconfigure((0, 1, 2), weight=1)
-        self.label_frame_old = ctk.CTkLabel(self.old_values_frame, text="OLD Values")
-        self.label_frame_old.grid(row=0, column=0, columnspan=3, padx=0, pady=0, sticky="ew")
-        label_summary_old = ctk.CTkLabel(self.old_values_frame, text="Summary:")
+        old_values_frame = ctk.CTkFrame(main_frame)
+        old_values_frame.grid(row=1, column=0, padx=25, pady=10, sticky="ew")
+        old_values_frame.grid_columnconfigure((0, 1, 2), weight=1)
+        label_frame_old = ctk.CTkLabel(old_values_frame, text="OLD Values")
+        label_frame_old.grid(row=0, column=0, columnspan=3, padx=0, pady=0, sticky="ew")
+        label_summary_old = ctk.CTkLabel(old_values_frame, text="Summary:")
         label_summary_old.grid(row=1, column=0, padx=10, pady=5, sticky="e")
-        self.entry_summary_old = ctk.CTkEntry(self.old_values_frame, placeholder_text="summary")
+        self.entry_summary_old = ctk.CTkEntry(old_values_frame, placeholder_text="summary")
         self.entry_summary_old.grid(row=1, column=1, columnspan=2, padx=(10, 10), pady=5, sticky="w")
-        label_description_old = ctk.CTkLabel(self.old_values_frame, text="Description:")
+        label_description_old = ctk.CTkLabel(old_values_frame, text="Description:")
         label_description_old.grid(row=2, column=0, padx=10, pady=5, sticky="e")
-        self.entry_description_old = ctk.CTkTextbox(self.old_values_frame, width=250, height=100)
+        self.entry_description_old = ctk.CTkTextbox(old_values_frame, width=250, height=100)
         self.entry_description_old.grid(row=2, column=1, padx=(0, 0), pady=5, sticky="ew")
-        label_color_old = ctk.CTkLabel(self.old_values_frame, text="Color:")
+        label_color_old = ctk.CTkLabel(old_values_frame, text="Color:")
         label_color_old.grid(row=3, column=0, padx=10, pady=5, sticky="e")
-        self.multi_selection_old = ctk.CTkComboBox(self.old_values_frame, state="readonly")
-        CTkScrollableDropdown(self.multi_selection_old, values=list(self.event_color_from.keys()), button_color="transparent", command=self.combobox_callback_color1)
+        self.multi_selection_old = ctk.CTkComboBox(old_values_frame, state="readonly")
+        CTkScrollableDropdown(self.multi_selection_old, values=list(self.event_color_from.keys()), button_color="transparent", command=self.__combobox_callback_color1)
         self.multi_selection_old.configure(button_color=self.event_color_from.get("No Color Filtering"))
         self.multi_selection_old.set("No Color Filtering")
         self.multi_selection_old.grid(row=3, column=1, padx=0, pady=5, sticky="w")
@@ -276,21 +272,20 @@ class EditEventsFrame(ctk.CTkFrame):
         label_color_new = ctk.CTkLabel(new_values_frame, text="Color:")
         label_color_new.grid(row=3, column=0, padx=10, pady=5, sticky="e")
         self.multi_selection_new = ctk.CTkComboBox(new_values_frame, state="readonly")
-        CTkScrollableDropdown(self.multi_selection_new, values=list(ConfigKeys.Keys.EVENT_COLOR.value.keys()), button_color="transparent", command=self.combobox_callback_color2)
+        CTkScrollableDropdown(self.multi_selection_new, values=list(ConfigKeys.Keys.EVENT_COLOR.value.keys()), button_color="transparent", command=self.__combobox_callback_color2)
         self.multi_selection_new.configure(button_color=ConfigKeys.Keys.EVENT_COLOR.value.get("Light Blue"))
         self.multi_selection_new.set("Light Blue")
         self.multi_selection_new.grid(row=3, column=1, padx=0, pady=5, sticky="w")
 
         # date
         (self.entry_date_from, self.entry_date_to, self.timezone_selection, entry_date_button, entry_date_button2) = GUIWidgets.create_date_interval_scroll_frame(self, img.calendar_image, TIMEZONE)
-        entry_date_button.configure(command=lambda: self.date_picker(1))
-        entry_date_button2.configure(command=lambda: self.date_picker(2))
+        entry_date_button.configure(command=lambda: self.__date_picker(1))
+        entry_date_button2.configure(command=lambda: self.__date_picker(2))
 
         # edit button
-        self.edit_button = ctk.CTkButton(self, image=img.edit_image, text="Edit", border_width=2, command=self.edit_events)
-        self.edit_button.grid(row=3, column=1, columnspan=2, padx=20, pady=20)
+        edit_button = ctk.CTkButton(self, image=img.edit_image, text="Edit", border_width=2, command=self.__edit_events)
+        edit_button.grid(row=3, column=1, columnspan=2, padx=20, pady=20)
 
-        # Tooltips
         CTkToolTip(self.entry_summary_old, delay=0.3, message="(Required) Insert OLD event title")
         CTkToolTip(self.entry_description_old, delay=0.3, message="(Optional) Insert the OLD event description")
         CTkToolTip(self.multi_selection_old, delay=0.3, message="(Optional) Choose OLD event color")
@@ -300,17 +295,17 @@ class EditEventsFrame(ctk.CTkFrame):
         CTkToolTip(self.entry_date_from, delay=0.3, message="(Optional) Enter date from")
         CTkToolTip(self.entry_date_to, delay=0.3, message="(Optional) Enter date to")
         CTkToolTip(self.timezone_selection, delay=0.3, message="(Optional) Choose time zone")
-        CTkToolTip(self.edit_button, delay=0.3, message="Edit events")
+        CTkToolTip(edit_button, delay=0.3, message="Edit events")
 
         # create log textbox
         self.log_box = ctk.CTkTextbox(self, width=250, height=100)
         self.log_box.bind("<Key>", lambda e: "break")  # set the textbox readonly
         self.log_box.grid(row=4, column=1, columnspan=2, padx=(0, 0), pady=(20, 0), sticky="nsew")
 
-    def date_picker(self, type):
+    def __date_picker(self, type):
         self.date_picker_window = CommonOperations.date_picker_window(type, self.date_picker_window, self.entry_date_from, self.entry_date_to, self.log_box)
 
-    def edit_events(self):
+    def __edit_events(self):
         self._logger.info("Editing events")
 
         # Get OLD values
@@ -338,80 +333,48 @@ class EditEventsFrame(ctk.CTkFrame):
 
         try:
             # Parse dates if provided
-            if date_from:
-                date_from = datetime.strptime(date_from, DATE_FORMATTER)
-            if date_to:
-                date_to = datetime.strptime(date_to, DATE_FORMATTER)
-        except ValueError:
-            self._logger.error("ERROR: Invalid date format")
-            CommonOperations.write_log(self.log_box, "ERROR: Invalid date format")
-            return
+            date_from = datetime.strptime(date_from, DATE_FORMATTER) if (len(date_from) != 0) else None
+            date_to = datetime.strptime(date_to, DATE_FORMATTER) if (len(date_to) != 0) else None
 
-        time_zone = self.timezone_selection.get()
-        CommonOperations.set_timezone(time_zone)
+            time_zone = self.timezone_selection.get()
+            CommonOperations.set_timezone(time_zone)
 
-        try:
             # Retrieve events to edit
-            old_events = gc.CalendarEventsManager.getEvents(
-                self._common.get_credentials(),
-                title=summary_old,
-                description=description_old,
-                start_date=date_from,
-                end_date=date_to,
-                time_zone=time_zone,
-                color_id=color_index_old
-            )
+            event_info = EventInfo(summary_old, description_old, date_from, date_to, color_index_old, time_zone)
+            old_events = self.event_service.fetch_events(event_info)
 
             if not old_events:
                 self._logger.info("No events found")
                 CommonOperations.write_log(self.log_box, "No events found")
-            else:
-                # Simulate event updates without applying them
-                new_events = gc.CalendarEventsManager.simulateEventUpdates(
-                    self._common.get_credentials(),
-                    old_events,
-                    summary_new,
-                    description_new,
-                    color_index_new,
-                    date_from,
-                    date_to,
-                    time_zone
-                )
-                # Show the list of old and new events for comparison
-                self.events_list_viewer_window(old_events, new_events, summary_new, description_new, color_index_new, date_from, date_to, time_zone)
 
-        # Handle various exceptions
+            event_info = EventInfo(summary_new, description_new, date_from, date_to, color_index_old, time_zone)
+            new_events = self.event_service.simulate_update_events(event_info, old_events)
+            self.events_list_viewer_window(old_events, new_events, summary_new, description_new, color_index_new, date_from, date_to, time_zone)
+        except ValueError:
+            self._logger.error("ERROR: Invalid date format")
+            CommonOperations.write_log(self.log_box, "ERROR: Invalid date format")
         except Exception as error:
             ExceptionHandler.handle_exception(self._common, self.log_box, error)
 
-    def combobox_callback_color1(self, color):
+    def __combobox_callback_color1(self, color):
         self.multi_selection_old.configure(button_color=self.event_color_from.get(color))
         self.multi_selection_old.set(color)
         self._logger.info(f"Old color '{color}' selected")
         CommonOperations.write_log(self.log_box, f"color '{color}' selected")
 
-    def combobox_callback_color2(self, color):
+    def __combobox_callback_color2(self, color):
         self.multi_selection_new.configure(button_color=ConfigKeys.Keys.EVENT_COLOR.value.get(color))
         self.multi_selection_new.set(color)
         self._logger.info(f"New color '{color}' selected")
         CommonOperations.write_log(self.log_box, f"color '{color}' selected")
 
-    def update_events(self, old_events: dict, summary_new: str, description_new: str, color_index_new, date_from: str, date_to: str, time_zone: str):
-        # Apply updates to the events
+    def __update_events(self, old_events: dict, summary_new: str, description_new: str, color_index_new, date_from: str, date_to: str, time_zone: str):
         msg = CTkMessagebox(title="Edit events", message=f"Are you sure you want to confirm the changes?\n{len(old_events)} events will be changed.", icon="question", option_1="No", option_2="Yes")
         if msg.get() == "Yes":
             self._logger.info(f"Old events edited: {old_events}")
 
-            updated_events = gc.CalendarEventsManager.editEvent(
-                self._common.get_credentials(),
-                old_events,
-                summary_new,
-                description_new,
-                color_index_new,
-                date_from,
-                date_to,
-                time_zone
-            )
+            event_info = EventInfo(summary_new, description_new, date_from, date_to, color_index_new, time_zone)
+            updated_events = self.event_service.edit_events(event_info, old_events)
             if updated_events is None: return
 
             self._logger.info(f"{len(updated_events)} event(s) successfully updated!")
@@ -440,15 +403,15 @@ class EditEventsFrame(ctk.CTkFrame):
             event_frame.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky="nsew")
 
             # Buttons for updating or canceling the event changes
-            button_update = ctk.CTkButton(self.toplevel_window, text="Update Results", command=lambda: self.update_events(old_events, summary_new, description_new, color_index_new, date_from, date_to, time_zone))
+            button_update = ctk.CTkButton(self.toplevel_window, text="Update Results", command=lambda: self.__update_events(old_events, summary_new, description_new, color_index_new, date_from, date_to, time_zone))
             button_update.grid(row=1, column=0, padx=5, pady=(0, 10), sticky="nsew")
 
             button_cancel = ctk.CTkButton(self.toplevel_window, text="Cancel", command=self.close_top_frame_window)
             button_cancel.grid(row=1, column=1, padx=5, pady=(0, 10), sticky="nsew")
 
             # Extract and display old and new event details with colors
-            old_events_info = self.extract_event_info(old_events)
-            new_events_info = self.extract_event_info(new_events)
+            old_events_info = self.__extract_event_info(old_events)
+            new_events_info = self.__extract_event_info(new_events)
 
             # Display old events in red and new events in green with reduced spacing
             for i in range(len(old_events_info)):
@@ -469,7 +432,7 @@ class EditEventsFrame(ctk.CTkFrame):
         else:
             self.toplevel_window.focus()  # Focus the window if it already exists
 
-    def extract_event_info(self, events: dict):
+    def __extract_event_info(self, events: dict):
         # Extract relevant event information for display
         event_info_list = []
         for index, event in enumerate(events, start=1):
@@ -480,9 +443,7 @@ class EditEventsFrame(ctk.CTkFrame):
                 start_date = event['start']['date']
                 end_date = event['end']['date']
 
-            start_datetime = datetime.fromisoformat(start_date)
-            end_datetime = datetime.fromisoformat(end_date)
-            duration = end_datetime - start_datetime
+            duration = self.__get_duration_from_date_interval(start_date, end_date)
 
             event_info = {
                 'index': index,
@@ -495,6 +456,11 @@ class EditEventsFrame(ctk.CTkFrame):
             event_info_list.append(event_info)
 
         return event_info_list
+
+    def __get_duration_from_date_interval(self, start_date: str, end_date: str) -> timedelta:
+        start_datetime = datetime.fromisoformat(start_date)
+        end_datetime = datetime.fromisoformat(end_date)
+        return (end_datetime - start_datetime)
 #?###########################################################
 
 #?###########################################################
@@ -512,8 +478,9 @@ class GetEventsFrame(ctk.CTkFrame):
 
     def __init__(self, parent, _):
         ctk.CTkFrame.__init__(self, parent)
-        img = Images()
+        self.img = Images()
         self.event_color["No Color Filtering"] = ""
+        self.event_service = EventsService(self._common)
 
         # configure grid layout (4x4)
         self.grid_columnconfigure(1, weight=1)
@@ -521,7 +488,7 @@ class GetEventsFrame(ctk.CTkFrame):
         self.grid_rowconfigure((0, 1, 2, 3), weight=1)
 
         # create sidebar frame with widgets
-        (sidebar_button_1, sidebar_button_2, sidebar_button_3, sidebar_button_4, google_calendar_link, logo_button) = GUIWidgets.create_side_bar_frame(self, img.plus_image, img.edit_image, img.list_image, img.chart_image, img.google_image, img.icon)
+        (sidebar_button_1, sidebar_button_2, sidebar_button_3, sidebar_button_4, google_calendar_link, logo_button) = GUIWidgets.create_side_bar_frame(self, self.img.plus_image, self.img.edit_image, self.img.list_image, self.img.chart_image, self.img.google_image, self.img.icon)
         sidebar_button_1.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[NewEventsFrame]))
         sidebar_button_2.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[EditEventsFrame]))
         sidebar_button_3.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GetEventsFrame]))
@@ -536,7 +503,7 @@ class GetEventsFrame(ctk.CTkFrame):
         title_frame.grid(row=0, column=1, padx=0, pady=5, sticky="ew")
         title_frame.grid_columnconfigure((0, 1), weight=1)
         ctk.CTkLabel(title_frame, text="Get Events List", font=ctk.CTkFont(size=20, weight="bold")).grid(row=0, column=0, padx=5, pady=0, sticky="e")
-        ctk.CTkButton(title_frame, text="", width=10, image=img.info_image,  fg_color="transparent", command=lambda: CommonOperations.open_info_section_dialog(self, "Get Events List", section_message)).grid(row=0, column=1, padx=5, pady=0, sticky="w")
+        ctk.CTkButton(title_frame, text="", width=10, image=self.img.info_image,  fg_color="transparent", command=lambda: CommonOperations.open_info_section_dialog(self, "Get Events List", section_message)).grid(row=0, column=1, padx=5, pady=0, sticky="w")
 
         # create a container frame for the two scrollable frames
         container_frame = ctk.CTkFrame(self, fg_color="transparent")
@@ -562,21 +529,21 @@ class GetEventsFrame(ctk.CTkFrame):
         label_color = ctk.CTkLabel(main_frame, text="Color:")
         label_color.grid(row=3, column=0, padx=10, pady=5, sticky="e")
         self.multi_selection = ctk.CTkComboBox(main_frame, state="readonly")
-        CTkScrollableDropdown(self.multi_selection, values=list(self.event_color.keys()), button_color="transparent", command=self.combobox_callback)
+        CTkScrollableDropdown(self.multi_selection, values=list(self.event_color.keys()), button_color="transparent", command=self.__combobox_callback)
         self.multi_selection.configure(button_color=self.event_color.get("No Color Filtering"))
         self.multi_selection.set("No Color Filtering")
         self.multi_selection.grid(row=3, column=1, padx=0, pady=5, sticky="w")
 
         # Column 2: date_frame (Date Interval)
-        (self.entry_date_from, self.entry_date_to, entry_date_button, self.label_date_to, entry_date_button2, self.timezone_selection) = GUIWidgets.create_date_selection_for_events_list_scroll_frame(container_frame, TIMEZONE, img.calendar_image)
-        entry_date_button.configure(command=lambda: self._date_picker(1))
-        entry_date_button2.configure(command=lambda: self._date_picker(2))
+        (self.entry_date_from, self.entry_date_to, entry_date_button, self.label_date_to, entry_date_button2, self.timezone_selection) = GUIWidgets.create_date_selection_for_events_list_scroll_frame(container_frame, TIMEZONE, self.img.calendar_image)
+        entry_date_button.configure(command=lambda: self.__date_picker(1))
+        entry_date_button2.configure(command=lambda: self.__date_picker(2))
 
         # file output
-        (self.file_path, self.overwrite_mode, button_file_path, button_open_file, button_open_events_table_preview) = GUIWidgets.create_file_output_scroll_frame_for_events_list_frame(self, img.folder_image, img.file_image, img.table_image)
-        button_file_path.configure(command=lambda: self._get_file_path(self.file_path))
-        button_open_file.configure(command=self._open_file)
-        button_open_events_table_preview.configure(command=self._events_table_preview)
+        (self.file_path, self.overwrite_mode, button_file_path, button_open_file, button_open_events_table_preview) = GUIWidgets.create_file_output_scroll_frame_for_events_list_frame(self, self.img.folder_image, self.img.file_image, self.img.table_image)
+        button_file_path.configure(command=lambda: self.__get_file_path(self.file_path))
+        button_open_file.configure(command=self.__open_file)
+        button_open_events_table_preview.configure(command=self.__events_table_preview)
 
         # create a container frame for the buttons
         container_frame2 = ctk.CTkFrame(self, fg_color="transparent")
@@ -584,12 +551,11 @@ class GetEventsFrame(ctk.CTkFrame):
         container_frame2.grid_columnconfigure((0, 1), weight=1)  # 2 Columns for main_frame and date_frame
 
         # get list button
-        get_button = ctk.CTkButton(container_frame2, image=img.list_image, text="Get", border_width=2, command=self._get_and_preview)
+        get_button = ctk.CTkButton(container_frame2, image=self.img.list_image, text="Get", border_width=2, command=self.__get_and_preview)
         get_button.grid(row=0, column=0, padx=5, pady=10, sticky="e")
-        get_and_plot_button = ctk.CTkButton(container_frame2, image=img.chart_image, text="Get and plot", border_width=2, command=self._get_and_plot)
+        get_and_plot_button = ctk.CTkButton(container_frame2, image=self.img.chart_image, text="Get and plot", border_width=2, command=self.__get_and_plot)
         get_and_plot_button.grid(row=0, column=1, padx=5, pady=10, sticky="w")
 
-        # Tooltips
         CTkToolTip(self.entry_id, delay=0.3, message="(Optional) Enter event id This is a very specific field;\n if you want to get a specific event and you know the specific event id, you can enter it and ignore the fields below.\n Otherwise you can ignore it and proceed to fill in the other fields.")
         CTkToolTip(self.entry_summary, delay=0.3, message="(Optional) Insert event title")
         CTkToolTip(self.entry_description, delay=0.3, message="(Optional) Insert the event description")
@@ -612,13 +578,13 @@ class GetEventsFrame(ctk.CTkFrame):
         self.cleanup_temp_files()
 
     # returns the number of events obtained
-    def _get_events_count(self):
+    def __get_events_count(self):
         self.events = []
 
         id = self.entry_id.get()
         if len(id) != 0:
             try:
-                self.events = gc.CalendarEventsManager.getEventByID(self._common.get_credentials(), id)
+                self.events = self.event_service.fetch_event_by_id(id)
                 #self.events_list_viewer_window()
                 self._logger.info(f"Event obtained succesfully!")
                 self._common.write_log(self.log_box, f"Event obtained succesfully!")
@@ -637,14 +603,10 @@ class GetEventsFrame(ctk.CTkFrame):
         try:
             date_from = datetime.strptime(date_from, DATE_FORMATTER) if (len(date_from) != 0) else None
             date_to = datetime.strptime(date_to, DATE_FORMATTER) if (len(date_to) != 0) else None
-        except ValueError as error:
-            self._logger.error(f"Error on creating event: date format is not correct")
-            self._common.write_log(self.log_box, f"Error on creating event: date format is not correct")
-            return
 
-        try:
             color_index = self._common.get_color_id(ConfigKeys.Keys.EVENT_COLOR.value, self.multi_selection.get())
-            self.events = gc.CalendarEventsManager.getEvents(creds=self._common.get_credentials(), title=summary, start_date=date_from, end_date=date_to, color_id=color_index, description=description, time_zone=time_zone)
+            event_info = EventInfo(summary, description, date_from, date_to, color_index, time_zone)
+            self.events = self.event_service.fetch_events(event_info)
             if len(self.events) == 0:
                 self._logger.info(f"No events obtained")
                 self._common.write_log(self.log_box, f"No events obtained")
@@ -654,29 +616,29 @@ class GetEventsFrame(ctk.CTkFrame):
             self._logger.info(f"{len(self.events)} Event(s) obtained succesfully!")
             self._common.write_log(self.log_box, f"{len(self.events)} Event(s) obtained succesfully!")
             return len(self.events)
+        except ValueError as error:
+            self._logger.error(f"Error on creating event: date format is not correct")
+            self._common.write_log(self.log_box, f"Error on creating event: date format is not correct")
         except Exception as error:
                 ExceptionHandler.handle_exception(self._common, self.log_box, error)
 
-    def _get_and_preview(self):
-        events_count = self._get_events_count()
-
-        if (events_count == 0):
-            return;
+    def __get_and_preview(self):
+        if (self.__get_events_count() == 0):
+            return
 
         self.events_list_viewer_window()
 
-    def _get_and_plot(self):
-        events_count = self._get_events_count()
-
-        if events_count == 0:
+    def __get_and_plot(self):
+        if self.__get_events_count() == 0:
             return
 
-        # save results to a temp file
-        tmp = tempfile.NamedTemporaryFile(delete=False)  # Prevent automatic deletion
         try:
+            # save results to a temp file
+            tmp = tempfile.NamedTemporaryFile(delete=False)  # Prevent automatic deletion
+
             self.file_path.delete("0", tkinter.END)
             self.file_path.insert("0", string=tmp.name)
-            self.save_results_to_file()
+            self.__save_results_to_file()
 
             FrameController.show_frame(self._common.get_frames()[GraphFrame])
             GraphFrame.set_file_path(self._common.get_frames()[GraphFrame], text=tmp.name)
@@ -714,7 +676,7 @@ class GetEventsFrame(ctk.CTkFrame):
             event_list_file_viewer.bind("<Key>", lambda e: "break")  # set the textbox readonly
             event_list_file_viewer.grid(row=0, column=0, columnspan=2, padx=0, pady=(0, 10), sticky="nsew")
 
-            button_save = ctk.CTkButton(self.toplevel_window, text="Save results", command=lambda: self.get_filepath_to_save_results())
+            button_save = ctk.CTkButton(self.toplevel_window, text="Save results", command=lambda: self.__get_filepath_to_save_results())
             button_save.grid(row=1, column=0, padx=5, pady=(0, 10), sticky="nsew")
 
             button_cancel = ctk.CTkButton(self.toplevel_window, text="Cancel", command=lambda: self.close_top_frame_window())
@@ -722,7 +684,7 @@ class GetEventsFrame(ctk.CTkFrame):
 
             event_list_file_viewer.delete(1.0, tkinter.END)
 
-            events_info = self.format_events_content()
+            events_info = self.__format_events_content()
 
             # print event after event
             for event in events_info:
@@ -736,15 +698,15 @@ class GetEventsFrame(ctk.CTkFrame):
 
         return self.toplevel_window
 
-    def format_events_content(self):
+    def __format_events_content(self):
         # obtain only important informations about the event
         event_dict = {}
         events_info = []
         index = 1
         for event in self.events:
 
-            (start_date, end_date) = self._set_event_date_with_fallback(event)
-            duration = self._get_duration_from_date_interval(start_date, end_date)
+            (start_date, end_date) = self.__set_event_date_with_fallback(event)
+            duration = self.__get_duration_from_date_interval(start_date, end_date)
 
             event_dict = {
                 'index': index,
@@ -759,9 +721,9 @@ class GetEventsFrame(ctk.CTkFrame):
 
         return events_info
 
-    def get_filepath_to_save_results(self):
-        if self.file_path != None and len(self.file_path.get()) != 0:
-            self.save_results_to_file()
+    def __get_filepath_to_save_results(self):
+        if self.file_path and self.file_path.get():
+            self.__save_results_to_file()
             return
 
         if self.toplevel_entry_window is None or not self.toplevel_entry_window.winfo_exists():
@@ -771,9 +733,9 @@ class GetEventsFrame(ctk.CTkFrame):
             self.toplevel_entry_window.geometry("350x50")
             entry = ctk.CTkEntry(self.toplevel_entry_window, width=250, placeholder_text="file path")
             entry.grid(row=0, column=0, padx=5, pady=(10, 10), sticky="nsew")
-            button_add_filepath = ctk.CTkButton(self.toplevel_entry_window, width=10, text="", image=self.folder_image, command=lambda: self._get_file_path(entry))
+            button_add_filepath = ctk.CTkButton(self.toplevel_entry_window, width=10, text="", image=self.img.folder_image, command=lambda: self.__get_file_path(entry))
             button_add_filepath.grid(row=0, column=1, padx=5, pady=(10, 10), sticky="nsew")
-            button_ok = ctk.CTkButton(self.toplevel_entry_window, width=10, text="Ok", command=lambda: self.save_results_to_file2(entry))
+            button_ok = ctk.CTkButton(self.toplevel_entry_window, width=10, text="Ok", command=lambda: self.__save_results_to_file2(entry))
             button_ok.grid(row=0, column=2, padx=5, pady=(10, 10), sticky="nsew")
 
             self.toplevel_entry_window.resizable(False, False)
@@ -785,7 +747,7 @@ class GetEventsFrame(ctk.CTkFrame):
         return self.toplevel_entry_window
 
     # somethimes the event doesn't have 'dateTime'
-    def _set_event_date_with_fallback(self, event) -> tuple[Any, Any]:
+    def __set_event_date_with_fallback(self, event) -> tuple[Any, Any]:
         try:
             start_date = event['start']['dateTime']
             end_date = event['end']['dateTime']
@@ -794,12 +756,12 @@ class GetEventsFrame(ctk.CTkFrame):
             end_date = event['end']['date']
         return (start_date, end_date)
 
-    def _get_duration_from_date_interval(self, start_date, end_date) -> timedelta:
+    def __get_duration_from_date_interval(self, start_date, end_date) -> timedelta:
         start_datetime = datetime.fromisoformat(start_date)
         end_datetime = datetime.fromisoformat(end_date)
         return (end_datetime - start_datetime)
 
-    def save_results_to_file(self):
+    def __save_results_to_file(self):
         try:
             # close the toplevel windows
             if self.toplevel_window: self.close_top_frame_window()
@@ -819,27 +781,26 @@ class GetEventsFrame(ctk.CTkFrame):
             counter = 0
             for event in self.events:
 
-                (start_date, end_date) = self._set_event_date_with_fallback(event)
-                duration = self._get_duration_from_date_interval(start_date, end_date)
+                (start_date, end_date) = self.__set_event_date_with_fallback(event)
+                duration = self.__get_duration_from_date_interval(start_date, end_date)
 
                 added = DataCSV.addData(data, event['id'], data_list=(event['id'], event['summary'], start_date, end_date, duration))
                 if added:
                     counter += 1
 
-            # save all into data
             DataCSV.saveDataToFile(data, self.file_path.get(), '|', 'utf-8')
 
             self._logger.info(f"{counter} event(s) added to file {self.file_path.get()}")
             self._common.write_log(self.log_box, f"{counter} event(s) added to file {self.file_path.get()}")
 
         except Exception as error:
-                ExceptionHandler.handle_exception(self._common, self.log_box, error)
+            ExceptionHandler.handle_exception(self._common, self.log_box, error)
 
-    def save_results_to_file2(self, entry):
+    def __save_results_to_file2(self, entry):
         self.file_path.delete("0", tkinter.END)
         self.file_path.insert("0", entry.get())
 
-        self.save_results_to_file()
+        self.__save_results_to_file()
 
     def close_top_frame_window(self):
         self.toplevel_window.destroy()
@@ -847,22 +808,22 @@ class GetEventsFrame(ctk.CTkFrame):
     def close_top_frame_entry_window(self):
         self.toplevel_entry_window.destroy()
 
-    def combobox_callback(self, color):
+    def __combobox_callback(self, color):
         self.multi_selection.configure(button_color=self.event_color.get(color))
         self.multi_selection.set(color)
         self._logger.info(f"color '{color}' selected")
         CommonOperations.write_log(log_box=self.log_box, message=f"color '{color}' selected")
 
-    def _get_file_path(self, entry):
+    def __get_file_path(self, entry):
         self._common.get_file_path(self.log_box, entry)
 
-    def _open_file(self):
+    def __open_file(self):
         self.file_viewer_window = self._common.file_viewer_window(self.file_viewer_window, self.file_path.get(), self.log_box)
 
-    def _events_table_preview(self):
+    def __events_table_preview(self):
         self.events_preview_in_table = self._common.events_preview_in_table(self.events_preview_in_table, self.file_path.get(), self.log_box)
 
-    def _date_picker(self, type):
+    def __date_picker(self, type):
         self.date_picker_window = self._common.date_picker_window(type, self.date_picker_window, self.entry_date_from, self.entry_date_to, self.log_box)
 #?###########################################################
 
@@ -895,15 +856,15 @@ class GraphFrame(ctk.CTkFrame):
         # create main panel
         (self.file_path, button_file_path, button_open_file, button_open_events_table_preview) = GUIWidgets.create_file_path_scroll_frame_for_graph_frame(self, img.folder_image, img.file_image, img.table_image, img.info_image)
         button_file_path.configure(command=self.get_file_path)
-        button_open_file.configure(command=self._open_file)
-        button_open_events_table_preview.configure(command=self._events_table_preview)
+        button_open_file.configure(command=self.__open_file)
+        button_open_events_table_preview.configure(command=self.__events_table_preview)
 
         # Graph types
         (self.button_select_all, self.button_deselect_all, self.total_hours_per_year, self.total_hours_per_month, self.total_hours_by_summary, self.total_hours_by_summary2, self.total_hours_per_year_by_summary, self.total_hours_per_month_by_summary, self.total_hours_per_month_grouped_by_year) = GUIWidgets.create_graph_types_scroll_frame(self, img.square_check_image, img.square_image)
-        self.button_select_all.configure(command=self._select_all)
-        self.button_deselect_all.configure(command=self._deselect_all)
+        self.button_select_all.configure(command=self.__select_all)
+        self.button_deselect_all.configure(command=self.__deselect_all)
 
-        self.graph_button = ctk.CTkButton(self, command=self._generate_graph, image=img.chart_image, border_width=2, text="Generate")
+        self.graph_button = ctk.CTkButton(self, command=self.__generate_graph, image=img.chart_image, border_width=2, text="Generate")
         self.graph_button.grid(row=4, column=1, padx=20, pady=20)
 
         CTkToolTip(self.file_path, delay=0.3, message="(Required) Enter the path to the file you generated from the 'Get Events List' section.")
@@ -929,13 +890,13 @@ class GraphFrame(ctk.CTkFrame):
         self.file_path.delete("0", tkinter.END)
         self.file_path.insert("0", string=text)
 
-    def _open_file(self):
+    def __open_file(self):
         self.file_viewer_window = self._common.file_viewer_window(self.file_viewer_window, self.file_path.get(), self.log_box)
 
-    def _events_table_preview(self):
+    def __events_table_preview(self):
         self.events_preview_in_table = self._common.events_preview_in_table(self.events_preview_in_table, self.file_path.get(), self.log_box)
 
-    def _select_all(self):
+    def __select_all(self):
         self.total_hours_per_year.select()
         self.total_hours_per_month.select()
         self.total_hours_by_summary.select()
@@ -946,7 +907,7 @@ class GraphFrame(ctk.CTkFrame):
         self._logger.info(f"all chart types selected")
         self._common.write_log(self.log_box, f"all chart types selected")
 
-    def _deselect_all(self):
+    def __deselect_all(self):
         self.total_hours_per_year.deselect()
         self.total_hours_per_month.deselect()
         self.total_hours_by_summary.deselect()
@@ -958,7 +919,7 @@ class GraphFrame(ctk.CTkFrame):
         self._common.write_log(self.log_box, f"all chart types deselected")
 
     # Timeout function to stop the chart generation
-    def _generate_chart_with_timeout(self, chart_function, data, timeout=ConfigKeys.Keys.GRAPH_TIMEOUT.value):
+    def __generate_chart_with_timeout(self, chart_function, data, timeout=ConfigKeys.Keys.GRAPH_TIMEOUT.value):
         def target():
             try:
                 if not self.stop_event.is_set():  # Check if timeout occurred
@@ -982,10 +943,10 @@ class GraphFrame(ctk.CTkFrame):
             self._common.write_log(self.log_box, "Chart generation timed out.")
             CTkMessagebox(title="Chart Generation Error", message="One or more charts were cancelled due to a timeout. Please try again later.", icon="cancel", option_1="OK")
 
-    def _reset_stop_event(self):
+    def __reset_stop_event(self):
         self.stop_event.clear()  # Reset the stop event for future calls
 
-    def _generate_graph(self):
+    def __generate_graph(self):
         if self._common.check_file_path_errors(self.log_box, self.file_path.get()):
             return
 
@@ -995,23 +956,22 @@ class GraphFrame(ctk.CTkFrame):
             data = Plotter.Plotter.loadData(self.file_path.get())
             Plotter.Plotter.allStats(data)
 
-            # Reset the stop event before generating new charts
-            self._reset_stop_event()
+            self.__reset_stop_event()
 
             if self.total_hours_per_year.get() == "on":
-                self._generate_chart_with_timeout(Plotter.Plotter.chart_TotalHoursPerYear, data)
+                self.__generate_chart_with_timeout(Plotter.Plotter.chart_TotalHoursPerYear, data)
             if self.total_hours_per_month.get() == "on":
-                self._generate_chart_with_timeout(Plotter.Plotter.chart_TotalHoursPerMonth, data)
+                self.__generate_chart_with_timeout(Plotter.Plotter.chart_TotalHoursPerMonth, data)
             if self.total_hours_by_summary.get() == "on":
-                self._generate_chart_with_timeout(Plotter.Plotter.chart_TotalHoursBySummary, data)
+                self.__generate_chart_with_timeout(Plotter.Plotter.chart_TotalHoursBySummary, data)
             if self.total_hours_by_summary2.get() == "on":
-                self._generate_chart_with_timeout(Plotter.Plotter.chart_TotalHoursBySummaryPie, data)
+                self.__generate_chart_with_timeout(Plotter.Plotter.chart_TotalHoursBySummaryPie, data)
             if self.total_hours_per_year_by_summary.get() == "on":
-                self._generate_chart_with_timeout(Plotter.Plotter.chart_TotalHoursPerYearBySummary, data)
+                self.__generate_chart_with_timeout(Plotter.Plotter.chart_TotalHoursPerYearBySummary, data)
             if self.total_hours_per_month_by_summary.get() == "on":
-                self._generate_chart_with_timeout(Plotter.Plotter.chart_TotalHoursPerMonthBySummary, data)
+                self.__generate_chart_with_timeout(Plotter.Plotter.chart_TotalHoursPerMonthBySummary, data)
             if self.total_hours_per_month_grouped_by_year.get() == "on":
-                self._generate_chart_with_timeout(Plotter.Plotter.chart_TotalHoursPerMonthGroupedByYear, data)
+                self.__generate_chart_with_timeout(Plotter.Plotter.chart_TotalHoursPerMonthGroupedByYear, data)
 
         except Exception as error:
             ExceptionHandler.handle_exception(self._common, self.log_box, error)
@@ -1070,28 +1030,27 @@ class App():
         self.root = ctk.CTk()
         self._menu: CTkMenuBar = None
         self._button_5: ctk.CTkButton = None
+        self.event_service = EventsService(self._common)
 
         ConfigKeys.load_values_from_json()
-
         self._logger.info("Application started")
+        self.__read_data_from_last_session()
+        self.__init_window()
+        self.__init_menu()
+        FrameController.page_controller(self, self.root, self._common)
+        self.root.mainloop()
 
-        # read data from json to get path from last session
+    def __read_data_from_last_session(self):
         listRes = js.JSONPreferences.ReadFromJSON()
         if listRes != None and len(listRes) > 0:
             self.credentials_path = listRes["CredentialsPath"]
             self.token_path = listRes["TokenPath"]
             try:
-                self.credentials = gc.CalendarEventsManager.connectionSetup(self.credentials_path, gc.CalendarEventsManager.SCOPE, self.token_path)
+                self.credentials = self.event_service.get_connection_setup(self.credentials_path, self.token_path)
             except Exception as e:
                 print(f"Error: {e}")
 
-        self._init_window()
-        self._init_menu()
-        FrameController.page_controller(self, self.root, self._common)
-
-        self.root.mainloop()
-
-    def _init_window(self):
+    def __init_window(self):
         self.root.iconbitmap('./imgs/icon.ico')
         self.root.title("Calendar Data Manager")
         CommonOperations.centerWindow(self.root, ConfigKeys.Keys.APP_WIDTH.value, ConfigKeys.Keys.APP_HEIGHT.value)
@@ -1112,14 +1071,14 @@ class App():
                 CommonOperations.change_color_theme(color_theme)
             except: pass
 
-    def _init_menu(self):
+    def __init_menu(self):
         self._menu = CTkMenuBar(self.root)
         button_1 = self._menu.add_cascade("File")
         button_3 = self._menu.add_cascade("Settings")
         button_4 = self._menu.add_cascade("About")
         button_6 = self._menu.add_cascade("Help")
 
-        if self._common.get_credentials() is not None:
+        if self._common.get_credentials_or_none() is not None:
             self.update_username_menu_item()
 
         dropdown1 = CustomDropdownMenu(widget=button_1)
@@ -1133,8 +1092,8 @@ class App():
 
         if (ConfigKeys.Keys.MENUITEM_APPEARANCE.value):
             sub_menu2 = dropdown3.add_submenu("Appearance")
-            sub_menu2.add_option(option="Dark", command=lambda: self._change_app_appearance("dark"))
-            sub_menu2.add_option(option="Light", command=lambda: self._change_app_appearance("light"))
+            sub_menu2.add_option(option="Dark", command=lambda: self.__change_app_appearance("dark"))
+            sub_menu2.add_option(option="Light", command=lambda: self.__change_app_appearance("light"))
 
         if (ConfigKeys.Keys.MENUITEM_SCALING.value):
             sub_menu3 = dropdown3.add_submenu("Scaling")
@@ -1169,35 +1128,35 @@ class App():
             dropdown6.add_option(option="Report a bug", command=lambda: webbrowser.open(ConfigKeys.Keys.GITHUB_ISSUES_LINK.value))
 
     def update_username_menu_item(self):
-        (_, email, picture_url) = gc.CalendarEventsManager.get_user_info(self._common.get_credentials())
-
         # Configure column 4 to expand (to align right).
         self._menu.columnconfigure(4, weight=1)
 
-        if self._common.get_credentials() is not None:
-            user_image = self._load_profile_icon_with_fallback(picture_url)
+        credentials = self._common.get_credentials_or_none()
+        if credentials is not None:
+            (_, email, picture_url) = self.event_service.get_user_info(credentials)
+            user_image = self.__load_profile_icon_with_fallback(picture_url)
 
             if self._button_5 is not None:
                 self._button_5.configure(text=str(email), image=user_image)
                 self._button_5.grid(row=0, column=4, padx=10, pady=10, sticky="e")
             else:
-                self._button_5 = ctk.CTkButton(self._menu, text=str(email), fg_color="transparent", image=user_image, command=self._show_user_menu)
+                self._button_5 = ctk.CTkButton(self._menu, text=str(email), fg_color="transparent", image=user_image, command=self.__show_user_menu)
                 self._button_5.grid(row=0, column=4, padx=10, pady=10, sticky="e")
                 self.dropdown5 = CustomDropdownMenu(widget=self._button_5)
                 self.dropdown5.add_option(option="Google Calendar", command=lambda: webbrowser.open(ConfigKeys.Keys.GOOGLE_CALENDAR_LINK.value))
-                self.dropdown5.add_option(option="Log out", command=lambda: self._log_out())
+                self.dropdown5.add_option(option="Log out", command=lambda: self.__log_out())
 
-            self._change_app_appearance_profile()
+            self.__change_app_appearance_profile()
 
         else:
-            self._forget_username_menu_item()
+            self.__forget_username_menu_item()
 
-    def _load_profile_icon_with_fallback(self, picture_url) -> ImageTk.PhotoImage | tkinter.PhotoImage:
+    def __load_profile_icon_with_fallback(self, picture_url) -> ImageTk.PhotoImage | tkinter.PhotoImage:
         default_user_image = Images().user_image
-        res = self._get_user_image_from_url(picture_url)
+        res = self.__get_user_image_from_url(picture_url)
         return res if (picture_url and res is not None) else default_user_image
 
-    def _get_user_image_from_url(self, url) -> ImageTk.PhotoImage | None:
+    def __get_user_image_from_url(self, url) -> ImageTk.PhotoImage | None:
         try:
             response = requests.get(url)
             response.raise_for_status()  # check if the request is correct
@@ -1221,23 +1180,23 @@ class App():
             print(f"Error loading image: {e}")
             return None
 
-    def _show_user_menu(self):
+    def __show_user_menu(self):
         self.dropdown5.show()
 
-    def _forget_username_menu_item(self):
+    def __forget_username_menu_item(self):
         if self._button_5 is not None:
             self._button_5.grid_forget()
 
-    def _log_out(self):
+    def __log_out(self):
         self._logger.info(f"Logging out")
-        self._forget_username_menu_item()
+        self.__forget_username_menu_item()
         FrameController.show_frame(self._common.get_frames()[LoginFrame])
 
-    def _change_app_appearance(self, mode: str):
+    def __change_app_appearance(self, mode: str):
         self._common.change_appearance(mode)
-        self._change_app_appearance_profile(mode)
+        self.__change_app_appearance_profile(mode)
 
-    def _change_app_appearance_profile(self, appearance: str = ''):
+    def __change_app_appearance_profile(self, appearance: str = ''):
         self._logger.info(f"Changing appearance to {appearance}")
 
         if appearance is None or appearance == '':
@@ -1258,48 +1217,47 @@ class LoginFrame(ctk.CTkFrame):
     def __init__(self, parent, main_class: App):
         ctk.CTkFrame.__init__(self, parent)
         self.main_class = main_class
+        self.event_service = EventsService(self._common)
         img = Images()
 
         ctk.CTkLabel(self, text="Login", fg_color="transparent", font=("Arial", 32)).pack(padx=20, pady=20)
 
         google_calendar = ctk.CTkButton(master=self, image=img.google_image, text="Google Calendar", height=50, width=250, command=lambda: webbrowser.open(ConfigKeys.Keys.GOOGLE_CALENDAR_LINK.value))
-        google_login = ctk.CTkButton(master=self, image=img.arrow_image, text="Login with Google", height=50, width=250, command=lambda: self._set_credentials_path_frame())
+        google_login = ctk.CTkButton(master=self, image=img.arrow_image, text="Login with Google", height=50, width=250, command=lambda: self.__set_credentials_path_frame())
 
         google_calendar.pack(padx=20, pady=10, anchor='center')
         google_login.pack(padx=20, pady=10, anchor='center')
 
-        # Tooltips
         CTkToolTip(google_calendar, delay=0.3, message="View and manage your Google Calendar")
         CTkToolTip(google_login, delay=0.3, message="Login using your Google account")
 
-    def _set_credentials_path_frame(self):
-        self._set_credentials_path()
+    def __set_credentials_path_frame(self):
+        self.__set_credentials_path()
 
-    def _set_credentials_path(self):
+    def __set_credentials_path(self):
         credentials_path = './settings/client.json'
         if len(credentials_path) == 0: return
         token_path = credentials_path.rsplit("/", 1)[0] + "/" + "token.json"
 
         try:
-            credentials = gc.CalendarEventsManager.connectionSetup(credentials_path, gc.CalendarEventsManager.SCOPE, token_path)
+            credentials = self.event_service.get_connection_setup(credentials_path, token_path)
         except Exception as error:
             self._common.messagebox_exception(error)
             credentials = None
             try: os.remove(token_path) # delete token.json
             except: pass
 
-        if credentials is not None:
-            (user, _, _) = gc.CalendarEventsManager.get_user_info(credentials)
+        if credentials:
             self._common.set_credentials(credentials, credentials_path, token_path)
-            self._update_username_menu_item()
+            self.__update_username_menu_item()
             FrameController.show_frame(self._common.get_frames()[MainFrame])
-        else:
-            msg = CTkMessagebox(title="Credentials error", message="Do you wish to retry?", icon="cancel", option_1="No", option_2="Yes")
-            response = msg.get()
-            if response=="Yes":
-                self._set_credentials_path_frame()
+            return
 
-    def _update_username_menu_item(self):
+        msg = CTkMessagebox(title="Credentials error", message="Do you wish to retry?", icon="cancel", option_1="No", option_2="Yes")
+        if msg.get() == "Yes":
+            self.__set_credentials_path_frame()
+
+    def __update_username_menu_item(self):
         self.main_class.update_username_menu_item()
 #?###########################################################
 

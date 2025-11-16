@@ -496,7 +496,7 @@ class CalendarEventsManager:
             raise Exception(f"An error occurred: {str(generic_exception)}")
 
     @staticmethod
-    def editEvent(creds: Credentials, old_events: Dict, summary_new: str, description_new: str, color_id_new, start_date: Optional[str] = None, end_date: Optional[str] = None, time_zone: str = 'UTC'):
+    def editEvent(creds: Credentials, old_events: Dict, summary_new: str, description_new: str, color_id_new, start_date: Optional[datetime.datetime], end_date: Optional[datetime.datetime], time_zone: str = 'UTC'):
         if creds == None: raise ValueError("Credentials can't be null")
 
         try:
@@ -532,7 +532,7 @@ class CalendarEventsManager:
             raise Exception(f"An error occurred: {str(generic_exception)}")
 
     @staticmethod
-    def simulateEventUpdates(creds: Credentials, old_events: Dict, summary_new: str, description_new: str, color_id_new, start_date: Optional[str] = None, end_date: Optional[str] = None, time_zone: str = 'UTC'):
+    def simulateEventUpdates(creds: Credentials, old_events: Dict, summary_new: str, description_new: str, color_id_new, start_date: Optional[datetime.datetime], end_date: Optional[datetime.datetime], time_zone: str = 'UTC'):
         if creds is None:
             raise ValueError("Credentials can't be null")
 

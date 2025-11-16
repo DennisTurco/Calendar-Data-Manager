@@ -34,9 +34,9 @@ DAY_FORMATTER: Final[str] = "%m/%d/%y" # use this only for calendar picker
 class CommonOperations():
     _instance = None
 
-    token_path: Optional[str]
+    token_path: str
     credentials: Optional[Credentials]
-    credentials_path: Optional[str]
+    credentials_path: str
     _frames = {}
     _logger = LogService.get_logger(__name__)
 
@@ -46,20 +46,24 @@ class CommonOperations():
         return cls._instance
 
     def __init__(self):
-        # initialize variables only one time
         if not hasattr(self, 'credentials'):  # avoid to re-initialize variables
             self.credentials = None
-            self.credentials_path = None
-            self.token_path = None
+            self.credentials_path = ""
+            self.token_path = ""
 
-    def set_credentials(self, credentials, credentials_path, token_path):
+    def set_credentials(self, credentials: Credentials, credentials_path: str, token_path: str):
         self.credentials = credentials
         self.credentials_path = credentials_path
         self.token_path = token_path
         js.JSONPreferences.WriteCredentialsToJSON(self.credentials_path, self.token_path)
 
-    def get_credentials(self) -> Credentials:
+    def get_credentials_or_none(self) -> Credentials | None:
         return self.credentials
+
+    def get_credentials_or_exception(self) -> Credentials:
+        if self.credentials:
+            return self.credentials
+        raise Exception("Cannot get credential, credentials are None")
 
     def get_credentials_path(self) -> str:
         return self.credentials_path

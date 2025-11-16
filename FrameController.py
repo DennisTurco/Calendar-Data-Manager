@@ -28,7 +28,7 @@ def page_controller(master, root, common: CommonOperations):
     common.set_frames(master.frames)
 
     # Show the correct frame based on credentials
-    if common.get_credentials() is None or common.get_credentials_path() is None:
+    if common.get_credentials_or_none() is None or len(common.get_credentials_path()) == 0:
         show_frame(master.frames[LoginFrame])  # Access by class
     else:
         show_frame(master.frames[MainFrame])  # Access by class
