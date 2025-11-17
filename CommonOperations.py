@@ -1,12 +1,10 @@
-from markdown import markdown
 import os
 from datetime import datetime, timedelta
 from typing import Final, Optional
-from googleapiclient.discovery import build
 import pyperclip
 
 from ConfigKeys import ConfigKeys
-import JSONPreferences as js
+from JsonPreferences import JsonPreferences
 
 import traceback
 import tempfile
@@ -15,12 +13,9 @@ import tkinter
 from LogService import LogService
 from tkinter import filedialog
 import customtkinter as ctk
-from CTkScrollableDropdown import *
 from CTkXYFrame import *
-from CTkMenuBar import *
 from CTkMessagebox import *
 from tkcalendar import *
-from CTkToolTip import *
 from CTkTable import *
 import CustomSpinbox
 from google.oauth2.credentials import Credentials
@@ -31,7 +26,7 @@ DATE_FORMATTER: Final[str] = '%d-%m-%Y %H:%M'
 DAY_FORMATTER: Final[str] = "%m/%d/%y" # use this only for calendar picker
 
 # singleton class
-class CommonOperations():
+class CommonOperations:
     _instance = None
 
     token_path: str
@@ -55,7 +50,7 @@ class CommonOperations():
         self.credentials = credentials
         self.credentials_path = credentials_path
         self.token_path = token_path
-        js.JSONPreferences.WriteCredentialsToJSON(self.credentials_path, self.token_path)
+        JsonPreferences.write_credentials_to_json(self.credentials_path, self.token_path)
 
     def get_credentials_or_none(self) -> Credentials | None:
         return self.credentials
@@ -89,7 +84,7 @@ class CommonOperations():
             return
 
         self.toplevel_window = ctk.CTkToplevel()
-        self.toplevel_window.after(200, lambda: self.toplevel_window.iconbitmap('./imgs/bug.ico')) # i have to delay the icon because it' buggy on windows
+        self.toplevel_window.after(200, lambda: self.toplevel_window.iconbitmap('./imgs/bug.ico')) # type: ignore # I have to delay the icon because it's buggy on windows
         self.toplevel_window.title(f'Exception traceback')
 
         # Create a grid inside the toplevel window
@@ -118,7 +113,7 @@ class CommonOperations():
         file_viewer.insert(tkinter.END, str(error))
 
         self.toplevel_window.attributes("-topmost", False)  # Focus on this window
-        CommonOperations.centerTopLevel(self.toplevel_window)
+        CommonOperations.center_top_level(self.toplevel_window)
 
     @staticmethod
     def copy_to_clipboard(error_text: str):
@@ -126,10 +121,10 @@ class CommonOperations():
 
     @staticmethod
     def change_scaling_event(new_scaling: str):
-        if new_scaling == None: return
+        if new_scaling is None or len(new_scaling) == 0: return
         new_scaling_float = int(new_scaling) / 100
         ctk.set_widget_scaling(new_scaling_float)
-        js.JSONPreferences.WriteTextScalingToJSON(new_scaling)
+        JsonPreferences.write_text_scaling_to_json(new_scaling)
 
     @staticmethod
     def write_log(log_box, message):
@@ -147,6 +142,8 @@ class CommonOperations():
             CommonOperations.write_log(log_box, f"ERROR: file '{filepath}' doesn't found")
             return True
 
+        return False
+
     @staticmethod
     def get_file_path(logbox, entry):
         file_path = filedialog.askopenfilename(title="Select file where do you want to save data", filetypes=(("CSV files", "*.csv"), ("TXT files", "*.txt"), ("All files", "*.*")))
@@ -157,7 +154,7 @@ class CommonOperations():
         return file_path
 
     @staticmethod
-    def get_date(type, toplevel_window, entry_date_from, entry_date_to, log_box, calendar, hours, minutes):
+    def get_date(picker_type, toplevel_window, entry_date_from, entry_date_to, log_box, calendar, hours, minutes):
         date = calendar.get_date() # get the date from the calendar
 
         try:
@@ -171,12 +168,12 @@ class CommonOperations():
         full_date = datetime(date.year, date.month, date.day, hours, minutes)
         full_date_str = full_date.strftime(DATE_FORMATTER)
 
-        if type == 1:
+        if picker_type == 1:
             LogService.get_logger(__name__).info(f"Date Selected From: {full_date_str}")
             CommonOperations.write_log(log_box, f"Date Selected From: {full_date_str}")
             entry_date_from.delete("0", tkinter.END)
             entry_date_from.insert("0", full_date_str)
-        elif type == 2:
+        elif picker_type == 2:
             LogService.get_logger(__name__).info(f"Date Selected To: {full_date_str}")
             CommonOperations.write_log(log_box, f"Date Selected To: {full_date_str}")
             entry_date_to.delete("0", tkinter.END)
@@ -187,12 +184,12 @@ class CommonOperations():
         toplevel_window.destroy()
 
     @staticmethod
-    def date_picker_window(type, toplevel_window, entry_date_from, entry_date_to, log_box) -> ctk.CTkToplevel:
+    def date_picker_window(picker_type, toplevel_window, entry_date_from, entry_date_to, log_box) -> ctk.CTkToplevel:
         LogService.get_logger(__name__).info("Opening date picker")
 
         if toplevel_window is None or not toplevel_window.winfo_exists():
             toplevel_window = ctk.CTkToplevel() # create window if its None or destroyed
-            toplevel_window.after(200, lambda: toplevel_window.iconbitmap('./imgs/calendar.ico')) # i have to delay the icon because it' buggy on windows
+            toplevel_window.after(200, lambda: toplevel_window.iconbitmap('./imgs/calendar.ico')) # type: ignore # I have to delay the icon because it's buggy on windows
 
             calendar = Calendar(toplevel_window)
             calendar.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
@@ -216,25 +213,25 @@ class CommonOperations():
             after_one_hour = now + timedelta(hours=1)
             hour_after_one_hour = after_one_hour.strftime("%H")
 
-            if type == 1:
+            if picker_type == 1:
                 toplevel_window.title("Date From")
                 confirm_button = ctk.CTkButton(toplevel_window, text="Confirm", command=lambda: CommonOperations.get_date(1, toplevel_window, entry_date_from, entry_date_to, log_box, calendar, spinbox_hours.get(), spinbox_minutes.get()))
                 # set default hour
                 spinbox_hours.set(int(current_hour))
-            elif type == 2:
+            elif picker_type == 2:
                 toplevel_window.title("Date To")
                 confirm_button = ctk.CTkButton(toplevel_window, text="Confirm", command=lambda: CommonOperations.get_date(2, toplevel_window, entry_date_from, entry_date_to, log_box, calendar, spinbox_hours.get(), spinbox_minutes.get()))
                 # set default hour
                 spinbox_hours.set(int(hour_after_one_hour))
             else:
-                raise Exception("type option doesn't exists")
+                raise Exception("picker type option doesn't exists")
 
             confirm_button.grid(row=3, column=0, padx=10, pady=10, sticky="nsew")
 
             toplevel_window.attributes("-topmost", True) # focus to this windows
             toplevel_window.resizable(False, False)
 
-            CommonOperations.centerTopLevel(toplevel_window)
+            CommonOperations.center_top_level(toplevel_window)
         else:
             toplevel_window.focus()  # if window exists focus it
 
@@ -249,30 +246,21 @@ class CommonOperations():
                 color_index = idx+1
                 break
 
-        # check if the color is valid (it is not setted 'No Color Filtering')
+        # check if the color is valid (it is not set 'No Color Filtering')
         if color_index == 12: # 'No Color Filtering' has index == 12
             color_index = -1
 
         return color_index
 
     @staticmethod
-    def get_timezone():
-        timezone = 'UTC' # set default timezone
-        listRes = js.JSONPreferences.ReadFromJSON()
-        if listRes != None and len(listRes) > 0:
-            try: timezone = listRes["TimeZone"]
-            except: pass
-        return timezone
-
-    @staticmethod
     def file_viewer_window(toplevel_window, filepath, log_box):
 
-        if CommonOperations.check_file_path_errors(log_box, filepath): return
+        if CommonOperations.check_file_path_errors(log_box, filepath): return None
 
         if toplevel_window is None or not toplevel_window.winfo_exists():
             toplevel_window = ctk.CTkToplevel() # create window if its None or destroyed
             toplevel_window.title(filepath)
-            toplevel_window.after(200, lambda: toplevel_window.iconbitmap('./imgs/list.ico')) # i have to delay the icon because it' buggy on windows
+            toplevel_window.after(200, lambda: toplevel_window.iconbitmap('./imgs/list.ico')) # type: ignore # I have to delay the icon because it's buggy on windows
             file_viewer = ctk.CTkTextbox(toplevel_window)
             file_viewer.bind("<Key>", lambda e: "break")  # set the textbox readonly
             file_viewer.pack(fill=tkinter.BOTH, expand=True)
@@ -286,7 +274,7 @@ class CommonOperations():
             toplevel_window.attributes("-topmost", True) # focus to this windows
             LogService.get_logger(__name__).info(f"file '{filepath}' opened")
             CommonOperations.write_log(log_box, f"file '{filepath}' opened")
-            CommonOperations.centerTopLevel(toplevel_window)
+            CommonOperations.center_top_level(toplevel_window)
         else:
             toplevel_window.focus()  # if window exists focus it
 
@@ -295,7 +283,7 @@ class CommonOperations():
     @staticmethod
     def events_preview_in_table(toplevel_window, filepath, log_box):
         if CommonOperations.check_file_path_errors(log_box, filepath):
-            return
+            return None
 
         if toplevel_window is None or not toplevel_window.winfo_exists():
             events = []
@@ -312,15 +300,15 @@ class CommonOperations():
             if len(events) == 0:
                 LogService.get_logger(__name__).info(f"file '{filepath}' is empty")
                 CommonOperations.write_log(log_box, f"file '{filepath}' is empty")
-                return
+                return None
             elif len(events) > 200:
                 LogService.get_logger(__name__).info(f"unable to display table preview: the file '{filepath}' is too large.")
                 CommonOperations.write_log(log_box, f"unable to display table preview: the file '{filepath}' is too large.")
-                return
+                return None
 
             toplevel_window = ctk.CTkToplevel()  # create window if it's None or destroyed
             toplevel_window.title(filepath)
-            toplevel_window.after(200, lambda: toplevel_window.iconbitmap('./imgs/list.ico'))  # delay the icon
+            toplevel_window.after(200, lambda: toplevel_window.iconbitmap('./imgs/list.ico')) # type: ignore  # delay the icon
 
             frame = CTkXYFrame(toplevel_window)
             frame.pack(fill="both", expand=True, padx=10, pady=10)
@@ -331,7 +319,7 @@ class CommonOperations():
             toplevel_window.attributes("-topmost", True)  # focus to this window
             LogService.get_logger(__name__).info(f"file '{filepath}' opened")
             CommonOperations.write_log(log_box, f"file '{filepath}' opened")
-            CommonOperations.centerTopLevel(toplevel_window)
+            CommonOperations.center_top_level(toplevel_window)
         else:
             toplevel_window.focus()  # if window exists, focus it
 
@@ -339,7 +327,7 @@ class CommonOperations():
 
     @staticmethod
     def set_timezone(timezone):
-        js.JSONPreferences.WriteTimeZoneToJSON(timezone)
+        JsonPreferences.write_time_zone_to_json(timezone)
 
     @staticmethod
     def set_color_theme(color_theme: str):
@@ -348,16 +336,16 @@ class CommonOperations():
 
     @staticmethod
     def change_color_theme(color_theme: str):
-        if color_theme == None: return
+        if color_theme is None: return
         LogService.get_logger(__name__).info(f"Changing color theme to: {color_theme}")
         ctk.set_default_color_theme(color_theme)
-        js.JSONPreferences.WriteColorThemeToJSON(color_theme)
+        JsonPreferences.write_color_theme_to_json(color_theme)
 
     @staticmethod
     def change_appearance(new_appearance: str):
-        if new_appearance == None: return
+        if new_appearance is None: return
         ctk.set_appearance_mode(new_appearance)
-        js.JSONPreferences.WriteAppearanceToJSON(new_appearance)
+        JsonPreferences.write_appearance_to_json(new_appearance)
 
     @staticmethod
     def open_info_section_dialog(root, title: str, section_message):
@@ -366,9 +354,9 @@ class CommonOperations():
         # Create a dialog window with a CTkTextbox
         dialog = ctk.CTkToplevel(root)
         dialog.title(title)
-        dialog.after(200, lambda: dialog.iconbitmap('./imgs/information.ico'))
+        dialog.after(200, lambda: dialog.iconbitmap('./imgs/information.ico')) # type: ignore
 
-        CommonOperations.centerWindow(dialog, 420, 400)
+        CommonOperations.center_window(dialog, 420, 400)
         dialog.attributes("-topmost", True)
         dialog.resizable(False, False)
 
@@ -382,22 +370,35 @@ class CommonOperations():
         close_button = ctk.CTkButton(dialog, text="Ok", command=dialog.destroy)
         close_button.pack(pady=10)
 
-    def get_appearance(self) -> str:
+    @staticmethod
+    def get_appearance() -> str:
         appearance = ctk.get_appearance_mode()
 
-        if appearance is None or appearance == "":
-            listRes = js.JSONPreferences.ReadFromJSON()
+        if not appearance:
+            list_res = JsonPreferences.read_from_json()
             appearance = ""
-            if listRes != None and len(listRes) > 0:
+            if isinstance(list_res, dict) and "Appearance" in list_res:
                 try:
-                    appearance = listRes["Appearence"]
+                    appearance = list_res["Appearance"]
                     CommonOperations.change_appearance(appearance)
-                except: pass
+                except (TypeError, ValueError, KeyError) as _:
+                    pass
 
         return appearance
 
     @staticmethod
-    def centerWindow(root, app_width, app_height):
+    def get_timezone():
+        timezone = 'UTC'  # set default timezone
+        list_res = JsonPreferences.read_from_json()
+        if isinstance(list_res, dict) and "TimeZone" in list_res:
+            try:
+                timezone = list_res["TimeZone"]
+            except (TypeError, ValueError, KeyError) as _:
+                pass
+        return timezone
+
+    @staticmethod
+    def center_window(root, app_width, app_height):
         screen_width = root.winfo_screenwidth()
         screen_height = root.winfo_screenheight()
 
@@ -407,7 +408,7 @@ class CommonOperations():
         root.geometry(f'{app_width}x{app_height}+{int(x)}+{int(y)}')
 
     @staticmethod
-    def centerTopLevel(toplevel: ctk.CTkToplevel):
+    def center_top_level(toplevel: ctk.CTkToplevel):
         toplevel.update_idletasks()  # Ensure all geometry changes take effect
         screen_width = toplevel.winfo_screenwidth()
         screen_height = toplevel.winfo_screenheight()

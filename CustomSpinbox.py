@@ -4,10 +4,6 @@ import customtkinter as ctk
 from CTkToolTip import *
 from typing import Callable
 
-import customtkinter as ctk
-from CTkToolTip import *
-from typing import Callable
-
 class CustomSpinbox(ctk.CTkFrame):
     def __init__(self, *args,
                  width: int = 100,
@@ -46,15 +42,13 @@ class CustomSpinbox(ctk.CTkFrame):
         self.add_button.bind("<MouseWheel>", self.on_mouse_wheel)
         self.bind("<MouseWheel>", self.on_mouse_wheel)
 
-        # Aggiungi il tooltip e forza la finestra a essere temporaneamente in primo piano
         self.set_tooltip()
 
     def set_tooltip(self):
         CTkToolTip(self.entry, message="Use the mouse wheel to adjust the value")
-        # Forza la finestra a essere in primo piano solo per un breve periodo
-        parent_window = self.winfo_toplevel()  # Ottieni la finestra Toplevel
+        parent_window = self.winfo_toplevel()
         parent_window.attributes('-topmost', True)
-        parent_window.after(500, lambda: parent_window.attributes('-topmost', False))
+        parent_window.after(500, lambda: parent_window.attributes('-topmost', False)) # type: ignore
 
     def add_button_callback(self):
         if self.command is not None:

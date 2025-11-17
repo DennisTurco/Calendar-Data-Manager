@@ -8,7 +8,7 @@ import os
 class Plotter:
 
     @staticmethod
-    def loadData(filepath):
+    def load_data(filepath):
         # check if file exists and if it is empty
         if not os.path.isfile(filepath): raise FileNotFoundError()
         if os.stat(filepath).st_size == 0: raise pd.errors.EmptyDataError()
@@ -51,7 +51,7 @@ class Plotter:
             raise Exception(f"An error occurred: {str(e)}")
 
     @staticmethod
-    def __extractTimeData(data):
+    def __extract_time_data(data):
         # Extract year from the Start column and convert Duration to timedelta
         data['Start'] = pd.to_datetime(data['Start'])
         data['End'] = pd.to_datetime(data['End'])
@@ -64,7 +64,7 @@ class Plotter:
         return data
 
     @staticmethod
-    def __hoursBySummary(data):
+    def __hours_by_summary(data):
         # Group by 'Summary' and calculate the sum of hours
         hours_by_summary = data.groupby('Summary')['Duration'].sum()
 
@@ -79,7 +79,7 @@ class Plotter:
     def __chart1(data):
         #################### Total Hours per Year
         # extract time
-        data = Plotter.__extractTimeData(data)
+        data = Plotter.__extract_time_data(data)
 
         # Group by year and calculate the sum of hours
         yearly_hours = data.groupby('Year')['Duration'].sum()
@@ -106,9 +106,9 @@ class Plotter:
     def __chart2(data):
         #################### Total Hours by Summary
         # extract time
-        data = Plotter.__extractTimeData(data)
+        data = Plotter.__extract_time_data(data)
 
-        hours_by_summary = Plotter.__hoursBySummary(data)
+        hours_by_summary = Plotter.__hours_by_summary(data)
 
         # Create a bar chart
         plt.figure(figsize=(10, 6))  # Adjust the figure size if needed
@@ -131,13 +131,13 @@ class Plotter:
     def __chart3(data):
         #################### Total Hours by Summary Pie chart
         # extract time
-        data = Plotter.__extractTimeData(data)
+        data = Plotter.__extract_time_data(data)
 
-        hours_by_summary = Plotter.__hoursBySummary(data)
+        hours_by_summary = Plotter.__hours_by_summary(data)
 
         # Create a pie chart
         plt.figure(figsize=(10, 6))  # Adjust the figure size if needed
-        ax = hours_by_summary.plot(kind='pie', autopct='%1.1f%%', startangle=90)
+        hours_by_summary.plot(kind='pie', autopct='%1.1f%%', startangle=90)
 
         plt.xlabel('Summary', fontsize=9)
         plt.ylabel('Total Hours', fontsize=9)
@@ -149,12 +149,12 @@ class Plotter:
         plt.legend(title='Summary', bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=9)  # Add legend outside the plot
         ####################
 
-    #! TODO: fixhere
+    #! TODO: fix here
     @staticmethod
     def __chart4(data):
         #################### Total Hours by Summary and Year
         # extract time
-        data = Plotter.__extractTimeData(data)
+        data = Plotter.__extract_time_data(data)
 
         # Group by 'Summary' and 'Year' and calculate the sum of hours
         summary_yearly_hours = data.groupby(['Year', 'Summary'])['Duration'].sum()
@@ -164,7 +164,7 @@ class Plotter:
 
         # Plot the bar chart
         plt.figure(figsize=(12, 8))  # Adjust the figure size if needed
-        ax = summary_yearly_hours.plot(kind='bar', stacked=True)
+        summary_yearly_hours.plot(kind='bar', stacked=True)
 
         plt.xlabel('Year', fontsize=9)
         plt.ylabel('Total Hours', fontsize=9)
@@ -176,10 +176,10 @@ class Plotter:
         ####################
 
     @staticmethod
-    def chart_TotalHoursPerYear(data):
+    def chart_total_hours_per_year(data):
         #################### Total Hours per Year
         # Extract time data
-        data = Plotter.__extractTimeData(data)
+        data = Plotter.__extract_time_data(data)
 
         # Group by year and calculate the sum of hours
         yearly_hours = data.groupby('Year')['Duration'].sum().reset_index()
@@ -199,10 +199,10 @@ class Plotter:
         ####################
 
     @staticmethod
-    def chart_TotalHoursPerMonth(data):
+    def chart_total_hours_per_month(data):
         #################### Total Hours per Month
         # Extract time data
-        data = Plotter.__extractTimeData(data)
+        data = Plotter.__extract_time_data(data)
 
         # Group by month and calculate the sum of hours
         monthly_hours = data.groupby('Month')['Duration'].sum().reset_index()
@@ -222,10 +222,10 @@ class Plotter:
         ####################
 
     @staticmethod
-    def chart_TotalHoursPerMonthGroupedByYear(data):
+    def chart_total_hours_per_month_grouped_by_year(data):
         #################### Total Hours per Month Grouped by Year
         # Extract time data
-        data = Plotter.__extractTimeData(data)
+        data = Plotter.__extract_time_data(data)
 
         # Group by month, year, and calculate the sum of hours
         monthly_hours_by_year = data.groupby(['Month', 'Year'])['Duration'].sum().reset_index()
@@ -272,12 +272,12 @@ class Plotter:
         ####################
 
     @staticmethod
-    def chart_TotalHoursBySummary(data):
+    def chart_total_hours_by_summary(data):
         #################### Total Hours by Summary
         # Extract time
-        data = Plotter.__extractTimeData(data)
+        data = Plotter.__extract_time_data(data)
 
-        hours_by_summary = Plotter.__hoursBySummary(data)
+        hours_by_summary = Plotter.__hours_by_summary(data)
 
         # Convert Series to DataFrame
         hours_by_summary_df = pd.DataFrame({'Summary': hours_by_summary.index, 'Duration': hours_by_summary.values})
@@ -294,12 +294,12 @@ class Plotter:
         ####################
 
     @staticmethod
-    def chart_TotalHoursBySummaryPie(data):
+    def chart_total_hours_by_summary_pie(data):
         #################### Total Hours by Summary Pie chart
         # Extract time
-        data = Plotter.__extractTimeData(data)
+        data = Plotter.__extract_time_data(data)
 
-        hours_by_summary = Plotter.__hoursBySummary(data)
+        hours_by_summary = Plotter.__hours_by_summary(data)
 
         # Create a pie chart using Plotly Express
         fig = px.pie(hours_by_summary, values='Duration', names=hours_by_summary.index, labels={'Duration': 'Total Hours', 'names': 'Summary'}, title='Total Hours by Summary Pie chart')
@@ -309,10 +309,10 @@ class Plotter:
         ####################
 
     @staticmethod
-    def chart_TotalHoursPerYearBySummary(data):
+    def chart_total_hours_per_year_by_summary(data):
         #################### Total Hours per Year by Summary
         # Extract time data
-        data = Plotter.__extractTimeData(data)
+        data = Plotter.__extract_time_data(data)
 
         # Group by year and summary, calculate the sum of hours
         yearly_hours_by_summary = data.groupby(['Year', 'Summary'])['Duration'].sum().reset_index()
@@ -334,10 +334,10 @@ class Plotter:
         ####################
 
     @staticmethod
-    def chart_TotalHoursPerMonthBySummary(data):
+    def chart_total_hours_per_month_by_summary(data):
         #################### Total Hours per Month by Summary
         # Extract time data
-        data = Plotter.__extractTimeData(data)
+        data = Plotter.__extract_time_data(data)
 
         # Group by month and summary, calculate the sum of hours
         monthly_hours_by_summary = data.groupby(['Month', 'Summary'])['Duration'].sum().reset_index()
@@ -359,16 +359,16 @@ class Plotter:
         ####################
 
     @staticmethod
-    def allStats(data):
+    def all_stats(data):
         # extract time
-        data = Plotter.__extractTimeData(data)
+        data = Plotter.__extract_time_data(data)
 
         # Group by year and calculate the sum of hours
         yearly_hours = data.groupby('Year')['Duration'].sum()
 
-        hours_by_summary = Plotter.__hoursBySummary(data)
+        hours_by_summary = Plotter.__hours_by_summary(data)
 
-        summary_yearly_hours = data.groupby(['Year', 'Summary'])['Duration'].sum().unstack()
+        data.groupby(['Year', 'Summary'])['Duration'].sum().unstack()
 
         stats = [yearly_hours, hours_by_summary]
 

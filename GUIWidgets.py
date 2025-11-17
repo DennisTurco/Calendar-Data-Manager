@@ -1,4 +1,3 @@
-
 from tkinter import PhotoImage
 import customtkinter as ctk
 from CTkScrollableDropdown import *
@@ -11,7 +10,7 @@ def create_side_bar_frame(master, plus_image: PhotoImage, edit_image: PhotoImage
 
     resized_logo = logo_app.subsample(2, 2)
     # logo_label = ctk.CTkLabel(sidebar_frame, text="", image=resized_logo, width=32, height=32, fg_color="transparent")
-    # logo_label.grid(row=0, column=0, padx=(20, 20), pady=(10, 20))
+    # logo_label.grid(row=0, column=0, (20, 20), (10, 20))
     logo_button = ctk.CTkButton(sidebar_frame, text="", width=32, height=32, fg_color="transparent", image=resized_logo)
     logo_button.grid(row=0, column=0, padx=(20, 20), pady=(10, 20))
 
@@ -27,7 +26,7 @@ def create_side_bar_frame(master, plus_image: PhotoImage, edit_image: PhotoImage
     sidebar_button_4.grid(row=5, column=0, padx=20, pady=10)
     google_calendar_link = ctk.CTkButton(sidebar_frame, image=google_image, text="Google Calendar")
     google_calendar_link.grid(row=7, column=0, padx=20, pady=(10, 10))
-    return (sidebar_button_1, sidebar_button_2, sidebar_button_3, sidebar_button_4, google_calendar_link, logo_button)
+    return sidebar_button_1, sidebar_button_2, sidebar_button_3, sidebar_button_4, google_calendar_link, logo_button
 
 def create_date_interval_scroll_frame(master, calendar_image: PhotoImage, timezone: list[str]):
     date_frame = ctk.CTkScrollableFrame(master, label_text="Date Interval")
@@ -51,7 +50,7 @@ def create_date_interval_scroll_frame(master, calendar_image: PhotoImage, timezo
     CTkScrollableDropdown(timezone_selection, values=list(timezone), justify="left", button_color="transparent")
     timezone_selection.set(CommonOperations.get_timezone())
     timezone_selection.grid(row=2, column=1, padx=0, pady=(10, 10), sticky="nsew")
-    return (entry_date_from, entry_date_to, timezone_selection, entry_date_button, entry_date_button2)
+    return entry_date_from, entry_date_to, timezone_selection, entry_date_button, entry_date_button2
 
 def create_file_output_scroll_frame_for_events_list_frame(master, folder_image: PhotoImage, file_image: PhotoImage, table_image: PhotoImage):
     file_output_frame = ctk.CTkScrollableFrame(master, label_text="Save results to file")
@@ -73,7 +72,7 @@ def create_file_output_scroll_frame_for_events_list_frame(master, folder_image: 
     button_open_file.grid(row=0, column=0, padx=10, pady=10, sticky="e")
     button_open_events_table_preview = ctk.CTkButton(master=third_row_frame, image=table_image, text="table preview")
     button_open_events_table_preview.grid(row=0, column=1, padx=10, pady=10, sticky="w")
-    return (file_path, overwrite_mode, button_file_path, button_open_file, button_open_events_table_preview)
+    return file_path, overwrite_mode, button_file_path, button_open_file, button_open_events_table_preview
 
 def create_file_path_scroll_frame_for_graph_frame(master, folder_image: PhotoImage, file_image: PhotoImage, table_image: PhotoImage, info_image: PhotoImage):
     section_message = '''The Create Graph section of the Calendar Data Manager lets you transform your event data into insightful visualizations for better analysis. Here's what you can do:
@@ -117,7 +116,7 @@ This feature is perfect for analyzing productivity, tracking activity trends, an
     button_open_file.grid(row=0, column=0, padx=10, pady=10, sticky="e")
     button_open_events_table_preview = ctk.CTkButton(master=second_row_frame, image=table_image, text="table preview")
     button_open_events_table_preview.grid(row=0, column=1, padx=10, pady=10, sticky="w")
-    return (file_path, button_file_path, button_open_file, button_open_events_table_preview)
+    return file_path, button_file_path, button_open_file, button_open_events_table_preview
 
 def create_graph_types_scroll_frame(master, square_check_image: PhotoImage, square_image: PhotoImage):
     graph_types_frame = ctk.CTkScrollableFrame(master, label_text="Set Graph Types")
@@ -146,7 +145,7 @@ def create_graph_types_scroll_frame(master, square_check_image: PhotoImage, squa
     total_hours_per_month_by_summary.grid(row=3, column=1, padx=10, pady=10, sticky="ew")
     total_hours_per_month_grouped_by_year = ctk.CTkCheckBox(graph_types_frame, text="Hours per Month Grouped By Year", onvalue="on", offvalue="off")
     total_hours_per_month_grouped_by_year.grid(row=4, column=0, padx=10, pady=10, sticky="ew")
-    return(button_select_all, button_deselect_all, total_hours_per_year, total_hours_per_month, total_hours_by_summary, total_hours_by_summary2, total_hours_per_year_by_summary, total_hours_per_month_by_summary, total_hours_per_month_grouped_by_year)
+    return button_select_all, button_deselect_all, total_hours_per_year, total_hours_per_month, total_hours_by_summary, total_hours_by_summary2, total_hours_per_year_by_summary, total_hours_per_month_by_summary, total_hours_per_month_grouped_by_year
 
 def create_date_selection_for_events_list_scroll_frame(master, timezone: list[str], calendar_image: PhotoImage):
     date_frame = ctk.CTkScrollableFrame(master, label_text="Date Interval")
@@ -170,4 +169,4 @@ def create_date_selection_for_events_list_scroll_frame(master, timezone: list[st
     CTkScrollableDropdown(timezone_selection, values=list(timezone), justify="left", button_color="transparent")
     timezone_selection.set(CommonOperations.get_timezone())
     timezone_selection.grid(row=2, column=1, padx=0, pady=(10, 10), sticky="nsew")
-    return (entry_date_from, entry_date_to, entry_date_button, label_date_to, entry_date_button2, timezone_selection)
+    return entry_date_from, entry_date_to, entry_date_button, label_date_to, entry_date_button2, timezone_selection

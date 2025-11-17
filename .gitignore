@@ -17,3 +17,6 @@ __pycache__
 
 # ignore all .log files
 */*.log
+
+# Ignore PyCharm project files
+.idea/

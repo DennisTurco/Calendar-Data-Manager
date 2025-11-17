@@ -38,7 +38,7 @@ class ConfigKeys:
         LOG_SERVICE_LINESTOKEEP = 3000
 
         @classmethod
-        def _set(cls, key: str, value: bool):
+        def set(cls, key: str, value: bool):
             """Set the value for a given config key."""
             if key in cls.__members__:
                 cls.__members__[key]._value_ = value  # Dynamically update the Enum value
@@ -51,41 +51,41 @@ class ConfigKeys:
         Load log type values from a JSON file and update the ConfigKeys enum.
         """
         try:
-            with open(ConfigKeys.Keys.CONFIG_DIR.value + ConfigKeys.Keys.CONFIG_FILE.value, 'r') as file:
+            with open(f"{ConfigKeys.Keys.CONFIG_DIR.value}{ConfigKeys.Keys.CONFIG_FILE.value}", 'r') as file:
                 data = json.load(file)  # Parse JSON file content
 
-            ConfigKeys.Keys._set('GOOGLE_CALENDAR_LINK', data['GOOGLE_CALENDAR_LINK'])
-            ConfigKeys.Keys._set('TUTORIAL_SETUP_LINK', data['TUTORIAL_SETUP_LINK'])
-            ConfigKeys.Keys._set('GITHUB_ISSUES_LINK', data['GITHUB_ISSUES_LINK'])
-            ConfigKeys.Keys._set('GITHUB_PAGE_LINK', data['GITHUB_PAGE_LINK'])
-            ConfigKeys.Keys._set('DONATE_BUYMEACOFFE_PAGE_LINK', data['DONATE_BUYMEACOFFE_PAGE_LINK'])
-            ConfigKeys.Keys._set('DONATE_PAYPAL_PAGE_LINK', data['DONATE_PAYPAL_PAGE_LINK'])
-            ConfigKeys.Keys._set('SHARD_WEBSITE', data['SHARD_WEBSITE'])
-            ConfigKeys.Keys._set('SHARD_EMAIL', data['SHARD_EMAIL'])
-            ConfigKeys.Keys._set('VERSION', data['VERSION'])
-            ConfigKeys.Keys._set('APP_WIDTH', data['APP_WIDTH'])
-            ConfigKeys.Keys._set('APP_HEIGHT', data['APP_HEIGHT'])
-            ConfigKeys.Keys._set('CONFIG_DIR', data['CONFIG_DIR'])
-            ConfigKeys.Keys._set('PREFERENCE_FILE', data['PREFERENCE_FILE'])
-            ConfigKeys.Keys._set('LOG_FILE', data['LOG_FILE'])
-            ConfigKeys.Keys._set('EVENT_COLOR', data['EVENT_COLOR'])
-            ConfigKeys.Keys._set('TIMEZONE', data['TIMEZONE'])
-            ConfigKeys.Keys._set('MENUITEM_BUGREPORT', data['MenuItems']['BugReport'])
-            ConfigKeys.Keys._set('MENUITEM_SUPPORT', data['MenuItems']['Support'])
-            ConfigKeys.Keys._set('MENUITEM_EXIT', data['MenuItems']['Exit'])
-            ConfigKeys.Keys._set('MENUITEM_THEME', data['MenuItems']['Theme'])
-            ConfigKeys.Keys._set('MENUITEM_SCALING', data['MenuItems']['Scaling'])
-            ConfigKeys.Keys._set('MENUITEM_APPEARANCE', data['MenuItems']['Appearance'])
-            ConfigKeys.Keys._set('MENUITEM_SHARE', data['MenuItems']['Share'])
-            ConfigKeys.Keys._set('MENUITEM_DONATE', data['MenuItems']['Donate'])
-            ConfigKeys.Keys._set('HOMEBUTTONS_MESSAGESECTION', data['HomeButtons']['MessageSection'])
-            ConfigKeys.Keys._set('HOMEBUTTONS_GITHUB', data['HomeButtons']['Github'])
-            ConfigKeys.Keys._set('HOMEBUTTONS_BUYMEACOFFE', data['HomeButtons']['BuyMeACoffe'])
-            ConfigKeys.Keys._set('HOMEBUTTONS_PAYPAL', data['HomeButtons']['Paypal'])
-            ConfigKeys.Keys._set('GRAPH_TIMEOUT', data['GraphTimeout']['value'])
-            ConfigKeys.Keys._set('LOG_SERVICE_LEVEL', data['LogService']['Level'])
-            ConfigKeys.Keys._set('LOG_SERVICE_MAXLINES', data['LogService']['MaxLines']['value'])
-            ConfigKeys.Keys._set('LOG_SERVICE_LINESTOKEEP', data['LogService']['LinesToKeepAfterFileClear']['value'])
+            ConfigKeys.Keys.set('GOOGLE_CALENDAR_LINK', data['GOOGLE_CALENDAR_LINK'])
+            ConfigKeys.Keys.set('TUTORIAL_SETUP_LINK', data['TUTORIAL_SETUP_LINK'])
+            ConfigKeys.Keys.set('GITHUB_ISSUES_LINK', data['GITHUB_ISSUES_LINK'])
+            ConfigKeys.Keys.set('GITHUB_PAGE_LINK', data['GITHUB_PAGE_LINK'])
+            ConfigKeys.Keys.set('DONATE_BUYMEACOFFE_PAGE_LINK', data['DONATE_BUYMEACOFFE_PAGE_LINK'])
+            ConfigKeys.Keys.set('DONATE_PAYPAL_PAGE_LINK', data['DONATE_PAYPAL_PAGE_LINK'])
+            ConfigKeys.Keys.set('SHARD_WEBSITE', data['SHARD_WEBSITE'])
+            ConfigKeys.Keys.set('SHARD_EMAIL', data['SHARD_EMAIL'])
+            ConfigKeys.Keys.set('VERSION', data['VERSION'])
+            ConfigKeys.Keys.set('APP_WIDTH', data['APP_WIDTH'])
+            ConfigKeys.Keys.set('APP_HEIGHT', data['APP_HEIGHT'])
+            ConfigKeys.Keys.set('CONFIG_DIR', data['CONFIG_DIR'])
+            ConfigKeys.Keys.set('PREFERENCE_FILE', data['PREFERENCE_FILE'])
+            ConfigKeys.Keys.set('LOG_FILE', data['LOG_FILE'])
+            ConfigKeys.Keys.set('EVENT_COLOR', data['EVENT_COLOR'])
+            ConfigKeys.Keys.set('TIMEZONE', data['TIMEZONE'])
+            ConfigKeys.Keys.set('MENUITEM_BUGREPORT', data['MenuItems']['BugReport'])
+            ConfigKeys.Keys.set('MENUITEM_SUPPORT', data['MenuItems']['Support'])
+            ConfigKeys.Keys.set('MENUITEM_EXIT', data['MenuItems']['Exit'])
+            ConfigKeys.Keys.set('MENUITEM_THEME', data['MenuItems']['Theme'])
+            ConfigKeys.Keys.set('MENUITEM_SCALING', data['MenuItems']['Scaling'])
+            ConfigKeys.Keys.set('MENUITEM_APPEARANCE', data['MenuItems']['Appearance'])
+            ConfigKeys.Keys.set('MENUITEM_SHARE', data['MenuItems']['Share'])
+            ConfigKeys.Keys.set('MENUITEM_DONATE', data['MenuItems']['Donate'])
+            ConfigKeys.Keys.set('HOMEBUTTONS_MESSAGESECTION', data['HomeButtons']['MessageSection'])
+            ConfigKeys.Keys.set('HOMEBUTTONS_GITHUB', data['HomeButtons']['Github'])
+            ConfigKeys.Keys.set('HOMEBUTTONS_BUYMEACOFFE', data['HomeButtons']['BuyMeACoffe'])
+            ConfigKeys.Keys.set('HOMEBUTTONS_PAYPAL', data['HomeButtons']['Paypal'])
+            ConfigKeys.Keys.set('GRAPH_TIMEOUT', data['GraphTimeout']['value'])
+            ConfigKeys.Keys.set('LOG_SERVICE_LEVEL', data['LogService']['Level'])
+            ConfigKeys.Keys.set('LOG_SERVICE_MAXLINES', data['LogService']['MaxLines']['value'])
+            ConfigKeys.Keys.set('LOG_SERVICE_LINESTOKEEP', data['LogService']['LinesToKeepAfterFileClear']['value'])
 
         except (FileNotFoundError, KeyError, json.JSONDecodeError) as e:
             print(f"Error loading log type values from JSON: {e}")
