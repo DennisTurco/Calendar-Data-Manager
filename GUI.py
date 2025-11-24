@@ -59,24 +59,8 @@ class Images:
         self.github_image = tkinter.PhotoImage(file='./imgs/github.png')
         self.user_image = tkinter.PhotoImage(file='./imgs/user.png')
 
-def create_log_box(parent, row: int, column: int, columnspan: int = 2, width: int = 250, height: int = 100):
-    """Create a readonly log textbox, place it on the grid and return it.
-
-    Consolidates repeated creation, binding and gridding of the log textbox used
-    by multiple frames.
-    """
-    log_box = ctk.CTkTextbox(parent, width=width, height=height)
-    log_box.bind("<Key>", lambda e: "break")  # set the textbox readonly
-    log_box.grid(row=row, column=column, columnspan=columnspan, padx=(0, 0), pady=(20, 0), sticky="nsew")
-    return log_box
-
 #?###########################################################
 class BaseFrame(ctk.CTkFrame):
-    """Base frame that centralizes common resources and helpers for other frames.
-
-    Provides: `self._common`, `self._logger`, and convenience methods that wrap
-    the previously added module-level helpers.
-    """
     def __init__(self, parent):
         ctk.CTkFrame.__init__(self, parent)
         self._common = CommonOperations()
@@ -96,11 +80,6 @@ class BaseFrame(ctk.CTkFrame):
 
 
 def setup_sidebar(frame, common: CommonOperations, img: Images):
-    """Create the sidebar and wire the common navigation commands.
-
-    Returns the tuple of widgets from `GUIWidgets.create_side_bar_frame` for cases
-    where the caller wants to further customize them.
-    """
     (sidebar_button_1, sidebar_button_2, sidebar_button_3, sidebar_button_4, google_calendar_link, logo_button) = GUIWidgets.create_side_bar_frame(frame, img.plus_image, img.edit_image, img.list_image, img.chart_image, img.google_image, img.icon)
     sidebar_button_1.configure(command=lambda: FrameController.show_frame(common.get_frames()[NewEventsFrame]))
     sidebar_button_2.configure(command=lambda: FrameController.show_frame(common.get_frames()[EditEventsFrame]))
@@ -112,16 +91,11 @@ def setup_sidebar(frame, common: CommonOperations, img: Images):
 
 #TODO: fixhere
 def wire_date_picker_buttons(frame, entry_date_button, entry_date_button2):
-    """Wire date picker buttons to the frame's __date_picker method."""
     entry_date_button.configure(command=lambda: frame.__date_picker(1))
     entry_date_button2.configure(command=lambda: frame.__date_picker(2))
 
 
 def add_tooltips(*widget_message_pairs, delay: float = 0.3):
-    """Attach CTkToolTip to pairs of (widget, message).
-
-    Usage: add_tooltips((w1, 'msg1'), (w2, 'msg2'), delay=0.3)
-    """
     for pair in widget_message_pairs:
         try:
             widget, message = pair
@@ -130,6 +104,14 @@ def add_tooltips(*widget_message_pairs, delay: float = 0.3):
             # keep behavior resilient in case of unexpected input
             pass
 
+def create_log_box(parent, row: int, column: int, columnspan: int = 2, width: int = 250, height: int = 100):
+    log_box = ctk.CTkTextbox(parent, width=width, height=height)
+    log_box.bind("<Key>", lambda e: "break")  # set the textbox readonly
+    log_box.grid(row=row, column=column, columnspan=columnspan, padx=(0, 0), pady=(20, 0), sticky="nsew")
+    return log_box
+#?###########################################################
+
+#?###########################################################
 class NewEventsFrame(BaseFrame):
     toplevel_window = None
     _common = CommonOperations()
@@ -146,7 +128,7 @@ class NewEventsFrame(BaseFrame):
         self.grid_rowconfigure((0, 1, 2), weight=1)
 
         # create sidebar frame with widgets
-        (sidebar_button_1, sidebar_button_2, sidebar_button_3, sidebar_button_4, google_calendar_link, logo_button) = self.setup_sidebar(img)
+        self.setup_sidebar(img)
 
         # create main panel
         section_message = InformationMessages.new_event_info_message
@@ -264,7 +246,7 @@ class EditEventsFrame(BaseFrame):
         self.grid_rowconfigure((0, 1, 2), weight=1)
 
         # create sidebar frame with widgets
-        (sidebar_button_1, sidebar_button_2, sidebar_button_3, sidebar_button_4, google_calendar_link, logo_button) = self.setup_sidebar(img)
+        self.setup_sidebar(img)
 
         section_message = InformationMessages.update_events_info_message
 
@@ -539,7 +521,7 @@ class GetEventsFrame(BaseFrame):
         self.grid_rowconfigure((0, 1, 2, 3), weight=1)
 
         # create sidebar frame with widgets
-        (sidebar_button_1, sidebar_button_2, sidebar_button_3, sidebar_button_4, google_calendar_link, logo_button) = self.setup_sidebar(self.img)
+        self.setup_sidebar(self.img)
 
         section_message = InformationMessages.get_events_info_message
 
@@ -673,6 +655,7 @@ class GetEventsFrame(BaseFrame):
             return
 
         self.events_list_viewer_window()
+
     def __get_and_plot(self):
         if self.__get_events_count() <= 0:
             return
@@ -898,7 +881,7 @@ class GraphFrame(BaseFrame):
         self.grid_rowconfigure((0, 1, 2), weight=1)
 
         # create sidebar frame with widgets
-        (sidebar_button_1, sidebar_button_2, sidebar_button_3, sidebar_button_4, google_calendar_link, logo_button) = self.setup_sidebar(img)
+        self.setup_sidebar(img)
 
         # create main panel
         (self.file_path, button_file_path, button_open_file, button_open_events_table_preview) = GUIWidgets.create_file_path_scroll_frame_for_graph_frame(self, img.folder_image, img.file_image, img.table_image, img.info_image)
