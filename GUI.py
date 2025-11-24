@@ -59,14 +59,84 @@ class Images:
         self.github_image = tkinter.PhotoImage(file='./imgs/github.png')
         self.user_image = tkinter.PhotoImage(file='./imgs/user.png')
 
+def create_log_box(parent, row: int, column: int, columnspan: int = 2, width: int = 250, height: int = 100):
+    """Create a readonly log textbox, place it on the grid and return it.
+
+    Consolidates repeated creation, binding and gridding of the log textbox used
+    by multiple frames.
+    """
+    log_box = ctk.CTkTextbox(parent, width=width, height=height)
+    log_box.bind("<Key>", lambda e: "break")  # set the textbox readonly
+    log_box.grid(row=row, column=column, columnspan=columnspan, padx=(0, 0), pady=(20, 0), sticky="nsew")
+    return log_box
+
 #?###########################################################
-class NewEventsFrame(ctk.CTkFrame):
+class BaseFrame(ctk.CTkFrame):
+    """Base frame that centralizes common resources and helpers for other frames.
+
+    Provides: `self._common`, `self._logger`, and convenience methods that wrap
+    the previously added module-level helpers.
+    """
+    def __init__(self, parent):
+        ctk.CTkFrame.__init__(self, parent)
+        self._common = CommonOperations()
+        self._logger = LogService.get_logger(__name__)
+
+    def setup_sidebar(self, img: Images):
+        return setup_sidebar(self, self._common, img)
+
+    def create_log_box(self, row: int, column: int = 1, columnspan: int = 2, width: int = 250, height: int = 100):
+        return create_log_box(self, row, column, columnspan, width, height)
+
+    def wire_date_picker_buttons(self, entry_date_button, entry_date_button2):
+        wire_date_picker_buttons(self, entry_date_button, entry_date_button2)
+
+    def add_tooltips(self, *widget_message_pairs, delay: float = 0.3):
+        add_tooltips(*widget_message_pairs, delay=delay)
+
+
+def setup_sidebar(frame, common: CommonOperations, img: Images):
+    """Create the sidebar and wire the common navigation commands.
+
+    Returns the tuple of widgets from `GUIWidgets.create_side_bar_frame` for cases
+    where the caller wants to further customize them.
+    """
+    (sidebar_button_1, sidebar_button_2, sidebar_button_3, sidebar_button_4, google_calendar_link, logo_button) = GUIWidgets.create_side_bar_frame(frame, img.plus_image, img.edit_image, img.list_image, img.chart_image, img.google_image, img.icon)
+    sidebar_button_1.configure(command=lambda: FrameController.show_frame(common.get_frames()[NewEventsFrame]))
+    sidebar_button_2.configure(command=lambda: FrameController.show_frame(common.get_frames()[EditEventsFrame]))
+    sidebar_button_3.configure(command=lambda: FrameController.show_frame(common.get_frames()[GetEventsFrame]))
+    sidebar_button_4.configure(command=lambda: FrameController.show_frame(common.get_frames()[GraphFrame]))
+    logo_button.configure(command=lambda: FrameController.show_frame(common.get_frames()[MainFrame]))
+    google_calendar_link.configure(command=lambda: webbrowser.open(ConfigKeys.Keys.GOOGLE_CALENDAR_LINK.value))
+    return (sidebar_button_1, sidebar_button_2, sidebar_button_3, sidebar_button_4, google_calendar_link, logo_button)
+
+#TODO: fixhere
+def wire_date_picker_buttons(frame, entry_date_button, entry_date_button2):
+    """Wire date picker buttons to the frame's __date_picker method."""
+    entry_date_button.configure(command=lambda: frame.__date_picker(1))
+    entry_date_button2.configure(command=lambda: frame.__date_picker(2))
+
+
+def add_tooltips(*widget_message_pairs, delay: float = 0.3):
+    """Attach CTkToolTip to pairs of (widget, message).
+
+    Usage: add_tooltips((w1, 'msg1'), (w2, 'msg2'), delay=0.3)
+    """
+    for pair in widget_message_pairs:
+        try:
+            widget, message = pair
+            CTkToolTip(widget, delay=delay, message=message)
+        except Exception:
+            # keep behavior resilient in case of unexpected input
+            pass
+
+class NewEventsFrame(BaseFrame):
     toplevel_window = None
     _common = CommonOperations()
     _logger = LogService.get_logger(__name__)
 
     def __init__(self, parent, _):
-        ctk.CTkFrame.__init__(self, parent)
+        BaseFrame.__init__(self, parent)
         img = Images()
         self.event_service = EventsService(self._common)
 
@@ -76,13 +146,7 @@ class NewEventsFrame(ctk.CTkFrame):
         self.grid_rowconfigure((0, 1, 2), weight=1)
 
         # create sidebar frame with widgets
-        (sidebar_button_1, sidebar_button_2, sidebar_button_3, sidebar_button_4, google_calendar_link, logo_button) = GUIWidgets.create_side_bar_frame(self, img.plus_image, img.edit_image, img.list_image, img.chart_image, img.google_image, img.icon)
-        sidebar_button_1.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[NewEventsFrame]))
-        sidebar_button_2.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[EditEventsFrame]))
-        sidebar_button_3.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GetEventsFrame]))
-        sidebar_button_4.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GraphFrame]))
-        logo_button.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[MainFrame]))
-        google_calendar_link.configure(command=lambda: webbrowser.open(ConfigKeys.Keys.GOOGLE_CALENDAR_LINK.value))
+        (sidebar_button_1, sidebar_button_2, sidebar_button_3, sidebar_button_4, google_calendar_link, logo_button) = self.setup_sidebar(img)
 
         # create main panel
         section_message = InformationMessages.new_event_info_message
@@ -124,18 +188,18 @@ class NewEventsFrame(ctk.CTkFrame):
         self.create_button = ctk.CTkButton(self, image=img.plus_image, text="Create", border_width=2, command=self.__create_event)
         self.create_button.grid(row=3, column=1, padx=20, pady=20)
 
-        CTkToolTip(self.entry_summary, delay=0.3, message="(Required) Insert event title")
-        CTkToolTip(self.entry_description, delay=0.3, message="(Optional) Insert event description")
-        CTkToolTip(self.multi_selection, delay=0.3, message="(Required) Choose event color")
-        CTkToolTip(self.entry_date_from, delay=0.3, message="(Optional) Enter date from")
-        CTkToolTip(self.entry_date_to, delay=0.3, message="(Optional) Enter date to")
-        CTkToolTip(self.timezone_selection, delay=0.3, message="(Optional) Choose time zone")
-        CTkToolTip(self.create_button, delay=0.3, message="Create new event")
+        self.add_tooltips(
+            (self.entry_summary, "(Required) Insert event title"),
+            (self.entry_description, "(Optional) Insert event description"),
+            (self.multi_selection, "(Required) Choose event color"),
+            (self.entry_date_from, "(Optional) Enter date from"),
+            (self.entry_date_to, "(Optional) Enter date to"),
+            (self.timezone_selection, "(Optional) Choose time zone"),
+            (self.create_button, "Create new event")
+        )
 
         # create log textbox
-        self.log_box = ctk.CTkTextbox(self, width=250, height=100)
-        self.log_box.bind("<Key>", lambda e: "break")  # set the textbox readonly
-        self.log_box.grid(row=4, column=1, columnspan=2, padx=(0, 0), pady=(20, 0), sticky="nsew")
+        self.log_box = self.create_log_box(4, 1, 2)
 
     def __create_event(self):
         self._logger.info("Creating event")
@@ -179,7 +243,7 @@ class NewEventsFrame(ctk.CTkFrame):
 #?###########################################################
 
 #?###########################################################
-class EditEventsFrame(ctk.CTkFrame):
+class EditEventsFrame(BaseFrame):
     _common = CommonOperations()
     _logger = LogService.get_logger(__name__)
     toplevel_window: Optional[ctk.CTkToplevel] = None
@@ -188,7 +252,7 @@ class EditEventsFrame(ctk.CTkFrame):
     event_color_to: dict[str, str] = ConfigKeys.Keys.EVENT_COLOR.value
 
     def __init__(self, parent, _):
-        ctk.CTkFrame.__init__(self, parent)
+        BaseFrame.__init__(self, parent)
         img = Images()
         self.event_service = EventsService(self._common)
 
@@ -200,13 +264,7 @@ class EditEventsFrame(ctk.CTkFrame):
         self.grid_rowconfigure((0, 1, 2), weight=1)
 
         # create sidebar frame with widgets
-        (sidebar_button_1, sidebar_button_2, sidebar_button_3, sidebar_button_4, google_calendar_link, logo_button) = GUIWidgets.create_side_bar_frame(self, img.plus_image, img.edit_image, img.list_image, img.chart_image, img.google_image, img.icon)
-        sidebar_button_1.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[NewEventsFrame]))
-        sidebar_button_2.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[EditEventsFrame]))
-        sidebar_button_3.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GetEventsFrame]))
-        sidebar_button_4.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GraphFrame]))
-        logo_button.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[MainFrame]))
-        google_calendar_link.configure(command=lambda: webbrowser.open(ConfigKeys.Keys.GOOGLE_CALENDAR_LINK.value))
+        (sidebar_button_1, sidebar_button_2, sidebar_button_3, sidebar_button_4, google_calendar_link, logo_button) = self.setup_sidebar(img)
 
         section_message = InformationMessages.update_events_info_message
 
@@ -278,21 +336,21 @@ class EditEventsFrame(ctk.CTkFrame):
         edit_button = ctk.CTkButton(self, image=img.edit_image, text="Edit", border_width=2, command=self.__edit_events)
         edit_button.grid(row=3, column=1, columnspan=2, padx=20, pady=20)
 
-        CTkToolTip(self.entry_summary_old, delay=0.3, message="(Required) Insert OLD event title")
-        CTkToolTip(self.entry_description_old, delay=0.3, message="(Optional) Insert the OLD event description")
-        CTkToolTip(self.multi_selection_old, delay=0.3, message="(Optional) Choose OLD event color")
-        CTkToolTip(self.entry_summary_new, delay=0.3, message="(Required) Insert NEW event title")
-        CTkToolTip(self.entry_description_new, delay=0.3, message="(Optional/Required) Insert NEW event description;\n If the old description is set, this field will not be ignored.")
-        CTkToolTip(self.multi_selection_new, delay=0.3, message="(Required) Choose NEW event color")
-        CTkToolTip(self.entry_date_from, delay=0.3, message="(Optional) Enter date from")
-        CTkToolTip(self.entry_date_to, delay=0.3, message="(Optional) Enter date to")
-        CTkToolTip(self.timezone_selection, delay=0.3, message="(Optional) Choose time zone")
-        CTkToolTip(edit_button, delay=0.3, message="Edit events")
+        self.add_tooltips(
+            (self.entry_summary_old, "(Required) Insert OLD event title"),
+            (self.entry_description_old, "(Optional) Insert the OLD event description"),
+            (self.multi_selection_old, "(Optional) Choose OLD event color"),
+            (self.entry_summary_new, "(Required) Insert NEW event title"),
+            (self.entry_description_new, "(Optional/Required) Insert NEW event description;\n If the old description is set, this field will not be ignored."),
+            (self.multi_selection_new, "(Required) Choose NEW event color"),
+            (self.entry_date_from, "(Optional) Enter date from"),
+            (self.entry_date_to, "(Optional) Enter date to"),
+            (self.timezone_selection, "(Optional) Choose time zone"),
+            (edit_button, "Edit events")
+        )
 
         # create log textbox
-        self.log_box = ctk.CTkTextbox(self, width=250, height=100)
-        self.log_box.bind("<Key>", lambda e: "break")  # set the textbox readonly
-        self.log_box.grid(row=4, column=1, columnspan=2, padx=(0, 0), pady=(20, 0), sticky="nsew")
+        self.log_box = self.create_log_box(4, 1, 2)
 
     def __date_picker(self, picker_type):
         self.date_picker_window = CommonOperations.date_picker_window(picker_type, self.date_picker_window, self.entry_date_from, self.entry_date_to, self.log_box)
@@ -457,7 +515,7 @@ class EditEventsFrame(ctk.CTkFrame):
 #?###########################################################
 
 #?###########################################################
-class GetEventsFrame(ctk.CTkFrame):
+class GetEventsFrame(BaseFrame):
     toplevel_window = None
     toplevel_entry_window = None
     date_picker_window = None
@@ -470,7 +528,7 @@ class GetEventsFrame(ctk.CTkFrame):
     event_color = ConfigKeys.Keys.EVENT_COLOR.value
 
     def __init__(self, parent, _):
-        ctk.CTkFrame.__init__(self, parent)
+        BaseFrame.__init__(self, parent)
         self.img = Images()
         self.event_color["No Color Filtering"] = ""
         self.event_service = EventsService(self._common)
@@ -481,13 +539,7 @@ class GetEventsFrame(ctk.CTkFrame):
         self.grid_rowconfigure((0, 1, 2, 3), weight=1)
 
         # create sidebar frame with widgets
-        (sidebar_button_1, sidebar_button_2, sidebar_button_3, sidebar_button_4, google_calendar_link, logo_button) = GUIWidgets.create_side_bar_frame(self, self.img.plus_image, self.img.edit_image, self.img.list_image, self.img.chart_image, self.img.google_image, self.img.icon)
-        sidebar_button_1.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[NewEventsFrame]))
-        sidebar_button_2.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[EditEventsFrame]))
-        sidebar_button_3.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GetEventsFrame]))
-        sidebar_button_4.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GraphFrame]))
-        logo_button.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[MainFrame]))
-        google_calendar_link.configure(command=lambda: webbrowser.open(ConfigKeys.Keys.GOOGLE_CALENDAR_LINK.value))
+        (sidebar_button_1, sidebar_button_2, sidebar_button_3, sidebar_button_4, google_calendar_link, logo_button) = self.setup_sidebar(self.img)
 
         section_message = InformationMessages.get_events_info_message
 
@@ -549,24 +601,24 @@ class GetEventsFrame(ctk.CTkFrame):
         get_and_plot_button = ctk.CTkButton(container_frame2, image=self.img.chart_image, text="Get and plot", border_width=2, command=self.__get_and_plot)
         get_and_plot_button.grid(row=0, column=1, padx=5, pady=10, sticky="w")
 
-        CTkToolTip(self.entry_id, delay=0.3, message="(Optional) Enter event id This is a very specific field;\n if you want to get a specific event and you know the specific event id, you can enter it and ignore the fields below.\n Otherwise you can ignore it and proceed to fill in the other fields.")
-        CTkToolTip(self.entry_summary, delay=0.3, message="(Optional) Insert event title")
-        CTkToolTip(self.entry_description, delay=0.3, message="(Optional) Insert the event description")
-        CTkToolTip(self.multi_selection, delay=0.3, message="(Optional) Choose event color")
-        CTkToolTip(self.entry_date_from, delay=0.3, message="(Optional) Enter date from")
-        CTkToolTip(self.entry_date_to, delay=0.3, message="(Optional) Enter date to")
-        CTkToolTip(self.timezone_selection, delay=0.3, message="(Optional) Choose time zone")
-        CTkToolTip(self.file_path, delay=0.3, message="(Optional) Enter the path to the file;\n if you want to save the results to a specific file (.csv, .txt)")
-        CTkToolTip(self.overwrite_mode, delay=0.3, message="If it is enabled, it overwrites the contents of the file with the newly obtained events.\n Otherwise, it adds the newly obtained events without deleting anything.")
-        CTkToolTip(button_open_file, delay=0.3, message="Open file preview")
-        CTkToolTip(button_open_events_table_preview, delay=0.3, message="Open file preview in table")
-        CTkToolTip(get_button, delay=0.3, message="Get and save events.")
-        CTkToolTip(get_and_plot_button, delay=0.3, message="Get and plot events without saving to a file.")
+        self.add_tooltips(
+            (self.entry_id, "(Optional) Enter event id This is a very specific field;\n if you want to get a specific event and you know the specific event id, you can enter it and ignore the fields below.\n Otherwise you can ignore it and proceed to fill in the other fields."),
+            (self.entry_summary, "(Optional) Insert event title"),
+            (self.entry_description, "(Optional) Insert the event description"),
+            (self.multi_selection, "(Optional) Choose event color"),
+            (self.entry_date_from, "(Optional) Enter date from"),
+            (self.entry_date_to, "(Optional) Enter date to"),
+            (self.timezone_selection, "(Optional) Choose time zone"),
+            (self.file_path, "(Optional) Enter the path to the file;\n if you want to save the results to a specific file (.csv, .txt)"),
+            (self.overwrite_mode, "If it is enabled, it overwrites the contents of the file with the newly obtained events.\n Otherwise, it adds the newly obtained events without deleting anything."),
+            (button_open_file, "Open file preview"),
+            (button_open_events_table_preview, "Open file preview in table"),
+            (get_button, "Get and save events."),
+            (get_and_plot_button, "Get and plot events without saving to a file.")
+        )
 
         # create log textbox
-        self.log_box = ctk.CTkTextbox(self, width=250, height=100)
-        self.log_box.bind("<Key>", lambda e: "break")  # set the textbox readonly
-        self.log_box.grid(row=5, column=1, columnspan=2, padx=(0, 0), pady=(20, 0), sticky="nsew")
+        self.log_box = self.create_log_box(5, 1, 2)
 
         self.cleanup_temp_files()
 
@@ -829,7 +881,7 @@ class GetEventsFrame(ctk.CTkFrame):
 #?###########################################################
 
 #?###########################################################
-class GraphFrame(ctk.CTkFrame):
+class GraphFrame(BaseFrame):
     file_viewer_window = None
     events_preview_in_table = None
     _common = CommonOperations()
@@ -837,7 +889,7 @@ class GraphFrame(ctk.CTkFrame):
     stop_event = threading.Event()
 
     def __init__(self, parent, _):
-        ctk.CTkFrame.__init__(self, parent)
+        BaseFrame.__init__(self, parent)
         img = Images()
 
         # configure grid layout (4x4)
@@ -846,13 +898,7 @@ class GraphFrame(ctk.CTkFrame):
         self.grid_rowconfigure((0, 1, 2), weight=1)
 
         # create sidebar frame with widgets
-        (sidebar_button_1, sidebar_button_2, sidebar_button_3, sidebar_button_4, google_calendar_link, logo_button) = GUIWidgets.create_side_bar_frame(self, img.plus_image, img.edit_image, img.list_image, img.chart_image, img.google_image, img.icon)
-        sidebar_button_1.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[NewEventsFrame]))
-        sidebar_button_2.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[EditEventsFrame]))
-        sidebar_button_3.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GetEventsFrame]))
-        sidebar_button_4.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[GraphFrame]))
-        logo_button.configure(command=lambda: FrameController.show_frame(self._common.get_frames()[MainFrame]))
-        google_calendar_link.configure(command=lambda: webbrowser.open(ConfigKeys.Keys.GOOGLE_CALENDAR_LINK.value))
+        (sidebar_button_1, sidebar_button_2, sidebar_button_3, sidebar_button_4, google_calendar_link, logo_button) = self.setup_sidebar(img)
 
         # create main panel
         (self.file_path, button_file_path, button_open_file, button_open_events_table_preview) = GUIWidgets.create_file_path_scroll_frame_for_graph_frame(self, img.folder_image, img.file_image, img.table_image, img.info_image)
@@ -868,17 +914,17 @@ class GraphFrame(ctk.CTkFrame):
         self.graph_button = ctk.CTkButton(self, command=self.__generate_graph, image=img.chart_image, border_width=2, text="Generate")
         self.graph_button.grid(row=4, column=1, padx=20, pady=20)
 
-        CTkToolTip(self.file_path, delay=0.3, message="(Required) Enter the path to the file you generated from the 'Get Events List' section.")
-        CTkToolTip(button_open_file, delay=0.3, message="Open file preview")
-        CTkToolTip(button_open_events_table_preview, delay=0.3, message="Open file preview in table")
-        CTkToolTip(self.graph_button, delay=0.3, message="Generate graphs")
-        CTkToolTip(self.button_select_all, delay=0.3, message="Select all types")
-        CTkToolTip(self.button_deselect_all, delay=0.3, message="Deselect all types")
+        self.add_tooltips(
+            (self.file_path, "(Required) Enter the path to the file you generated from the 'Get Events List' section."),
+            (button_open_file, "Open file preview"),
+            (button_open_events_table_preview, "Open file preview in table"),
+            (self.graph_button, "Generate graphs"),
+            (self.button_select_all, "Select all types"),
+            (self.button_deselect_all, "Deselect all types")
+        )
 
         # create log textbox
-        self.log_box = ctk.CTkTextbox(self, width=250, height=100)
-        self.log_box.bind("<Key>", lambda e: "break")  # set the textbox readonly
-        self.log_box.grid(row=5, column=1, columnspan=2, padx=(0, 0), pady=(20, 0), sticky="nsew")
+        self.log_box = self.create_log_box(5, 1, 2)
 
     def get_file_path(self):
         file_path = filedialog.askopenfilename(title="Select file where do you want to save data", filetypes=(("CSV files", "*.csv"), ("TXT files", "*.txt"), ("All files", "*.*")))
@@ -980,11 +1026,11 @@ class GraphFrame(ctk.CTkFrame):
 #?###########################################################
 
 #?###########################################################
-class MainFrame(ctk.CTkFrame):
+class MainFrame(BaseFrame):
     _common = CommonOperations()
 
     def __init__(self, parent, _):
-        ctk.CTkFrame.__init__(self, parent)
+        BaseFrame.__init__(self, parent)
         img = Images()
 
         title_font = ctk.CTkFont(family="Georgia", weight='bold', slant='italic', size=45)
@@ -1008,17 +1054,17 @@ class MainFrame(ctk.CTkFrame):
         if ConfigKeys.Keys.HOMEBUTTONS_GITHUB.value:
             github_btn = ctk.CTkButton(master=button_frame, image=img.github_image, fg_color="transparent", border_width=1, text="", width=32, height=32, command=lambda: webbrowser.open(ConfigKeys.Keys.GITHUB_PAGE_LINK.value))
             github_btn.pack(side='left', padx=5)
-            CTkToolTip(github_btn, delay=0.3, message="Github page")
+            self.add_tooltips((github_btn, "Github page"))
 
         if ConfigKeys.Keys.HOMEBUTTONS_BUYMEACOFFE.value:
             donate_buymeacoffe_btn = ctk.CTkButton(master=button_frame, image=img.buymeacoffe_donation_image, fg_color="transparent", border_width=1, text="", width=32, height=32, command=lambda: webbrowser.open(ConfigKeys.Keys.DONATE_BUYMEACOFFE_PAGE_LINK.value))
             donate_buymeacoffe_btn.pack(side='left', padx=5)
-            CTkToolTip(donate_buymeacoffe_btn, delay=0.3, message="Donate with \"buy me a coffe\"")
+            self.add_tooltips((donate_buymeacoffe_btn, "Donate with \"buy me a coffe\""))
 
         if ConfigKeys.Keys.HOMEBUTTONS_PAYPAL.value:
             donate__paypal_btn = ctk.CTkButton(master=button_frame, image=img.paypal_donation_image, fg_color="transparent", border_width=1, text="", width=32, height=32, command=lambda: webbrowser.open(ConfigKeys.Keys.DONATE_PAYPAL_PAGE_LINK.value))
             donate__paypal_btn.pack(side='left', padx=5)
-            CTkToolTip(donate__paypal_btn, delay=0.3, message="Donate with \"Paypal\"")
+            self.add_tooltips((donate__paypal_btn, "Donate with \"Paypal\""))
 
 #?###########################################################
 
@@ -1220,11 +1266,11 @@ class App:
 
 #*###########################################################
 #?###########################################################
-class LoginFrame(ctk.CTkFrame):
+class LoginFrame(BaseFrame):
     _common = CommonOperations()
 
     def __init__(self, parent, main_class: App):
-        ctk.CTkFrame.__init__(self, parent)
+        BaseFrame.__init__(self, parent)
         self.main_class = main_class
         self.event_service = EventsService(self._common)
         img = Images()
@@ -1237,8 +1283,7 @@ class LoginFrame(ctk.CTkFrame):
         google_calendar.pack(padx=20, pady=10, anchor='center')
         google_login.pack(padx=20, pady=10, anchor='center')
 
-        CTkToolTip(google_calendar, delay=0.3, message="View and manage your Google Calendar")
-        CTkToolTip(google_login, delay=0.3, message="Login using your Google account")
+        self.add_tooltips((google_calendar, "View and manage your Google Calendar"), (google_login, "Login using your Google account"))
 
     def __set_credentials_path_frame(self):
         self.__set_credentials_path()

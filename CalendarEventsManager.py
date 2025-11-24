@@ -13,6 +13,9 @@ from LogService import LogService
 
 class CalendarEventsManager:
 
+    def __init__(self):
+        pass
+
     SCOPE = [
         'https://www.googleapis.com/auth/calendar',
         'openid',
