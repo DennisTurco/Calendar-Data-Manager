@@ -1,11 +1,13 @@
 from googleapiclient.errors import HttpError
 import pandas as pandas
 from LogService import LogService
+from CommonOperations import CommonOperations
+import customtkinter as ctk
 
 class ExceptionHandler:
 
     @staticmethod
-    def handle_exception(common, log_box, error):
+    def handle_exception(common: CommonOperations, log_box: ctk.CTkTextbox, error: Exception):
         error_map = {
             FileNotFoundError: "File not found error",
             PermissionError: "Permission error",

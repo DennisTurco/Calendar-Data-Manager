@@ -425,3 +425,4 @@ class CommonOperations:
 
     def get_frames(self):
         return self._frames
+
