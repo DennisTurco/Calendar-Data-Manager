@@ -1,7 +1,7 @@
 from enum import Enum
 import json
 
-from ConfigKeys import ConfigKeys
+from common.ConfigKeys import ConfigKeys
 
 ConfigKeys.load_values_from_json()
 JSON_PATH = ConfigKeys.Keys.CONFIG_DIR.value + ConfigKeys.Keys.PREFERENCE_FILE.value

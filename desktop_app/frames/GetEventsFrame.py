@@ -1,27 +1,27 @@
 from datetime import datetime, timedelta
 import glob
 import tempfile
-from enums.FrameTypes import FrameTypes
+from desktop_app.enums.FrameTypes import FrameTypes
 from typing import Any
 import os
-from DataEditor import DataCSV
+from common.DataEditor import DataCSV
 import tkinter
 import customtkinter as ctk
-from CTkScrollableDropdown import *
+from desktop_app.CTkScrollableDropdown import *
 
-from ConfigKeys import ConfigKeys
-from ExceptionHandler import ExceptionHandler
-from settings import TIMEZONE
-from InformationMessages import InformationMessages
-from entities.TimeRange import TimeRange
-from frames.BaseFrame import BaseFrame
-from Images import Images
-from services.EventsService import EventsService
-from entities.EventInfo import EventInfo
-from LogService import LogService
-from CommonOperations import CommonOperations
-import GUIWidgets
-import frames.FrameController as FrameController
+from common.ConfigKeys import ConfigKeys
+from common.ExceptionHandler import ExceptionHandler
+from common.settings import TIMEZONE
+from common.InformationMessages import InformationMessages
+from common.entities.TimeRange import TimeRange
+from desktop_app.frames.BaseFrame import BaseFrame
+from desktop_app.Images import Images
+from common.services.EventsService import EventsService
+from common.entities.EventInfo import EventInfo
+from common.LogService import LogService
+from common.CommonOperations import CommonOperations
+import desktop_app.GUIWidgets as GUIWidgets
+import desktop_app.frames.FrameController as FrameController
 
 class GetEventsFrame(BaseFrame):
     toplevel_window = None

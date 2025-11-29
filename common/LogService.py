@@ -1,7 +1,7 @@
 import logging
 import os
 from typing import Optional
-from ConfigKeys import ConfigKeys
+from common.ConfigKeys import ConfigKeys
 
 class LogService:
     _is_configured = False

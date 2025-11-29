@@ -3,21 +3,21 @@ from datetime import datetime, timedelta
 from typing import Final, Optional
 import pyperclip
 
-from ConfigKeys import ConfigKeys
-from JsonPreferences import JsonPreferences
+from common.ConfigKeys import ConfigKeys
+from common.JsonPreferences import JsonPreferences
 
 import traceback
 import tempfile
 
 import tkinter
-from LogService import LogService
+from common.LogService import LogService
 from tkinter import filedialog
 import customtkinter as ctk
-from CTkXYFrame import *
+from desktop_app.CTkXYFrame import *
 from CTkMessagebox import *
 from tkcalendar import *
 from CTkTable import *
-import CustomSpinbox
+import desktop_app.CustomSpinbox as CustomSpinbox
 from google.oauth2.credentials import Credentials
 
 import webbrowser

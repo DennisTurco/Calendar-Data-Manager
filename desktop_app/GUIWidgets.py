@@ -1,7 +1,7 @@
 from tkinter import PhotoImage
 import customtkinter as ctk
-from CTkScrollableDropdown import *
-from CommonOperations import CommonOperations
+from desktop_app.CTkScrollableDropdown import *
+from common.CommonOperations import CommonOperations
 
 def create_side_bar_frame(master, plus_image: PhotoImage, edit_image: PhotoImage, list_image: PhotoImage, chart_image: PhotoImage, google_image: PhotoImage, logo_app: PhotoImage):
     sidebar_frame = ctk.CTkFrame(master, width=140, corner_radius=0)

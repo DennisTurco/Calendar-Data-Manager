@@ -1,7 +1,7 @@
 from googleapiclient.errors import HttpError
 import pandas as pandas
-from LogService import LogService
-from CommonOperations import CommonOperations
+from common.LogService import LogService
+from common.CommonOperations import CommonOperations
 import customtkinter as ctk
 
 class ExceptionHandler:

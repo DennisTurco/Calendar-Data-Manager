@@ -6,4 +6,4 @@ class FrameTypes(Enum):
     GraphFrame = 3
     LoginFrame = 4
     MainFrame = 5
-    NewEventsFrame = 5
+    NewEventsFrame = 6

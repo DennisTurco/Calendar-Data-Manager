@@ -3,14 +3,14 @@ from tkinter import filedialog
 import tkinter
 
 from CTkMessagebox import CTkMessagebox
-from CommonOperations import CommonOperations
-from ConfigKeys import ConfigKeys
-from ExceptionHandler import ExceptionHandler
-import GUIWidgets
-from LogService import LogService
-from Plotter import Plotter
-from frames.BaseFrame import BaseFrame
-from Images import Images
+from common.CommonOperations import CommonOperations
+from common.ConfigKeys import ConfigKeys
+from common.ExceptionHandler import ExceptionHandler
+import desktop_app.GUIWidgets as GUIWidgets
+from common.LogService import LogService
+from common.Plotter import Plotter
+from desktop_app.frames.BaseFrame import BaseFrame
+from desktop_app.Images import Images
 import customtkinter as ctk
 
 class GraphFrame(BaseFrame):

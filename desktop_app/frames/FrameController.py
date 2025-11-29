@@ -1,13 +1,13 @@
 import customtkinter as ctk
-from enums.FrameTypes import FrameTypes
-from frames.LoginFrame import LoginFrame
-from frames.MainFrame import MainFrame
-from frames.EditEventsFrame import EditEventsFrame
-from frames.GetEventsFrame import GetEventsFrame
-from frames.GraphFrame import GraphFrame
-from frames.NewEventsFrame import NewEventsFrame
-from LogService import LogService
-from CommonOperations import CommonOperations
+from desktop_app.enums.FrameTypes import FrameTypes
+from desktop_app.frames.LoginFrame import LoginFrame
+from desktop_app.frames.MainFrame import MainFrame
+from desktop_app.frames.EditEventsFrame import EditEventsFrame
+from desktop_app.frames.GetEventsFrame import GetEventsFrame
+from desktop_app.frames.GraphFrame import GraphFrame
+from desktop_app.frames.NewEventsFrame import NewEventsFrame
+from common.LogService import LogService
+from common.CommonOperations import CommonOperations
 
 def show_frame(frame_type: FrameTypes, common: CommonOperations):
     logger = LogService.get_logger(__name__)

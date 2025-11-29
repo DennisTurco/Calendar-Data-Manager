@@ -1,15 +1,15 @@
-from enums.FrameTypes import FrameTypes
+from desktop_app.enums.FrameTypes import FrameTypes
 import webbrowser
 import os
 import customtkinter as ctk
 from CTkMessagebox import *
 
-from ConfigKeys import ConfigKeys
-import frames.FrameController as FrameController
-from frames.BaseFrame import BaseFrame
-from Images import Images
-from services.EventsService import EventsService
-from CommonOperations import CommonOperations
+from common.ConfigKeys import ConfigKeys
+import desktop_app.frames.FrameController as FrameController
+from desktop_app.frames.BaseFrame import BaseFrame
+from desktop_app.Images import Images
+from common.services.EventsService import EventsService
+from common.CommonOperations import CommonOperations
 
 class LoginFrame(BaseFrame):
     _common = CommonOperations()

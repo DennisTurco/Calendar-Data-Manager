@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional
 
-import CommonOperations
+import common.CommonOperations as CommonOperations
 
 @dataclass
 class TimeRange:

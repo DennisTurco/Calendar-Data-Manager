@@ -1,5 +1,5 @@
 from io import BytesIO
-from enums.FrameTypes import FrameTypes
+from desktop_app.enums.FrameTypes import FrameTypes
 import webbrowser
 import requests
 from PIL import Image as pilImage, ImageTk, ImageDraw
@@ -7,13 +7,13 @@ import tkinter
 import customtkinter as ctk
 from CTkMenuBar import *
 
-from ConfigKeys import ConfigKeys
-from services.EventsService import EventsService
-from LogService import LogService
-from CommonOperations import CommonOperations
-import frames.FrameController as FrameController
-from Images import Images
-from JsonPreferences import JsonPreferences
+from common.ConfigKeys import ConfigKeys
+from common.services.EventsService import EventsService
+from common.LogService import LogService
+from common.CommonOperations import CommonOperations
+import desktop_app.frames.FrameController as FrameController
+from desktop_app.Images import Images
+from common.JsonPreferences import JsonPreferences
 
 class App:
     _common = CommonOperations()

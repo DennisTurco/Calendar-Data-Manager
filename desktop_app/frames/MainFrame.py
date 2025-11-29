@@ -1,12 +1,12 @@
-from enums.FrameTypes import FrameTypes
+from desktop_app.enums.FrameTypes import FrameTypes
 import webbrowser
 import customtkinter as ctk
 
-from ConfigKeys import ConfigKeys
-from CommonOperations import CommonOperations
-import frames.FrameController as FrameController
-from frames.BaseFrame import BaseFrame
-from Images import Images
+from common.ConfigKeys import ConfigKeys
+from common.CommonOperations import CommonOperations
+import desktop_app.frames.FrameController as FrameController
+from desktop_app.frames.BaseFrame import BaseFrame
+from desktop_app.Images import Images
 
 class MainFrame(BaseFrame):
     _common = CommonOperations()

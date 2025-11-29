@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from entities.TimeRange import TimeRange
+from common.entities.TimeRange import TimeRange
 
 @dataclass
 class EventInfo:

@@ -1,5 +1,5 @@
-from CalendarEventsManager import CalendarEventsManager
-from entities.EventInfo import EventInfo
+from common.CalendarEventsManager import CalendarEventsManager
+from common.entities.EventInfo import EventInfo
 
 class EventsService:
     def __init__(self, common):
