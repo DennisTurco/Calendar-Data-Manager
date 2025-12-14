@@ -1,0 +1,40 @@
+{% set mid = modal_id %}
+<div id="{{ mid }}" class="fixed inset-0 z-50 hidden flex items-center justify-center pointer-events-none">
+
+    <!-- overlay -->
+    <div class="absolute inset-0 bg-black bg-opacity-40 transition-opacity pointer-events-auto"
+         onclick="closeModal('{{ mid }}')"></div>
+
+    <!-- modal panel -->
+    <div class="relative z-10 max-w-2xl w-full mx-4 pointer-events-auto">
+        <div id="{{ mid }}_panel"
+             class="bg-white rounded-lg shadow-xl overflow-hidden transform transition-all scale-95 opacity-0">
+
+            <!-- header -->
+            <div class="px-6 py-4 border-b flex items-start justify-between">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800">
+                        {{ modal_title or "Information" }}
+                    </h3>
+                </div>
+                <button aria-label="Close"
+                        class="text-gray-500 hover:text-gray-700"
+                        onclick="closeModal('{{ mid }}')">✕</button>
+            </div>
+
+            <!-- content -->
+            <div class="p-6 prose prose-slate max-w-none text-gray-700 text-left">
+                {{ modal_content | safe }}
+            </div>
+
+            <!-- footer -->
+            <div class="px-6 py-4 border-t text-right">
+                <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                        onclick="closeModal('{{ mid }}')">
+                    Ok
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>

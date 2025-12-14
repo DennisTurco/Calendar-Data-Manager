@@ -215,7 +215,7 @@ class EditEventsFrame(BaseFrame):
         # Create a new window if it doesn't exist
         if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
             self.toplevel_window = ctk.CTkToplevel()
-            self.toplevel_window.after(200, lambda: self.toplevel_window.iconbitmap('./imgs/list.ico')) # type: ignore # I have to delay the icon because it's buggy on windows
+            self.toplevel_window.after(200, lambda: self.toplevel_window.iconbitmap('../common/imgs/list.ico')) # type: ignore # I have to delay the icon because it's buggy on windows
             self.toplevel_window.title(f'{len(old_events)} Event(s) Found')
 
             # Configure grid layout

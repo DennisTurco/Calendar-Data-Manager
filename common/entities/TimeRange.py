@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional
 
-import common.CommonOperations as CommonOperations
+from common.settings import DATE_FORMATTER
 
 @dataclass
 class TimeRange:
@@ -17,6 +17,6 @@ class TimeRange:
 
     @classmethod
     def build_from_string(cls, date_from: str, date_to: str):
-        df = datetime.strptime(date_from, CommonOperations.DATE_FORMATTER) if date_from else None
-        dt = datetime.strptime(date_to, CommonOperations.DATE_FORMATTER) if date_to else None
+        df = datetime.strptime(date_from, DATE_FORMATTER) if date_from else None
+        dt = datetime.strptime(date_to, DATE_FORMATTER) if date_to else None
         return cls(df, dt)

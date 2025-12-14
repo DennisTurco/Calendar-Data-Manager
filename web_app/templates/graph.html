@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graph</title>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
+</head>
+
+<body class="bg-gray-100 text-gray-900 min-h-screen font-sans">
+
+    {% include 'navbar.html' %}
+    {% include 'sidebar.html' %}
+
+    <!-- Main Wrapper -->
+    <main class="w-full pl-0 md:pl-48 pt-16">
+        <div class="mx-auto max-w-3xl px-4 flex flex-col items-center">
+
+            <!-- Header -->
+            <header class="mt-12 text-center">
+                <div class="flex items-center justify-center gap-3">
+                    <h1 class="text-4xl font-semibold">Graphs</h1>
+
+                    {% if section_message %}
+                    <button type="button" onclick="openModal('info_graph')"
+                        class="text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 rounded"
+                        title="More info" aria-label="Informazioni sezione">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z" />
+                        </svg>
+                    </button>
+                    {% endif %}
+                </div>
+
+                {% with
+                modal_id="info_graph",
+                modal_title="Section Information",
+                modal_content=section_message
+                %}
+                {% include "components/info_modal.html" %}
+                {% endwith %}
+            </header>
+
+            <!-- Card container -->
+            <div class="card p-6 rounded-xl shadow-lg w-full max-w-3xl space-y-6 bg-white">
+
+                <!-- File path and preview buttons -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                    <div>
+                        <label class="block mb-1 text-gray-700 font-medium">File Path:</label>
+                        <input type="text" name="file_path" placeholder="path to file" class="input-field">
+                    </div>
+                    <div class="flex flex-wrap gap-2 md:col-span-2">
+                        <button type="button" class="button-secondary flex items-center gap-2">
+                            <img src="{{ url_for('static', filename='images/folder.png') }}" class="w-5 h-5"> Browse
+                        </button>
+                        <button type="button" class="button-secondary flex items-center gap-2">
+                            <img src="{{ url_for('static', filename='images/file.png') }}" class="w-5 h-5"> Open
+                        </button>
+                        <button type="button" class="button-secondary flex items-center gap-2">
+                            <img src="{{ url_for('static', filename='images/table.png') }}" class="w-5 h-5"> Preview
+                            Table
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Graph Types -->
+                <div class="space-y-3">
+                    <h2 class="section-header font-medium">Graph Types</h2>
+                    <div class="checkbox-group flex flex-wrap gap-4">
+                        {% for graph_type in graph_types %}
+                        <label class="checkbox-label flex items-center gap-2">
+                            <input type="checkbox" name="{{ graph_type.name }}" class="h-5 w-5">
+                            {{ graph_type.label }}
+                        </label>
+                        {% endfor %}
+                    </div>
+                    <div class="button-group flex gap-2">
+                        <button type="button" class="button-primary">Select All</button>
+                        <button type="button" class="button-secondary">Deselect All</button>
+                    </div>
+                </div>
+
+                <!-- Submit -->
+                <div class="flex justify-center mt-4">
+                    <button type="submit" class="button-success px-6 py-3 flex items-center gap-2">
+                        Generate
+                        <img src="{{ url_for('static', filename='images/chart.png') }}"
+                            class="w-5 h-5" alt="">
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/modal.js') }}"></script>
+
+</body>
+
+</html>

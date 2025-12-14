@@ -48,7 +48,7 @@ class App:
             print(f"Error: {e}")
 
     def __init_window(self):
-        self.root.iconbitmap('./imgs/icon.ico')
+        self.root.iconbitmap('../common/imgs/icon.ico')
         self.root.title("Calendar Data Manager")
         CommonOperations.center_window(self.root, ConfigKeys.Keys.APP_WIDTH.value, ConfigKeys.Keys.APP_HEIGHT.value)
         self.root.minsize(1100, 900)

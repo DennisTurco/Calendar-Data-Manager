@@ -13,6 +13,7 @@ import tkinter
 from common.LogService import LogService
 from tkinter import filedialog
 import customtkinter as ctk
+from common.settings import DATE_FORMATTER, DAY_FORMATTER
 from desktop_app.CTkXYFrame import *
 from CTkMessagebox import *
 from tkcalendar import *
@@ -21,9 +22,6 @@ import desktop_app.CustomSpinbox as CustomSpinbox
 from google.oauth2.credentials import Credentials
 
 import webbrowser
-
-DATE_FORMATTER: Final[str] = '%d-%m-%Y %H:%M'
-DAY_FORMATTER: Final[str] = "%m/%d/%y" # use this only for calendar picker
 
 # singleton class
 class CommonOperations:
@@ -84,7 +82,7 @@ class CommonOperations:
             return
 
         self.toplevel_window = ctk.CTkToplevel()
-        self.toplevel_window.after(200, lambda: self.toplevel_window.iconbitmap('./imgs/bug.ico')) # type: ignore # I have to delay the icon because it's buggy on windows
+        self.toplevel_window.after(200, lambda: self.toplevel_window.iconbitmap('../common/imgs/bug.ico')) # type: ignore # I have to delay the icon because it's buggy on windows
         self.toplevel_window.title(f'Exception traceback')
 
         # Create a grid inside the toplevel window
@@ -189,7 +187,7 @@ class CommonOperations:
 
         if toplevel_window is None or not toplevel_window.winfo_exists():
             toplevel_window = ctk.CTkToplevel() # create window if its None or destroyed
-            toplevel_window.after(200, lambda: toplevel_window.iconbitmap('./imgs/calendar.ico')) # type: ignore # I have to delay the icon because it's buggy on windows
+            toplevel_window.after(200, lambda: toplevel_window.iconbitmap('../common/imgs/calendar.ico')) # type: ignore # I have to delay the icon because it's buggy on windows
 
             calendar = Calendar(toplevel_window)
             calendar.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
@@ -260,7 +258,7 @@ class CommonOperations:
         if toplevel_window is None or not toplevel_window.winfo_exists():
             toplevel_window = ctk.CTkToplevel() # create window if its None or destroyed
             toplevel_window.title(filepath)
-            toplevel_window.after(200, lambda: toplevel_window.iconbitmap('./imgs/list.ico')) # type: ignore # I have to delay the icon because it's buggy on windows
+            toplevel_window.after(200, lambda: toplevel_window.iconbitmap('../common/imgs/list.ico')) # type: ignore # I have to delay the icon because it's buggy on windows
             file_viewer = ctk.CTkTextbox(toplevel_window)
             file_viewer.bind("<Key>", lambda e: "break")  # set the textbox readonly
             file_viewer.pack(fill=tkinter.BOTH, expand=True)
@@ -308,7 +306,7 @@ class CommonOperations:
 
             toplevel_window = ctk.CTkToplevel()  # create window if it's None or destroyed
             toplevel_window.title(filepath)
-            toplevel_window.after(200, lambda: toplevel_window.iconbitmap('./imgs/list.ico')) # type: ignore  # delay the icon
+            toplevel_window.after(200, lambda: toplevel_window.iconbitmap('../common/imgs/list.ico')) # type: ignore  # delay the icon
 
             frame = CTkXYFrame(toplevel_window)
             frame.pack(fill="both", expand=True, padx=10, pady=10)
@@ -354,7 +352,7 @@ class CommonOperations:
         # Create a dialog window with a CTkTextbox
         dialog = ctk.CTkToplevel(root)
         dialog.title(title)
-        dialog.after(200, lambda: dialog.iconbitmap('./imgs/information.ico')) # type: ignore
+        dialog.after(200, lambda: dialog.iconbitmap('../common/imgs/information.ico')) # type: ignore
 
         CommonOperations.center_window(dialog, 420, 400)
         dialog.attributes("-topmost", True)
@@ -387,7 +385,7 @@ class CommonOperations:
         return appearance
 
     @staticmethod
-    def get_timezone():
+    def get_timezone() -> str:
         timezone = 'UTC'  # set default timezone
         list_res = JsonPreferences.read_from_json()
         if isinstance(list_res, dict) and "TimeZone" in list_res:

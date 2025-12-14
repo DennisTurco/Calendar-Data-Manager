@@ -1,5 +1,7 @@
 from tkinter import PhotoImage
 import customtkinter as ctk
+from common.InformationMessages import InformationMessages
+from common.enums.GraphType import GraphType
 from desktop_app.CTkScrollableDropdown import *
 from common.CommonOperations import CommonOperations
 
@@ -75,29 +77,14 @@ def create_file_output_scroll_frame_for_events_list_frame(master, folder_image: 
     return file_path, overwrite_mode, button_file_path, button_open_file, button_open_events_table_preview
 
 def create_file_path_scroll_frame_for_graph_frame(master, folder_image: PhotoImage, file_image: PhotoImage, table_image: PhotoImage, info_image: PhotoImage):
-    section_message = '''The Create Graph section of the Calendar Data Manager lets you transform your event data into insightful visualizations for better analysis. Here's what you can do:
-
-• Select File for Analysis: Choose a previously generated `.csv` or `.txt` file that contains your calendar event data. You can preview the file content before proceeding.
-• Choose Graph Types: Select from various visualization options, including:
-    - Hours per Year
-    - Hours by Summary (Bar Chart or Pie Chart)
-    - Hours per Month
-    - Hours per Year by Summary
-    - Hours per Month by Summary
-
-Use the Select All or Deselect All buttons for quick graph type selection.
-
-• Generate Graphs: Once you've set your preferences, click Generate to create the selected graphs. These visualizations help you uncover patterns and trends in your calendar usage, such as how much time you spend on specific activities or summaries over different periods.
-
-This feature is perfect for analyzing productivity, tracking activity trends, and gaining valuable insights from your calendar data.
-        '''
+    graph_info_message = InformationMessages.graph_info_message
 
     # create main panel
     title_frame = ctk.CTkFrame(master, fg_color="transparent")
     title_frame.grid(row=0, column=1, padx=0, pady=5, sticky="ew")
     title_frame.grid_columnconfigure((0, 1), weight=1)
     ctk.CTkLabel(title_frame, text="Create Graph", font=ctk.CTkFont(size=20, weight="bold")).grid(row=0, column=0, padx=5, pady=0, sticky="e")
-    ctk.CTkButton(title_frame, text="", width=10, image=info_image,  fg_color="transparent", command=lambda: CommonOperations.open_info_section_dialog(master, "Create Graph", section_message)).grid(row=0, column=1, padx=5, pady=0, sticky="w")
+    ctk.CTkButton(title_frame, text="", width=10, image=info_image,  fg_color="transparent", command=lambda: CommonOperations.open_info_section_dialog(master, "Create Graph", graph_info_message)).grid(row=0, column=1, padx=5, pady=0, sticky="w")
 
     file_output_frame = ctk.CTkScrollableFrame(master, label_text="Set File Path")
     file_output_frame.grid(row=1, column=1, padx=(50, 50), pady=10, sticky="ew")
@@ -127,23 +114,23 @@ def create_graph_types_scroll_frame(master, square_check_image: PhotoImage, squa
     button_select_all.grid(row=0, column=0, padx=10, pady=10, sticky="e")
     button_deselect_all = ctk.CTkButton(graph_types_frame, text="deselect all", image=square_image)
     button_deselect_all.grid(row=0, column=1, padx=10, pady=10, sticky="w")
-    total_hours_per_year = ctk.CTkCheckBox(graph_types_frame, text="Hours per Year", onvalue="on", offvalue="off")
+    total_hours_per_year = ctk.CTkCheckBox(graph_types_frame, text=GraphType.HOURS_PER_YEAR, onvalue="on", offvalue="off")
     total_hours_per_year.grid(row=1, column=0, padx=10, pady=10, sticky="ew")
     total_hours_per_year.select()
-    total_hours_per_month = ctk.CTkCheckBox(graph_types_frame, text="Hours per Month", onvalue="on", offvalue="off")
+    total_hours_per_month = ctk.CTkCheckBox(graph_types_frame, text=GraphType.HOURS_PER_MONTH, onvalue="on", offvalue="off")
     total_hours_per_month.grid(row=1, column=1, padx=10, pady=10, sticky="ew")
     total_hours_per_month.select()
-    total_hours_by_summary = ctk.CTkCheckBox(graph_types_frame, text="Hours by Summary Bar chart", onvalue="on", offvalue="off")
+    total_hours_by_summary = ctk.CTkCheckBox(graph_types_frame, text=GraphType.HOURS_BY_SUMMARY_BAR, onvalue="on", offvalue="off")
     total_hours_by_summary.grid(row=2, column=0, padx=10, pady=10, sticky="ew")
     total_hours_by_summary.select()
-    total_hours_by_summary2 = ctk.CTkCheckBox(graph_types_frame, text="Hours by Summary Pie chart", onvalue="on", offvalue="off")
+    total_hours_by_summary2 = ctk.CTkCheckBox(graph_types_frame, text=GraphType.HOURS_BY_SUMMARY_PIE, onvalue="on", offvalue="off")
     total_hours_by_summary2.grid(row=2, column=1, padx=10, pady=10, sticky="ew")
     total_hours_by_summary2.select()
-    total_hours_per_year_by_summary = ctk.CTkCheckBox(graph_types_frame, text="Hours per Year By Summary", onvalue="on", offvalue="off")
+    total_hours_per_year_by_summary = ctk.CTkCheckBox(graph_types_frame, text=GraphType.HOURS_PER_YEAR_BY_SUMMARY, onvalue="on", offvalue="off")
     total_hours_per_year_by_summary.grid(row=3, column=0, padx=10, pady=10, sticky="ew")
-    total_hours_per_month_by_summary = ctk.CTkCheckBox(graph_types_frame, text="Hours per Month By Summary", onvalue="on", offvalue="off")
+    total_hours_per_month_by_summary = ctk.CTkCheckBox(graph_types_frame, text=GraphType.HOURS_PER_MONTH_BY_SUMMARY, onvalue="on", offvalue="off")
     total_hours_per_month_by_summary.grid(row=3, column=1, padx=10, pady=10, sticky="ew")
-    total_hours_per_month_grouped_by_year = ctk.CTkCheckBox(graph_types_frame, text="Hours per Month Grouped By Year", onvalue="on", offvalue="off")
+    total_hours_per_month_grouped_by_year = ctk.CTkCheckBox(graph_types_frame, text=GraphType.HOURS_PER_MONTH_GROUPED_BY_YEAR, onvalue="on", offvalue="off")
     total_hours_per_month_grouped_by_year.grid(row=4, column=0, padx=10, pady=10, sticky="ew")
     return button_select_all, button_deselect_all, total_hours_per_year, total_hours_per_month, total_hours_by_summary, total_hours_by_summary2, total_hours_per_year_by_summary, total_hours_per_month_by_summary, total_hours_per_month_grouped_by_year
 

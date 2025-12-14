@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Events</title>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
+</head>
+
+<body class="bg-gray-100 text-gray-900 min-h-screen flex flex-col items-center font-sans">
+
+    {% include 'navbar.html' %}
+    {% include 'sidebar.html' %}
+
+    <!-- Main WRAPPER -->
+    <main class="w-full pl-0 md:pl-48 pt-16">
+        <div class="mx-auto max-w-3xl px-4 flex flex-col items-center">
+
+            <!-- Header -->
+            <header class="mt-12 text-center">
+                <div class="flex items-center justify-center gap-3">
+                    <h1 class="text-4xl font-semibold">Edit Events</h1>
+
+                    {% if section_message %}
+                    <button type="button"
+                        onclick="openModal('info_edit')"
+                        class="text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 rounded"
+                        title="More info"
+                        aria-label="Informazioni sezione">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z" />
+                        </svg>
+                    </button>
+                    {% endif %}
+                </div>
+
+                {% with
+                modal_id="info_edit",
+                modal_title="Section Information",
+                modal_content=section_message
+                %}
+                {% include "components/info_modal.html" %}
+                {% endwith %}
+            </header>
+
+            <!-- Card container -->
+            <div class="card p-6 rounded-xl shadow-lg w-full max-w-5xl space-y-6 bg-white">
+
+                <!-- OLD and NEW Values with Arrow -->
+                <div class="grid md:grid-cols-3 gap-6 items-center">
+
+                    <!-- OLD Values -->
+                    <div class="space-y-4 border-r pr-4">
+                        <h2 class="section-header font-medium">OLD Values</h2>
+                        <label class="block text-gray-700 font-medium">Summary:</label>
+                        <input type="text" name="summary_old" placeholder="summary" class="input-field">
+
+                        <label class="block text-gray-700 font-medium">Description:</label>
+                        <textarea name="description_old" rows="4" class="textarea-field"></textarea>
+
+                        <div class="flex flex-col">
+                            <label for="color" class="mb-1 text-gray-700 font-medium">Color</label>
+                            <select name="color_old" class="input-field">
+                                {% for color_name in event_colors_old %}
+                                <option value="{{ color_name }}" {% if color_name=='No Color Filtering' %}selected{%
+                                    endif %}>
+                                    {{ color_name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Arrow -->
+                    <div class="flex justify-center items-center text-gray-400">
+                        <img src="{{ url_for('static', filename='images/arrow-right2.png') }}" class="w-8 h-8">
+                    </div>
+
+                    <!-- NEW Values -->
+                    <div class="space-y-4 pl-4">
+                        <h2 class="section-header font-medium">NEW Values</h2>
+                        <label class="block text-gray-700 font-medium">Summary:</label>
+                        <input type="text" name="summary_new" placeholder="summary" class="input-field">
+
+                        <label class="block text-gray-700 font-medium">Description:</label>
+                        <textarea name="description_new" rows="4" class="textarea-field"></textarea>
+
+                        <div class="flex flex-col">
+                            <label for="color" class="mb-1 text-gray-700 font-medium">Color</label>
+                            <select name="color_new" class="input-field">
+                                {% for color_name in event_colors_new %}
+                                <option value="{{ color_name }}" {% if color_name=='Light Blue' %}selected{% endif %}>
+                                    {{ color_name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Date pickers -->
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-gray-700 font-medium">Date From:</label>
+                        <input type="date" name="date_from" class="input-field">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium">Date To:</label>
+                        <input type="date" name="date_to" class="input-field">
+                    </div>
+                    <div class="col-span-2">
+                        <label for="timezone" class="mb-1 text-gray-700 font-medium">Timezone:</label>
+                        <select name="timezone" id="timezone" class="input-field">
+                            {% for tz in timezones %}
+                            <option value="{{ tz }}">
+                                {{ tz }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Submit -->
+                <div class="flex justify-center mt-4">
+                    <button type="submit" class="button-primary px-6 py-3 flex items-center gap-2">
+                        Edit
+                        <img src="{{ url_for('static', filename='images/edit.png') }}"
+                            class="w-5 h-5" alt="">
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script src="{{ url_for('static', filename='js/modal.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/default_timezone.js') }}"></script>
+</body>
+
+</html>

@@ -1,0 +1,141 @@
+<nav class="fixed top-0 left-0 right-0 h-16 bg-gray-800 flex items-center px-4 md:px-6 shadow-lg z-50">
+
+    <!-- Logo -->
+    <a href="/" class="flex items-center gap-2">
+        <img src="{{ url_for('static', filename='images/icon.png') }}" class="w-9 h-9" alt="Logo">
+        <span class="text-white font-bold text-lg md:text-xl">Calendar Data Manager</span>
+    </a>
+
+    <!-- Desktop menu -->
+    <div class="hidden md:flex gap-4 ml-10">
+
+        {% macro dropdown(title, items) %}
+        <div class="relative group">
+            <button class="text-white px-4 py-2 rounded hover:bg-gray-700">
+                {{ title }}
+            </button>
+
+            <div
+                class="absolute left-0 mt-2 w-48 bg-white rounded shadow-lg hidden group-hover:block z-50">
+                {% for item in items %}
+                    {% if item.submenu %}
+                        <div class="relative group">
+                            <button
+                                class="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100">
+                                {{ item.title }}
+                            </button>
+                            <div
+                                class="absolute left-full top-0 w-44 bg-white rounded shadow-lg hidden group-hover:block">
+                                {% for sub in item.submenu %}
+                                <a href="{{ sub.href }}"
+                                   class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                                    {{ sub.title }}
+                                </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% else %}
+                        <a href="{{ item.href }}"
+                           class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                            {{ item.title }}
+                        </a>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endmacro %}
+
+        {{ dropdown("About", [
+            {'title':'Website','href':'#'},
+            {'title':'Share','href':'#'},
+            {'title':'Donate - Buy me a coffee','href':'#'},
+            {'title':'Donate - Paypal','href':'#'}
+        ]) }}
+
+        {{ dropdown("Help", [
+            {'title':'Support','href':'mailto:?subject=Calendar Data Manager - Support'},
+            {'title':'Report a bug','href':'#'}
+        ]) }}
+    </div>
+
+    <!-- Spacer -->
+    <div class="flex-1"></div>
+
+    <!-- User profile desktop -->
+    {% if user %}
+    <div class="hidden md:block relative group">
+        <button class="flex items-center gap-2 bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-full">
+            <img src="{{ user.picture_url }}" class="w-8 h-8 rounded-full" alt="Profile">
+            <span class="hidden lg:inline">{{ user.email }}</span>
+        </button>
+
+        <div class="absolute right-0 mt-2 w-48 bg-white rounded shadow-lg hidden group-hover:block z-50">
+            <a href="https://calendar.google.com/" target="_blank"
+               class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Google Calendar</a>
+            <a href="/logout"
+               class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Log out</a>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Mobile hamburger -->
+    <button onclick="toggleSidebar()"
+        class="md:hidden text-white ml-4 focus:outline-none"
+        aria-label="Apri menu">
+        <svg xmlns="http://www.w3.org/2000/svg"
+            class="w-7 h-7"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+    </button>
+</nav>
+
+<!-- MOBILE MENU -->
+<div id="mobileMenu"
+     class="hidden fixed top-16 left-0 right-0 bg-gray-800 text-white px-4 py-4 space-y-4 z-40 md:hidden">
+
+    <a href="/exit" class="block py-2 border-b border-gray-700">Exit</a>
+
+    <details>
+        <summary class="cursor-pointer py-2">Settings</summary>
+        <div class="pl-4 space-y-2 text-sm">
+            <a href="/appearance/dark">Dark</a>
+            <a href="/appearance/light">Light</a>
+            <a href="/scaling/120">120%</a>
+            <a href="/scaling/110">110%</a>
+            <a href="/scaling/100">100%</a>
+        </div>
+    </details>
+
+    <details>
+        <summary class="cursor-pointer py-2">Help</summary>
+        <div class="pl-4 space-y-2 text-sm">
+            <a href="mailto:?subject=Calendar Data Manager - Support">Support</a>
+            <a href="#">Report a bug</a>
+        </div>
+    </details>
+
+    {% if user %}
+    <div class="border-t border-gray-700 pt-4">
+        <div class="flex items-center gap-3 mb-2">
+            <img src="{{ user.picture_url }}" class="w-8 h-8 rounded-full">
+            <span class="text-sm">{{ user.email }}</span>
+        </div>
+        <a href="https://calendar.google.com/" target="_blank"
+           class="block py-2">Google Calendar</a>
+        <a href="/logout" class="block py-2">Log out</a>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+function toggleMobileMenu() {
+    const menu = document.getElementById('mobileMenu');
+    menu.classList.toggle('hidden');
+}
+</script>

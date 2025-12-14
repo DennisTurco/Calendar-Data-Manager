@@ -30,3 +30,20 @@ Once you've set your filters and new values, click the Edit button to apply the 
 
 Once you've configured your filters, click Get to retrieve the data or Get and Plot to visualize it right away!
         '''
+    
+    graph_info_message = '''The Create Graph section of the Calendar Data Manager lets you transform your event data into insightful visualizations for better analysis. Here's what you can do:
+
+• Select File for Analysis: Choose a previously generated `.csv` or `.txt` file that contains your calendar event data. You can preview the file content before proceeding.
+• Choose Graph Types: Select from various visualization options, including:
+    - Hours per Year
+    - Hours by Summary (Bar Chart or Pie Chart)
+    - Hours per Month
+    - Hours per Year by Summary
+    - Hours per Month by Summary
+
+Use the Select All or Deselect All buttons for quick graph type selection.
+
+• Generate Graphs: Once you've set your preferences, click Generate to create the selected graphs. These visualizations help you uncover patterns and trends in your calendar usage, such as how much time you spend on specific activities or summaries over different periods.
+
+This feature is perfect for analyzing productivity, tracking activity trends, and gaining valuable insights from your calendar data.
+        '''

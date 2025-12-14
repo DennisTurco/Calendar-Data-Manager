@@ -1,0 +1,62 @@
+<!-- OVERLAY (mobile) -->
+<div id="sidebarOverlay"
+     onclick="toggleSidebar()"
+     class="fixed inset-0 bg-black/50 z-40 hidden md:hidden">
+</div>
+
+<!-- SIDEBAR -->
+<aside id="sidebar"
+    class="fixed top-16 left-0 h-[calc(100%-4rem)] w-48 bg-gray-800 flex flex-col items-center py-6 shadow-lg
+           transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out
+           z-50">
+
+    <!-- Logo -->
+    <a href="/" class="mb-6">
+        <img src="{{ url_for('static', filename='images/icon.png') }}"
+             class="w-16 h-16" alt="App Logo">
+    </a>
+
+    <!-- Title -->
+    <h2 class="text-white font-bold text-lg mb-6 hidden md:block">Menu</h2>
+
+    <!-- Sidebar buttons -->
+    <nav class="flex flex-col gap-3 w-full px-4">
+        <a href="/new-events" class="sidebar-btn">
+            <img src="{{ url_for('static', filename='images/plus.png') }}" class="w-5 h-5">
+            New Events
+        </a>
+        <a href="/edit-events" class="sidebar-btn">
+            <img src="{{ url_for('static', filename='images/edit.png') }}" class="w-5 h-5">
+            Edit Events
+        </a>
+        <a href="/get-events" class="sidebar-btn">
+            <img src="{{ url_for('static', filename='images/list.png') }}" class="w-5 h-5">
+            Get Events List
+        </a>
+        <a href="/graph" class="sidebar-btn">
+            <img src="{{ url_for('static', filename='images/chart.png') }}" class="w-5 h-5">
+            Graph
+        </a>
+    </nav>
+
+    <!-- Spacer -->
+    <div class="flex-1"></div>
+
+    <!-- Google Calendar button -->
+    <a href="https://calendar.google.com/" target="_blank"
+       class="sidebar-btn mb-4">
+        <img src="{{ url_for('static', filename='images/google.png') }}" class="w-5 h-5">
+        Google Calendar
+    </a>
+</aside>
+
+
+<script>
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+
+    sidebar.classList.toggle('-translate-x-full');
+    overlay.classList.toggle('hidden');
+}
+</script>
