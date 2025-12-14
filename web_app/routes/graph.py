@@ -10,9 +10,8 @@ def graph():
     graph_types = GraphType.to_list()
     print(graph_types)
     return render_template(
-        "graph.html", 
+        "graph.html",
         active_page="graph",
-        
         section_message = markdown.markdown(InformationMessages.graph_info_message, extensions=["extra", "nl2br"]),
         graph_types = GraphType.to_list()
         )

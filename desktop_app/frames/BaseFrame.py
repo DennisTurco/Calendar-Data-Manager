@@ -1,3 +1,4 @@
+from desktop_app.Images import Images
 from desktop_app.enums.FrameTypes import FrameTypes
 import webbrowser
 import customtkinter as ctk
@@ -8,7 +9,6 @@ from common.LogService import LogService
 from common.CommonOperations import CommonOperations
 import desktop_app.GUIWidgets as GUIWidgets
 import desktop_app.frames.FrameController as FrameController
-from desktop_app.Images import Images
 
 class BaseFrame(ctk.CTkFrame):
     def __init__(self, parent):

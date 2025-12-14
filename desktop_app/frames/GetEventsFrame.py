@@ -218,7 +218,7 @@ class GetEventsFrame(BaseFrame):
 
         if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
             self.toplevel_window = ctk.CTkToplevel()
-            self.toplevel_window.after(200, lambda: self.toplevel_window.iconbitmap('../common/imgs/list.ico')) # type: ignore # I have to delay the icon because it's buggy on windows
+            self.toplevel_window.after(200, lambda: self.toplevel_window.iconbitmap(self.img.list_ico)) # type: ignore # I have to delay the icon because it's buggy on windows
             self.toplevel_window.title(f'{len(self.events)} Event(s) obtained')
 
             # Create a grid inside the toplevel window
@@ -281,7 +281,7 @@ class GetEventsFrame(BaseFrame):
 
         if self.toplevel_entry_window is None or not self.toplevel_entry_window.winfo_exists():
             self.toplevel_entry_window = ctk.CTkToplevel()
-            self.toplevel_entry_window.after(200, lambda: self.toplevel_entry_window.iconbitmap('../common/imgs/folder.ico')) # type: ignore # I have to delay the icon because it's buggy on windows
+            self.toplevel_entry_window.after(200, lambda: self.toplevel_entry_window.iconbitmap(self.img.folder_ico)) # type: ignore # I have to delay the icon because it's buggy on windows
             self.toplevel_entry_window.title('Select a file to save the results')
             self.toplevel_entry_window.geometry("350x50")
             entry = ctk.CTkEntry(self.toplevel_entry_window, width=250, placeholder_text="file path")

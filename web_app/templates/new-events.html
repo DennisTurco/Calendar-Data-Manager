@@ -6,6 +6,7 @@
     <title>Create New Event</title>
     <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/icon.png') }}">
 </head>
 
 <body class="bg-gray-100 text-gray-900 min-h-screen font-sans">
@@ -109,9 +110,8 @@
                 <!-- Submit -->
                 <div class="flex justify-center mt-4">
                     <button type="submit" class="button-primary px-6 py-3 flex items-center gap-2">
+                        <img src="{{ url_for('static', filename='images/plus.png') }}" class="w-5 h-5" alt="">
                         Create
-                        <img src="{{ url_for('static', filename='images/plus.png') }}"
-                            class="w-5 h-5" alt="">
                     </button>
                 </div>
             </form>

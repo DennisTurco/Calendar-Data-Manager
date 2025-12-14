@@ -7,7 +7,7 @@ from common.settings import TIMEZONE
 
 bp = Blueprint("get_events", __name__, url_prefix="/get-events")
 
-@bp.route("/")
+@bp.route("/", methods=["GET", "POST"])
 def get_events():
     return render_template(
         "get-events.html",

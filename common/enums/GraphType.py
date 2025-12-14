@@ -10,5 +10,5 @@ class GraphType(Enum):
     HOURS_PER_MONTH_GROUPED_BY_YEAR = 'Hours per Month Grouped By Year'
 
     @staticmethod
-    def to_list():
+    def to_list() -> list[str]:
         return [GraphType.HOURS_PER_YEAR.value, GraphType.HOURS_PER_MONTH.value, GraphType.HOURS_BY_SUMMARY_BAR.value, GraphType.HOURS_BY_SUMMARY_PIE.value, GraphType.HOURS_PER_YEAR_BY_SUMMARY.value, GraphType.HOURS_PER_MONTH_BY_SUMMARY.value, GraphType.HOURS_PER_MONTH_GROUPED_BY_YEAR.value]

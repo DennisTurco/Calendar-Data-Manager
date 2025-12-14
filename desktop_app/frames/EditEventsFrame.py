@@ -28,7 +28,7 @@ class EditEventsFrame(BaseFrame):
 
     def __init__(self, parent):
         BaseFrame.__init__(self, parent)
-        img = Images()
+        self.img = Images()
 
         self.event_color_from["No Color Filtering"] = "" # adding a new element inside the dictionary
 
@@ -38,7 +38,7 @@ class EditEventsFrame(BaseFrame):
         self.grid_rowconfigure((0, 1, 2), weight=1)
 
         # create sidebar frame with widgets
-        self.setup_sidebar(img)
+        self.setup_sidebar(self.img)
 
         section_message = InformationMessages.update_events_info_message
 
@@ -47,7 +47,7 @@ class EditEventsFrame(BaseFrame):
         title_frame.grid(row=0, column=1, padx=0, pady=5, sticky="ew")
         title_frame.grid_columnconfigure((0, 1), weight=1)
         ctk.CTkLabel(title_frame, text="Edit Events", font=ctk.CTkFont(size=20, weight="bold")).grid(row=0, column=0, padx=5, pady=0, sticky="e")
-        ctk.CTkButton(title_frame, text="", width=10, image=img.info_image,  fg_color="transparent", command=lambda: CommonOperations.open_info_section_dialog(self, "Edit Events", section_message)).grid(row=0, column=1, padx=5, pady=0, sticky="w")
+        ctk.CTkButton(title_frame, text="", width=10, image=self.img.info_image,  fg_color="transparent", command=lambda: CommonOperations.open_info_section_dialog(self, "Edit Events", section_message)).grid(row=0, column=1, padx=5, pady=0, sticky="w")
 
         # Create a frame with a 1x2 grid
         main_frame = ctk.CTkScrollableFrame(self, label_text="Event Information")
@@ -77,7 +77,7 @@ class EditEventsFrame(BaseFrame):
         self.multi_selection_old.grid(row=3, column=1, padx=0, pady=5, sticky="w")
 
         # Centered img label
-        ctk.CTkLabel(main_frame, text="", image=img.arrow_image).grid(row=1, column=1, padx=0, pady=10, sticky="ew")
+        ctk.CTkLabel(main_frame, text="", image=self.img.arrow_image).grid(row=1, column=1, padx=0, pady=10, sticky="ew")
 
         # new main values
         new_values_frame = ctk.CTkFrame(main_frame)
@@ -102,12 +102,12 @@ class EditEventsFrame(BaseFrame):
         self.multi_selection_new.grid(row=3, column=1, padx=0, pady=5, sticky="w")
 
         # date
-        (self.entry_date_from, self.entry_date_to, self.timezone_selection, entry_date_button, entry_date_button2) = GUIWidgets.create_date_interval_scroll_frame(self, img.calendar_image, TIMEZONE)
+        (self.entry_date_from, self.entry_date_to, self.timezone_selection, entry_date_button, entry_date_button2) = GUIWidgets.create_date_interval_scroll_frame(self, self.img.calendar_image, TIMEZONE)
         entry_date_button.configure(command=lambda: self.__date_picker(1))
         entry_date_button2.configure(command=lambda: self.__date_picker(2))
 
         # edit button
-        edit_button = ctk.CTkButton(self, image=img.edit_image, text="Edit", border_width=2, command=self.__edit_events)
+        edit_button = ctk.CTkButton(self, image=self.img.edit_image, text="Edit", border_width=2, command=self.__edit_events)
         edit_button.grid(row=3, column=1, columnspan=2, padx=20, pady=20)
 
         self.add_tooltips(
@@ -214,7 +214,7 @@ class EditEventsFrame(BaseFrame):
         # Create a new window if it doesn't exist
         if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
             self.toplevel_window = ctk.CTkToplevel()
-            self.toplevel_window.after(200, lambda: self.toplevel_window.iconbitmap('../common/imgs/list.ico')) # type: ignore # I have to delay the icon because it's buggy on windows
+            self.toplevel_window.after(200, lambda: self.toplevel_window.iconbitmap(self.img.list_ico)) # type: ignore # I have to delay the icon because it's buggy on windows
             self.toplevel_window.title(f'{len(old_events)} Event(s) Found')
 
             # Configure grid layout
