@@ -22,8 +22,7 @@ class NewEventsFrame(BaseFrame):
     def __init__(self, parent):
         BaseFrame.__init__(self, parent)
         img = Images()
-        self.event_service = EventsService(self._common)
-
+    
         # configure grid layout (4x4)
         self.grid_columnconfigure(1, weight=1)
         self.grid_columnconfigure((2, 3), weight=0)
@@ -105,9 +104,9 @@ class NewEventsFrame(BaseFrame):
             return
         try:
             time_range = TimeRange().build_from_string(date_from, date_to)
-            color_index = self._common.get_color_id(ConfigKeys.Keys.EVENT_COLOR.value, self.multi_selection.get())
+            color_index = self._common.get_color_id(self.multi_selection.get())
             event_info = EventInfo(summary, str(self.entry_description), time_range, color_index, time_zone)
-            self.event_service.create_event(event_info)
+            EventsService.create_event(self._common.get_credentials_or_exception(), event_info)
             self._logger.info(f"Event '{summary}' created successfully!")
             self._common.write_log(self.log_box, f"Event '{summary}' created successfully!")
         except ValueError as _:

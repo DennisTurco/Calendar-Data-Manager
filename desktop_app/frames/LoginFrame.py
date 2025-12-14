@@ -17,7 +17,6 @@ class LoginFrame(BaseFrame):
     def __init__(self, parent, main_class):
         BaseFrame.__init__(self, parent)
         self.main_class = main_class
-        self.event_service = EventsService(self._common)
         img = Images()
 
         ctk.CTkLabel(self, text="Login", fg_color="transparent", font=("Arial", 32)).pack(padx=20, pady=20)
@@ -39,7 +38,7 @@ class LoginFrame(BaseFrame):
         token_path = credentials_path.rsplit("/", 1)[0] + "/" + "token.json"
 
         try:
-            credentials = self.event_service.get_connection_setup(credentials_path, token_path)
+            credentials = EventsService.get_connection_setup(credentials_path, token_path)
         except Exception as error:
             self._common.messagebox_exception(error)
             credentials = None

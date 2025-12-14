@@ -1,0 +1,17 @@
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="fixed top-20 right-4 z-[9999] space-y-3">
+      {% for category, message in messages %}
+        <div
+          data-toast
+          class="px-4 py-3 rounded-xl shadow-lg text-white transition-opacity duration-300
+          {% if category == 'error' %}bg-red-500
+          {% elif category == 'success' %}bg-green-500
+          {% else %}bg-blue-500{% endif %}"
+        >
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}

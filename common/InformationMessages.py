@@ -6,9 +6,9 @@ class InformationMessages:
     - Description: (Optional) Add more details to describe the event. This can be helpful for further context, such as the agenda or any notes.
     - Color: (Required) Choose a color to visually categorize your event for easy identification on your calendar.
 • Date Interval:
-    - From: (Optional) Set the starting date and time for the event.
-    - To: (Optional) Set the ending date and time for the event.
-    - Timezone: (Optional) Select the timezone in which the event will occur (default is UTC).
+    - From: (Required) Set the starting date and time for the event.
+    - To: (Required) Set the ending date and time for the event.
+    - Timezone: (Required) Select the timezone in which the event will occur (default is UTC).
 
 Once you've filled in the event details, simply click Create to add the event to your calendar. This tool makes it easy to create events quickly and organize your calendar effectively.
 '''

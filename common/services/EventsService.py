@@ -2,28 +2,29 @@ from common.CalendarEventsManager import CalendarEventsManager
 from common.entities.EventInfo import EventInfo
 
 class EventsService:
-    def __init__(self, common):
-        self.common = common
-
-    def get_connection_setup(self, credentials_path, token_path):
+    @staticmethod
+    def get_connection_setup(credentials_path, token_path):
         return CalendarEventsManager.connection_setup(
             credentials_path=credentials_path,
             scopes=CalendarEventsManager.SCOPE,
             token_path=token_path
         )
 
-    def get_user_info(self, credentials):
+    @staticmethod
+    def get_user_info(credentials):
         return CalendarEventsManager.get_user_info(credentials)
 
-    def fetch_event_by_id(self, event_id):
+    @staticmethod
+    def fetch_event_by_id(creds, event_id):
         return CalendarEventsManager.get_event_by_id(
-            creds=self.common.get_credentials_or_exception(),
+            creds=creds,
             event_id=event_id
         )
 
-    def fetch_events(self, event_info: EventInfo):
+    @staticmethod
+    def fetch_events(creds, event_info: EventInfo):
         return CalendarEventsManager.get_events(
-            creds=self.common.get_credentials_or_exception(),
+            creds=creds,
             title=event_info.summary,
             start_date=event_info.range.date_from,
             end_date=event_info.range.date_to,
@@ -32,9 +33,10 @@ class EventsService:
             time_zone=event_info.time_zone
         )
 
-    def edit_events(self, event_info: EventInfo, old_events):
+    @staticmethod
+    def edit_events(creds, event_info: EventInfo, old_events):
         return CalendarEventsManager.edit_event(
-            creds=self.common.get_credentials_or_exception(),
+            creds=creds,
             old_events=old_events,
             summary_new=event_info.summary,
             description_new=event_info.description,
@@ -42,9 +44,10 @@ class EventsService:
             time_zone=event_info.time_zone
         )
 
-    def simulate_update_events(self, event_info: EventInfo, old_events):
+    @staticmethod
+    def simulate_update_events(creds, event_info: EventInfo, old_events):
         return CalendarEventsManager.simulate_event_updates(
-            creds=self.common.get_credentials_or_exception(),
+            creds=creds,
             old_events=old_events,
             summary_new=event_info.summary,
             description_new=event_info.description,
@@ -52,9 +55,10 @@ class EventsService:
             time_zone=event_info.time_zone
         )
 
-    def create_event(self, event_info: EventInfo):
+    @staticmethod
+    def create_event(creds, event_info: EventInfo):
         CalendarEventsManager.create_event(
-            creds=self.common.get_credentials_or_exception(),
+            creds=creds,
             summary=event_info.summary,
             description=event_info.description,
             start_date=event_info.range.date_from,

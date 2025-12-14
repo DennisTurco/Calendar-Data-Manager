@@ -39,7 +39,6 @@ class GetEventsFrame(BaseFrame):
         BaseFrame.__init__(self, parent)
         self.img = Images()
         self.event_color["No Color Filtering"] = ""
-        self.event_service = EventsService(self._common)
 
         # configure grid layout (4x4)
         self.grid_columnconfigure(1, weight=1)
@@ -137,7 +136,7 @@ class GetEventsFrame(BaseFrame):
         entry_id = self.entry_id.get()
         if len(entry_id) != 0:
             try:
-                self.events = self.event_service.fetch_event_by_id(entry_id)
+                self.events = EventsService.fetch_event_by_id(self._common.get_credentials_or_exception(), entry_id)
                 #self.events_list_viewer_window()
                 self._logger.info(f"Event obtained successfully!")
                 self._common.write_log(self.log_box, f"Event obtained successfully!")
@@ -156,9 +155,9 @@ class GetEventsFrame(BaseFrame):
 
         try:
             time_range = TimeRange().build_from_string(date_from, date_to)
-            color_index = self._common.get_color_id(ConfigKeys.Keys.EVENT_COLOR.value, self.multi_selection.get())
+            color_index = self._common.get_color_id(self.multi_selection.get())
             event_info = EventInfo(summary, description, time_range, color_index, time_zone)
-            self.events = self.event_service.fetch_events(event_info)
+            self.events = EventsService.fetch_events(self._common.get_credentials_or_exception(), event_info)
             if len(self.events) == 0:
                 self._logger.info(f"No events obtained")
                 self._common.write_log(self.log_box, f"No events obtained")

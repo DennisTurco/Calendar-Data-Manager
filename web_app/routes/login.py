@@ -12,9 +12,6 @@ def login():
 
 @bp.route("/google-login", methods=["POST"])
 def google_login():
-    common = CommonOperations()
-    event_service = EventsService(common)
-
     list_res = JsonPreferences.read_from_json()
 
     if not isinstance(list_res, dict) or len(list_res) <= 0:
@@ -25,9 +22,10 @@ def google_login():
     token_path = list_res.get("TokenPath", credentials_path.rsplit("/", 1)[0] + "/token.json")
 
     try:
-        credentials = event_service.get_connection_setup(credentials_path, token_path)
+        credentials = EventsService.get_connection_setup(credentials_path, token_path)
         if credentials:
             session["google_authenticated"] = True
+            session["google_credentials"] = credentials.to_json()
             return redirect(url_for("main.index"))
         else:
             flash("Login failed. Please retry.")

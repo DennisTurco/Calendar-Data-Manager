@@ -29,7 +29,6 @@ class EditEventsFrame(BaseFrame):
     def __init__(self, parent):
         BaseFrame.__init__(self, parent)
         img = Images()
-        self.event_service = EventsService(self._common)
 
         self.event_color_from["No Color Filtering"] = "" # adding a new element inside the dictionary
 
@@ -136,12 +135,12 @@ class EditEventsFrame(BaseFrame):
         # Get OLD values
         summary_old = self.entry_summary_old.get()
         description_old = self.entry_description_old.get('0.0', tkinter.END)
-        color_index_old = CommonOperations.get_color_id(self.event_color_from, self.multi_selection_old.get())  # Get color index for old events
+        color_index_old = CommonOperations.get_color_id(self.multi_selection_old.get(), self.event_color_from)  # Get color index for old events
 
         # Get NEW values
         summary_new = self.entry_summary_new.get()
         description_new = self.entry_description_new.get('0.0', tkinter.END)
-        color_index_new = CommonOperations.get_color_id(self.event_color_to, self.multi_selection_new.get())  # Get color index for new events
+        color_index_new = CommonOperations.get_color_id(self.multi_selection_new.get(), self.event_color_to)  # Get color index for new events
 
         # Validate input data
         if not summary_old:
@@ -164,14 +163,14 @@ class EditEventsFrame(BaseFrame):
 
             # Retrieve events to edit
             event_info = EventInfo(summary_old, description_old, time_range, color_index_old, time_zone)
-            old_events = self.event_service.fetch_events(event_info)
+            old_events = EventsService.fetch_events(self._common.get_credentials_or_exception(), event_info)
 
             if not old_events:
                 self._logger.info("No events found")
                 CommonOperations.write_log(self.log_box, "No events found")
 
             event_info = EventInfo(summary_new, description_new, time_range, color_index_old, time_zone)
-            new_events = self.event_service.simulate_update_events(event_info, old_events)
+            new_events = EventsService.simulate_update_events(self._common.get_credentials_or_exception(), event_info, old_events)
             self.events_list_viewer_window(old_events, new_events, summary_new, description_new, color_index_new, date_from, date_to, time_zone)
         except ValueError:
             self._logger.error("ERROR: Invalid date format")
@@ -199,7 +198,7 @@ class EditEventsFrame(BaseFrame):
             time_range = TimeRange().build_from_string(date_from, date_to)
 
             event_info = EventInfo(summary_new, description_new, time_range, color_index_new, time_zone)
-            updated_events = self.event_service.edit_events(event_info, old_events)
+            updated_events = EventsService.edit_events(self._common.get_credentials_or_exception(), event_info, old_events)
             if updated_events is None: return
 
             self._logger.info(f"{len(updated_events)} event(s) successfully updated!")

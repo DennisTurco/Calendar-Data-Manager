@@ -24,7 +24,6 @@ class App:
         self._menu = None
         self.dropdown5 = None
         self._button_5 = None
-        self.event_service = EventsService(self._common)
 
         ConfigKeys.load_values_from_json()
         self._logger.info("Application started")
@@ -43,7 +42,7 @@ class App:
         self.credentials_path = list_res["CredentialsPath"]
         self.token_path = list_res["TokenPath"]
         try:
-            self.credentials = self.event_service.get_connection_setup(self.credentials_path, self.token_path)
+            self.credentials = EventsService.get_connection_setup(self.credentials_path, self.token_path)
         except Exception as e:
             print(f"Error: {e}")
 
@@ -133,7 +132,7 @@ class App:
 
         credentials = self._common.get_credentials_or_none()
         if credentials is not None:
-            (_, email, picture_url) = self.event_service.get_user_info(credentials)
+            (_, email, picture_url) = EventsService.get_user_info(credentials)
             user_image = self.__load_profile_icon_with_fallback(picture_url)
 
             if self._button_5 is not None:

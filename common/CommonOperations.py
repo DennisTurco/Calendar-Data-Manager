@@ -1,6 +1,6 @@
 import os
 from datetime import datetime, timedelta
-from typing import Final, Optional
+from typing import Optional
 import pyperclip
 
 from common.ConfigKeys import ConfigKeys
@@ -236,7 +236,7 @@ class CommonOperations:
         return toplevel_window
 
     @staticmethod
-    def get_color_id(colors, color_selected):
+    def get_color_id(color_selected, colors = ConfigKeys.Keys.EVENT_COLOR.value):
         color_index = 0
 
         for idx, color in enumerate(colors.keys()):

@@ -5,7 +5,7 @@ from common.InformationMessages import InformationMessages
 from common.ConfigKeys import ConfigKeys
 from common.settings import TIMEZONE
 
-bp = Blueprint("edit-events", __name__, url_prefix="/edit-events")
+bp = Blueprint("edit_events", __name__, url_prefix="/edit-events")
 
 @bp.route("/")
 def edit_events():
