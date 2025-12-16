@@ -10,51 +10,43 @@
     <div class="hidden md:flex gap-4 ml-10">
 
         {% macro dropdown(title, items) %}
-        <div class="relative group">
-            <button class="text-white px-4 py-2 rounded hover:bg-gray-700">
-                {{ title }}
-            </button>
+<div class="relative group">
+    <button class="text-white px-4 py-2 rounded hover:bg-gray-700">
+        {{ title }}
+    </button>
 
-            <div
-                class="absolute left-0 mt-2 w-48 bg-white rounded shadow-lg hidden group-hover:block z-50">
-                {% for item in items %}
-                    {% if item.submenu %}
-                        <div class="relative group">
-                            <button
-                                class="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100">
-                                {{ item.title }}
-                            </button>
-                            <div
-                                class="absolute left-full top-0 w-44 bg-white rounded shadow-lg hidden group-hover:block">
-                                {% for sub in item.submenu %}
-                                <a href="{{ sub.href }}"
-                                   class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                                    {{ sub.title }}
-                                </a>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    {% else %}
-                        <a href="{{ item.href }}"
-                           class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                            {{ item.title }}
-                        </a>
-                    {% endif %}
-                {% endfor %}
-            </div>
-        </div>
-        {% endmacro %}
+    <!-- hover bridge -->
+    <div class="absolute left-0 top-full h-2 w-full"></div>
+
+    <div
+        class="absolute left-0 top-full w-48 bg-white rounded shadow-lg
+               opacity-0 invisible group-hover:opacity-100 group-hover:visible
+               transition duration-150 z-50">
+
+        {% for item in items %}
+            <a href="{{ item.href }}"
+               class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                {{ item.title }}
+            </a>
+        {% endfor %}
+    </div>
+</div>
+{% endmacro %}
+
+
+<div class="absolute -top-2 left-0 w-full h-2"></div>
+
 
         {{ dropdown("About", [
-            {'title':'Website','href':'#'},
-            {'title':'Share','href':'#'},
-            {'title':'Donate - Buy me a coffee','href':'#'},
-            {'title':'Donate - Paypal','href':'#'}
+            {'title':'Website','href':'https://github.com/DennisTurco/Calendar-Data-Manager'},
+            {'title':'Share','href':'https://github.com/DennisTurco/Calendar-Data-Manager'},
+            {'title':'Donate - Buy me a coffee','href':'https://www.buymeacoffee.com/denno'},
+            {'title':'Donate - Paypal','href':'https://www.paypal.com/donate/?hosted_button_id=M7CJXS929334U'}
         ]) }}
 
         {{ dropdown("Help", [
-            {'title':'Support','href':'mailto:?subject=Calendar Data Manager - Support'},
-            {'title':'Report a bug','href':'#'}
+            {'title':'Support','href':'mailto:assistenza.shard@gmail.com?subject=Calendar Data Manager - Support'},
+            {'title':'Report a bug','href':'https://github.com/DennisTurco/Calendar-Data-Manager/issues'}
         ]) }}
     </div>
 
