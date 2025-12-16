@@ -1,4 +1,4 @@
-from flask import Blueprint, redirect, render_template, session, url_for
+from flask import Blueprint, current_app, redirect, render_template, session, url_for
 
 from common.ConfigKeys import ConfigKeys
 
@@ -9,6 +9,8 @@ def index():
 
     if not session.get("google_authenticated"):
         return redirect(url_for("login.login"))
+    
+    current_app.logger.debug(f"SESSION: {dict(session)}")
 
     return render_template(
         "index.html",

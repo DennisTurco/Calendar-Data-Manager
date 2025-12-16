@@ -9,7 +9,7 @@ from CTkMenuBar import *
 
 from common.ConfigKeys import ConfigKeys
 from common.services.EventsService import EventsService
-from common.LogService import LogService
+from desktop_app.LogService import LogService
 from common.CommonOperations import CommonOperations
 import desktop_app.frames.FrameController as FrameController
 from desktop_app.Images import Images

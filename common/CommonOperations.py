@@ -1,6 +1,6 @@
 import os
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import Any, Optional
 import pyperclip
 
 from common.ConfigKeys import ConfigKeys
@@ -10,9 +10,12 @@ import traceback
 import tempfile
 
 import tkinter
-from common.LogService import LogService
+from desktop_app.LogService import LogService
 from tkinter import filedialog
 import customtkinter as ctk
+from common.entities.EventInfo import EventInfo
+from common.entities.TimeRange import TimeRange
+from common.services.EventsService import EventsService
 from common.settings import DATE_FORMATTER, DAY_FORMATTER
 from desktop_app.CTkXYFrame import *
 from CTkMessagebox import *
@@ -418,6 +421,13 @@ class CommonOperations:
         y_position = (screen_height // 2) - (window_height // 2)
 
         toplevel.geometry(f"+{x_position}+{y_position}")  # Position the window at the center
+
+    @staticmethod
+    def get_events(creds, event_info: EventInfo) -> list[Any]:
+        if event_info.id is not None and len(event_info.id) != 0:
+            return EventsService.fetch_event_by_id(creds, event_info.id)
+            
+        return EventsService.fetch_events(creds, event_info)
 
     def set_frames(self, frames):
         self._frames = frames

@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Optional
 
 from common.entities.TimeRange import TimeRange
 
@@ -9,3 +10,4 @@ class EventInfo:
     range: TimeRange
     color: int
     time_zone: str
+    id: Optional[str] = ''

@@ -18,7 +18,7 @@ from desktop_app.frames.BaseFrame import BaseFrame
 from desktop_app.Images import Images
 from common.services.EventsService import EventsService
 from common.entities.EventInfo import EventInfo
-from common.LogService import LogService
+from desktop_app.LogService import LogService
 from common.CommonOperations import CommonOperations
 import desktop_app.GUIWidgets as GUIWidgets
 import desktop_app.frames.FrameController as FrameController
@@ -131,42 +131,32 @@ class GetEventsFrame(BaseFrame):
 
     # returns the number of events obtained
     def __get_events_count(self) -> int:
-        self.events = []
 
-        entry_id = self.entry_id.get()
-        if len(entry_id) != 0:
-            try:
-                self.events = EventsService.fetch_event_by_id(self._common.get_credentials_or_exception(), entry_id)
-                #self.events_list_viewer_window()
-                self._logger.info(f"Event obtained successfully!")
-                self._common.write_log(self.log_box, f"Event obtained successfully!")
-                return 1
-            except Exception as error:
-                ExceptionHandler.handle_exception(self._common, self.log_box, error)
-                return -1
-
+        entry_id = self.entry_id.get() if len(self.entry_id.get()) != 0 else None
         summary = self.entry_summary.get()
         date_from = self.entry_date_from.get()
         date_to = self.entry_date_to.get()
         description = self.entry_description.get("0.0", tkinter.END).replace('\n', '')
         time_zone = self.timezone_selection.get()
 
-        self._common.set_timezone(time_zone)
+        CommonOperations.set_timezone(time_zone)
+
+        time_range = TimeRange().build_from_string(date_from, date_to)
+        color_index = CommonOperations.get_color_id(self.multi_selection.get())
+        event_info = EventInfo(summary, description, time_range, color_index, time_zone, entry_id)
 
         try:
-            time_range = TimeRange().build_from_string(date_from, date_to)
-            color_index = self._common.get_color_id(self.multi_selection.get())
-            event_info = EventInfo(summary, description, time_range, color_index, time_zone)
-            self.events = EventsService.fetch_events(self._common.get_credentials_or_exception(), event_info)
-            if len(self.events) == 0:
+            self.events = CommonOperations.get_events(self._common.get_credentials_or_exception(), event_info)
+    
+            if len(self.events) > 1:
+                self._logger.info(f"{len(self.events)} Event(s) obtained successfully!")
+                self._common.write_log(self.log_box, f"{len(self.events)} Event(s) obtained successfully!")
+            elif len(self.events) == 0:
                 self._logger.info(f"No events obtained")
                 self._common.write_log(self.log_box, f"No events obtained")
-                return 0
-
-            #self.events_list_viewer_window() # i have to truncate the list for performances reason
-            self._logger.info(f"{len(self.events)} Event(s) obtained successfully!")
-            self._common.write_log(self.log_box, f"{len(self.events)} Event(s) obtained successfully!")
-            return len(self.events)
+            elif len(self.events) == 1:
+                self._logger.info(f"Event obtained successfully!")
+                self._common.write_log(self.log_box, f"Event obtained successfully!")
         except ValueError as _:
             self._logger.error(f"Error on creating event: date format is not correct")
             self._common.write_log(self.log_box, f"Error on creating event: date format is not correct")
@@ -174,6 +164,9 @@ class GetEventsFrame(BaseFrame):
         except Exception as error:
             ExceptionHandler.handle_exception(self._common, self.log_box, error)
             return -1
+        
+        return len(self.events)
+
 
     def __get_and_preview(self):
         if self.__get_events_count() <= 0:

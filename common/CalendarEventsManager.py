@@ -9,7 +9,7 @@ from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 
-from common.LogService import LogService
+from desktop_app.LogService import LogService
 
 class CalendarEventsManager:
 
@@ -298,33 +298,22 @@ class CalendarEventsManager:
 
     # TODO: add like mode for title and description
     @staticmethod
-    def get_events(creds: Credentials, title: Optional[str] = None, description: Optional[str] = None, start_date: Optional[datetime.datetime] = None, end_date: Optional[datetime.datetime] = None, time_zone: str = 'UTC', color_id: int = -1) -> list[Any]:
-        if creds is None: raise ValueError("Credentials can't be null")
+    def get_events(creds: Credentials, title: str = None, description: str = None,
+                start_date: datetime.datetime = None, end_date: datetime.datetime = None,
+                time_zone: str = 'UTC', color_id: int = -1) -> list[dict]:
 
-        try:
-            service = build("calendar", "v3", credentials=creds)
-            events = []
+        if creds is None:
+            raise ValueError("Credentials can't be null")
 
-            start_date_time = None
-            end_date_time = None
-            # end_date_time_search = None
+        service = build("calendar", "v3", credentials=creds)
+        events = []
 
-            if start_date:
-                # Check if start_date is already a datetime object
-                if isinstance(start_date, datetime.datetime):
-                    start_date_time = start_date.isoformat() + 'Z'
+        start_date_time = start_date.isoformat() + 'Z' if start_date else None
+        end_date_time = end_date.isoformat() + 'Z' if end_date else datetime.datetime.now().isoformat() + 'Z'
 
-            if end_date:
-                # Check if end_date is already a datetime object
-                if isinstance(end_date, datetime.datetime):
-                    end_date_time = end_date.isoformat() + 'Z'
-            else:
-                # Parsing and formatting end_date
-                end_date_time = datetime.datetime.now().isoformat() + "Z"
-
-            end_date_time_search = end_date_time
-
-            while True:
+        page_token = None
+        while True:
+            try:
                 events_result = service.events().list(
                     calendarId="primary",
                     maxResults=2500,
@@ -333,41 +322,29 @@ class CalendarEventsManager:
                     singleEvents=True,
                     orderBy="startTime",
                     timeZone=time_zone,
-                    fields="items"
+                    fields="items,nextPageToken",
+                    pageToken=page_token
                 ).execute()
+                
+                items = events_result.get('items', [])
 
-                if title is not None and len(title) > 0:
-                    events += [event for event in events_result.get('items', []) if title.lower() in event.get('summary', '').lower()]
-                else:
-                    events += [event for event in events_result.get('items', [])]
+                if title:
+                    items = [e for e in items if title.lower() in e.get('summary', '').lower()]
+                if description:
+                    items = [e for e in items if description.lower() in e.get('description', '').lower()]
+                if color_id not in [-1, 0]:
+                    items = [e for e in items if e.get('colorId') == str(color_id)]
 
-                if len(events) == 0:
-                    return []
+                events.extend(items)
 
-                # Exit if all events are found (when the date of the last element inside the list is the same for two times)
-                if events[-1]['end'].get('dateTime') == end_date_time_search:
+                page_token = events_result.get('nextPageToken')
+                if not page_token:
                     break
 
-                end_date_time_search = events[-1]['end'].get('dateTime')
+            except Exception as e:
+                raise Exception(f"Error fetching events: {e}")
 
-                start_date_time = end_date_time_search
-
-            # Filter events by color_id
-            if color_id != -1 and color_id != 0:
-                events = [event for event in events if event.get('colorId') == str(color_id)]
-
-            # Filter events by description
-            if description and len(description) > 2:  # as default it contains '\n' string
-                events = [event for event in events if description.lower() in event.get('description', '').lower()]
-
-            if events:
-                return events
-            else:
-                return []
-        except HttpError as http_error:
-            raise HttpError(f"HTTP error occurred: {str(http_error)}", None)
-        except Exception as generic_exception:
-            raise Exception(f"An error occurred: {str(generic_exception)}")
+        return events
 
     # TODO: test me
     @staticmethod

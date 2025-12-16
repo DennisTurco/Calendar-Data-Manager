@@ -6,7 +6,7 @@ from desktop_app.frames.EditEventsFrame import EditEventsFrame
 from desktop_app.frames.GetEventsFrame import GetEventsFrame
 from desktop_app.frames.GraphFrame import GraphFrame
 from desktop_app.frames.NewEventsFrame import NewEventsFrame
-from common.LogService import LogService
+from desktop_app.LogService import LogService
 from common.CommonOperations import CommonOperations
 
 def show_frame(frame_type: FrameTypes, common: CommonOperations):

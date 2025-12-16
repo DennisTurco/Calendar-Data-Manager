@@ -22,7 +22,7 @@
             <!-- HEADER -->
             <header class="mt-12 text-center">
                 <div class="flex items-center justify-center gap-3">
-                    <h1 class="text-4xl font-semibold">Get Events</h1>
+                    <h1 class="text-4xl font-semibold">Get Events & Plot</h1>
 
                     {% if section_message %}
                     <button type="button"
@@ -54,11 +54,6 @@
 
                 <!-- Event filters -->
                 <div class="flex flex-col">
-                    <label class="mb-1 text-gray-700 font-medium">Event ID</label>
-                    <input type="text" name="event_id" class="input-field">
-                </div>
-
-                <div class="flex flex-col">
                     <label class="mb-1 text-gray-700 font-medium">Summary</label>
                     <input type="text" name="summary" class="input-field">
                 </div>
@@ -82,13 +77,13 @@
                 <!-- Dates -->
                 <div class="flex flex-col md:flex-row gap-4">
                     <div class="flex flex-col flex-1">
-                        <label class="mb-1 text-gray-700 font-medium">Date From</label>
-                        <input type="date" name="date_from" class="input-field">
+                        <label for="date_from" class="mb-1 text-gray-700 font-medium">Date From</label>
+                        <input type="datetime-local" name="date_from" id="date_from" class="input-field" required>
                     </div>
 
                     <div class="flex flex-col flex-1">
-                        <label class="mb-1 text-gray-700 font-medium">Date To</label>
-                        <input type="date" name="date_to" class="input-field">
+                        <label for="date_to" class="mb-1 text-gray-700 font-medium">Date To</label>
+                        <input type="datetime-local" name="date_to" id="date_to" class="input-field" required>
                     </div>
                 </div>
 
@@ -104,42 +99,59 @@
                     </select>
                 </div>
 
-                <!-- Output options -->
-                <div class="flex flex-col">
-                    <label class="mb-1 text-gray-700 font-medium">Output File Path</label>
-                    <input type="text" name="file_path" class="input-field">
-                </div>
+                <!-- Graph Types -->
+                <div class="space-y-3">
+                    <h2 class="section-header font-medium">Graph Types</h2>
 
-                <div class="flex items-center gap-2">
-                    <input type="checkbox" name="overwrite_mode" class="h-5 w-5">
-                    <label class="text-gray-700">Overwrite existing file</label>
+                    <div class="flex flex-wrap gap-4" id="graphCheckboxes">
+                        {% for graph_type in graph_types %}
+                        <label class="checkbox-label flex items-center gap-2">
+                            <input type="checkbox" name="{{ graph_type | replace(' ', '_') }}" class="h-5 w-5">
+                            {{ graph_type }}
+                        </label>
+                        {% endfor %}
+                    </div>
+
+                    <div class="flex gap-2 mt-2">
+                        <button type="button" class="button-primary" id="selectAllBtn">Select All</button>
+                        <button type="button" class="button-secondary" id="deselectAllBtn">Deselect All</button>
+                    </div>
                 </div>
 
                 <!-- Submit -->
                 <div class="flex justify-center gap-4 mt-6">
                     <button type="submit"
                             name="action"
-                            value="get"
-                            class="button-primary px-6 py-3 flex items-center gap-2">
-                        <img src="{{ url_for('static', filename='images/list.png') }}" class="w-5 h-5">
-                        Get
-                    </button>
-
-                    <button type="submit"
-                            name="action"
                             value="get_and_plot"
-                            class="button-success px-6 py-3 flex items-center gap-2">
+                            class="button-primary px-6 py-3 flex items-center gap-2">
                         <img src="{{ url_for('static', filename='images/chart.png') }}" class="w-5 h-5">
                         Get & Plot
                     </button>
                 </div>
             </form>
         </div>
+
     </main>
 
     <script src="{{ url_for('static', filename='js/modal.js') }}"></script>
     <script src="{{ url_for('static', filename='js/default_timezone.js') }}"></script>
     <script src="{{ url_for('static', filename='js/toast.js') }}"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const selectAllBtn = document.getElementById('selectAllBtn');
+            const deselectAllBtn = document.getElementById('deselectAllBtn');
+            const checkboxes = document.querySelectorAll('#graphCheckboxes input[type="checkbox"]');
+
+            selectAllBtn.addEventListener('click', () => {
+                checkboxes.forEach(cb => cb.checked = true);
+            });
+
+            deselectAllBtn.addEventListener('click', () => {
+                checkboxes.forEach(cb => cb.checked = false);
+            });
+        });
+    </script>
 
 </body>
 </html>

@@ -1,3 +1,4 @@
+from typing import Any, Dict, List, Union
 import pandas as pd
 import matplotlib.pyplot as plt
 import plotly.express as px
@@ -8,50 +9,80 @@ import os
 class Plotter:
 
     @staticmethod
-    def load_data(filepath):
-        # check if file exists and if it is empty
-        if not os.path.isfile(filepath): raise FileNotFoundError()
-        if os.stat(filepath).st_size == 0: raise pd.errors.EmptyDataError()
+    def _normalize_datetime_columns(data: pd.DataFrame) -> pd.DataFrame:
+        """Normalize and convert Start/End columns to datetime."""
+        for col in ['Start', 'End']:
+            data[col] = (
+                data[col]
+                .astype(str)
+                .str.split('+').str[0]
+                .str.replace('T', ' ', regex=False)
+                .str.replace('Z', '', regex=False)
+            )
 
-        try:
-            # Load data from the CSV file
-            data = pd.read_csv(filepath, sep='|', header=None, encoding='utf-8')
-            data.columns = ['ID', 'Summary', 'Start', 'End', 'Duration']
+            # Add missing time part (YYYY-MM-DD)
+            data[col] = data[col].where(
+                data[col].str.len() > 10,
+                data[col] + " 00:00:00"
+            )
 
-            # Extract date without the additional time information
-            data['Start'] = data['Start'].str.split('+').str[0]
-            data['End'] = data['End'].str.split('+').str[0]
+            data[col] = pd.to_datetime(
+                data[col],
+                format='%Y-%m-%d %H:%M:%S',
+                errors='raise'
+            )
 
-            # Remove character 'T'
-            data['Start'] = data['Start'].str.replace('T', ' ')
-            data['End'] = data['End'].str.replace('T', ' ')
-
-            # Remove character 'Z'
-            data['Start'] = data['Start'].str.replace('Z', '')
-            data['End'] = data['End'].str.replace('Z', '')
-
-            # Set the hours, minutes, and seconds if they are missing
-            for index, elem in enumerate(data['Start']):
-                if len(elem) == 10:
-                    data.loc[index, 'Start'] = elem + " 00:00:00"
-            for index, elem in enumerate(data['End']):
-                if len(elem) == 10:
-                    data.loc[index, 'End'] = elem + " 00:00:00"
-
-            # Convert the 'Start' and 'End' columns to datetime with the correct format
-            data['Start'] = pd.to_datetime(data['Start'], format='%Y-%m-%d %H:%M:%S')
-            data['End'] = pd.to_datetime(data['End'], format='%Y-%m-%d %H:%M:%S')
-
-            return data
-        except pd.errors.ParserError as parser_error:
-            raise pd.errors.ParserError(f"Parsing error: {str(parser_error)}")
-        except ValueError as value_error:
-            raise ValueError(f"Value error: {str(value_error)}")
-        except Exception as e:
-            raise Exception(f"An error occurred: {str(e)}")
+        return data
 
     @staticmethod
-    def __extract_time_data(data):
+    def load_data_from_csv(filepath: str) -> pd.DataFrame:
+        if not os.path.isfile(filepath):
+            raise FileNotFoundError(f"File not found: {filepath}")
+
+        if os.stat(filepath).st_size == 0:
+            raise pd.errors.EmptyDataError("CSV file is empty")
+
+        try:
+            data = pd.read_csv(filepath, sep='|', header=None, encoding='utf-8')
+            data.columns = ['ID', 'Summary', 'Start', 'End', 'Duration']
+            return Plotter._normalize_datetime_columns(data)
+
+        except Exception as e:
+            raise RuntimeError(f"Failed to load CSV data: {e}") from e
+
+    @staticmethod
+    def load_data_from_list(events: List[Any]) -> pd.DataFrame:
+        if not events:
+            return pd.DataFrame(columns=['ID', 'Summary', 'Start', 'End', 'Duration'])
+
+        rows = []
+
+        for event in events:
+            start = event.get('start', {})
+            end = event.get('end', {})
+
+            start_value = start.get('dateTime') or start.get('date')
+            end_value = end.get('dateTime') or end.get('date')
+
+            if not start_value or not end_value:
+                continue
+
+            rows.append({
+                'ID': event.get('id'),
+                'Summary': event.get('summary', ''),
+                'Start': start_value,
+                'End': end_value,
+                'Duration': None
+            })
+
+        if not rows:
+            return pd.DataFrame(columns=['ID', 'Summary', 'Start', 'End', 'Duration'])
+
+        df = pd.DataFrame(rows)
+        return Plotter._normalize_datetime_columns(df)
+
+    @staticmethod
+    def __extract_time_data(data: pd.DataFrame) -> pd.DataFrame:
         # Extract year from the Start column and convert Duration to timedelta
         data['Start'] = pd.to_datetime(data['Start'])
         data['End'] = pd.to_datetime(data['End'])
@@ -153,10 +184,8 @@ class Plotter:
     @staticmethod
     def __chart4(data):
         #################### Total Hours by Summary and Year
-        # extract time
         data = Plotter.__extract_time_data(data)
 
-        # Group by 'Summary' and 'Year' and calculate the sum of hours
         summary_yearly_hours = data.groupby(['Year', 'Summary'])['Duration'].sum()
 
         # Unstack the DataFrame to have 'Summary' as columns
@@ -176,12 +205,9 @@ class Plotter:
         ####################
 
     @staticmethod
-    def chart_total_hours_per_year(data):
-        #################### Total Hours per Year
-        # Extract time data
+    def chart_total_hours_per_year(data: pd.DataFrame, get: bool = False):
         data = Plotter.__extract_time_data(data)
 
-        # Group by year and calculate the sum of hours
         yearly_hours = data.groupby('Year')['Duration'].sum().reset_index()
 
         # Create a bar chart with Plotly
@@ -195,16 +221,15 @@ class Plotter:
         fig.update_layout(xaxis=dict(tickmode='array', tickvals=yearly_hours['Year'], ticktext=yearly_hours['Year']))
 
         # Show the plot
-        fig.show()
-        ####################
+        if not get:
+            fig.show()
+        else:
+            return fig
 
     @staticmethod
-    def chart_total_hours_per_month(data):
-        #################### Total Hours per Month
-        # Extract time data
+    def chart_total_hours_per_month(data: pd.DataFrame, get: bool = False):
         data = Plotter.__extract_time_data(data)
 
-        # Group by month and calculate the sum of hours
         monthly_hours = data.groupby('Month')['Duration'].sum().reset_index()
 
         # Create a bar chart with Plotly
@@ -218,16 +243,16 @@ class Plotter:
         fig.update_layout(xaxis=dict(tickmode='array', tickvals=monthly_hours['Month'], ticktext=monthly_hours['Month']))
 
         # Show the plot
-        fig.show()
-        ####################
+        if not get:
+            fig.show()
+        else:
+            return fig
+        
 
     @staticmethod
-    def chart_total_hours_per_month_grouped_by_year(data):
-        #################### Total Hours per Month Grouped by Year
-        # Extract time data
+    def chart_total_hours_per_month_grouped_by_year(data: pd.DataFrame, get: bool = False):
         data = Plotter.__extract_time_data(data)
 
-        # Group by month, year, and calculate the sum of hours
         monthly_hours_by_year = data.groupby(['Month', 'Year'])['Duration'].sum().reset_index()
 
         # Create a bar chart with Plotly, color by 'Year'
@@ -268,13 +293,14 @@ class Plotter:
         )
 
         # Show the plot
-        fig.show()
+        if not get:
+            fig.show()
+        else:
+            return fig
         ####################
 
     @staticmethod
-    def chart_total_hours_by_summary(data):
-        #################### Total Hours by Summary
-        # Extract time
+    def chart_total_hours_by_summary(data: pd.DataFrame, get: bool = False):
         data = Plotter.__extract_time_data(data)
 
         hours_by_summary = Plotter.__hours_by_summary(data)
@@ -290,13 +316,14 @@ class Plotter:
             fig.add_annotation(x=i, y=val + 0.05, text=f"{val:.2f}h", showarrow=False)
 
         # Show the plot
-        fig.show()
+        if not get:
+            fig.show()
+        else:
+            return fig
         ####################
 
     @staticmethod
-    def chart_total_hours_by_summary_pie(data):
-        #################### Total Hours by Summary Pie chart
-        # Extract time
+    def chart_total_hours_by_summary_pie(data: pd.DataFrame, get: bool = False):
         data = Plotter.__extract_time_data(data)
 
         hours_by_summary = Plotter.__hours_by_summary(data)
@@ -305,13 +332,14 @@ class Plotter:
         fig = px.pie(hours_by_summary, values='Duration', names=hours_by_summary.index, labels={'Duration': 'Total Hours', 'names': 'Summary'}, title='Total Hours by Summary Pie chart')
 
         # Show the plot
-        fig.show()
+        if not get:
+            fig.show()
+        else:
+            return fig
         ####################
 
     @staticmethod
-    def chart_total_hours_per_year_by_summary(data):
-        #################### Total Hours per Year by Summary
-        # Extract time data
+    def chart_total_hours_per_year_by_summary(data, get: bool = False):
         data = Plotter.__extract_time_data(data)
 
         # Group by year and summary, calculate the sum of hours
@@ -330,16 +358,16 @@ class Plotter:
                                     ticktext=yearly_hours_by_summary['Year']))
 
         # Show the plot
-        fig.show()
+        if not get:
+            fig.show()
+        else:
+            return fig
         ####################
 
     @staticmethod
-    def chart_total_hours_per_month_by_summary(data):
-        #################### Total Hours per Month by Summary
-        # Extract time data
+    def chart_total_hours_per_month_by_summary(data: pd.DataFrame, get: bool = False):
         data = Plotter.__extract_time_data(data)
 
-        # Group by month and summary, calculate the sum of hours
         monthly_hours_by_summary = data.groupby(['Month', 'Summary'])['Duration'].sum().reset_index()
 
         # Create a bar chart with Plotly
@@ -355,15 +383,15 @@ class Plotter:
                                     ticktext=monthly_hours_by_summary['Month']))
 
         # Show the plot
-        fig.show()
-        ####################
+        if not get:
+            fig.show()
+        else:
+            return fig
 
     @staticmethod
-    def all_stats(data):
-        # extract time
+    def all_stats(data: pd.DataFrame):
         data = Plotter.__extract_time_data(data)
 
-        # Group by year and calculate the sum of hours
         yearly_hours = data.groupby('Year')['Duration'].sum()
 
         hours_by_summary = Plotter.__hours_by_summary(data)

@@ -1,6 +1,6 @@
 from googleapiclient.errors import HttpError
 import pandas as pandas
-from common.LogService import LogService
+from desktop_app.LogService import LogService
 from common.CommonOperations import CommonOperations
 import customtkinter as ctk
 

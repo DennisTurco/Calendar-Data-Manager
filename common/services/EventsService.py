@@ -1,3 +1,4 @@
+from typing import Any
 from common.CalendarEventsManager import CalendarEventsManager
 from common.entities.EventInfo import EventInfo
 
@@ -15,14 +16,14 @@ class EventsService:
         return CalendarEventsManager.get_user_info(credentials)
 
     @staticmethod
-    def fetch_event_by_id(creds, event_id):
+    def fetch_event_by_id(creds, event_id) -> list[Any]:
         return CalendarEventsManager.get_event_by_id(
             creds=creds,
             event_id=event_id
         )
 
     @staticmethod
-    def fetch_events(creds, event_info: EventInfo):
+    def fetch_events(creds, event_info: EventInfo) -> list[Any]:
         return CalendarEventsManager.get_events(
             creds=creds,
             title=event_info.summary,
@@ -34,7 +35,7 @@ class EventsService:
         )
 
     @staticmethod
-    def edit_events(creds, event_info: EventInfo, old_events):
+    def edit_events(creds, event_info: EventInfo, old_events) -> list | None:
         return CalendarEventsManager.edit_event(
             creds=creds,
             old_events=old_events,
@@ -45,7 +46,7 @@ class EventsService:
         )
 
     @staticmethod
-    def simulate_update_events(creds, event_info: EventInfo, old_events):
+    def simulate_update_events(creds, event_info: EventInfo, old_events) -> list:
         return CalendarEventsManager.simulate_event_updates(
             creds=creds,
             old_events=old_events,
@@ -56,7 +57,7 @@ class EventsService:
         )
 
     @staticmethod
-    def create_event(creds, event_info: EventInfo):
+    def create_event(creds, event_info: EventInfo) -> None:
         CalendarEventsManager.create_event(
             creds=creds,
             summary=event_info.summary,

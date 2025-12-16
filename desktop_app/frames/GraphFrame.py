@@ -7,7 +7,7 @@ from common.CommonOperations import CommonOperations
 from common.ConfigKeys import ConfigKeys
 from common.ExceptionHandler import ExceptionHandler
 import desktop_app.GUIWidgets as GUIWidgets
-from common.LogService import LogService
+from desktop_app.LogService import LogService
 from common.Plotter import Plotter
 from desktop_app.frames.BaseFrame import BaseFrame
 from desktop_app.Images import Images
@@ -132,7 +132,7 @@ class GraphFrame(BaseFrame):
         try:
             self._logger.info(f"Generating chart")
             self._common.write_log(self.log_box, "Generating chart")
-            data = Plotter.load_data(self.file_path.get())
+            data = Plotter.load_data_from_csv(self.file_path.get())
             Plotter.all_stats(data)
 
             self.__reset_stop_event()

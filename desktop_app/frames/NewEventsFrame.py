@@ -10,7 +10,7 @@ from desktop_app.frames.BaseFrame import BaseFrame
 from desktop_app.Images import Images
 from common.services.EventsService import EventsService
 from common.entities.EventInfo import EventInfo
-from common.LogService import LogService
+from desktop_app.LogService import LogService
 from common.CommonOperations import CommonOperations
 import desktop_app.GUIWidgets as GUIWidgets
 

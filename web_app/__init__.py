@@ -3,19 +3,19 @@ from dotenv import load_dotenv
 from flask import Flask
 
 def create_app():
-    load_dotenv()  # legge il .env
+    load_dotenv() 
 
     app = Flask(__name__)
 
     app.secret_key = os.environ.get("FLASK_SECRET_KEY")
 
     # Route Login
-    from web_app.routes.login import bp as login_bp
-    app.register_blueprint(login_bp)
+    from web_app.routes.login import bp as login
+    app.register_blueprint(login)
 
     # Route Home
-    from web_app.routes.home import bp as main_bp
-    app.register_blueprint(main_bp)
+    from web_app.routes.home import bp as main
+    app.register_blueprint(main)
 
     # Route new Events
     from web_app.routes.new_events import bp as new_events
@@ -29,9 +29,9 @@ def create_app():
     from web_app.routes.edit_events import bp as edit_events
     app.register_blueprint(edit_events)
 
-    # Route Graph
-    from web_app.routes.graph import bp as graph
-    app.register_blueprint(graph)
+    # Route edit Events
+    from web_app.routes.graph_viewer import bp as graph_viewer
+    app.register_blueprint(graph_viewer)
 
     # Error Handlers
     from web_app.routes import error_page
