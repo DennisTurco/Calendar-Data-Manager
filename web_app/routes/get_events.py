@@ -17,8 +17,14 @@ bp = Blueprint("get_events", __name__, url_prefix="/get-events")
 
 @bp.route("/", methods=["GET", "POST"])
 def get_events():
+
+    cred_cache_id = session.get("cred_cache_id")
+    credentials: Credentials = CacheManager.get(cred_cache_id)
+    if not credentials:
+        return redirect(url_for("login.login"))
+
     if request.method == "POST":
-        return _fetch_events()
+        return _fetch_events(credentials)
     
     return render_template(
         "get-events.html",
@@ -33,12 +39,7 @@ def get_events():
     )
 
 
-def _fetch_events():
-    cred_cache_id = session.get("cred_cache_id")
-    credentials: Credentials = CacheManager.get(cred_cache_id)
-    if not credentials:
-        return redirect(url_for("login.login"))
-    
+def _fetch_events(credentials: Credentials):    
     summary = request.form.get("summary")
     description = request.form.get("description")
     color = request.form.get("color")

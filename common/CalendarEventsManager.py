@@ -298,9 +298,13 @@ class CalendarEventsManager:
 
     # TODO: add like mode for title and description
     @staticmethod
-    def get_events(creds: Credentials, title: str = None, description: str = None,
-                start_date: datetime.datetime = None, end_date: datetime.datetime = None,
-                time_zone: str = 'UTC', color_id: int = -1) -> list[dict]:
+    def get_events(creds: Credentials,
+                   title: str = None,
+                   description: str = None,
+                   start_date: datetime.datetime = None,
+                   end_date: datetime.datetime = None,
+                   time_zone: str = 'UTC',
+                   color_id: int = 1) -> list[dict]:
 
         if creds is None:
             raise ValueError("Credentials can't be null")
@@ -312,6 +316,7 @@ class CalendarEventsManager:
         end_date_time = end_date.isoformat() + 'Z' if end_date else datetime.datetime.now().isoformat() + 'Z'
 
         page_token = None
+
         while True:
             try:
                 events_result = service.events().list(
@@ -325,15 +330,20 @@ class CalendarEventsManager:
                     fields="items,nextPageToken",
                     pageToken=page_token
                 ).execute()
-                
+
                 items = events_result.get('items', [])
 
                 if title:
                     items = [e for e in items if title.lower() in e.get('summary', '').lower()]
                 if description:
                     items = [e for e in items if description.lower() in e.get('description', '').lower()]
-                if color_id not in [-1, 0]:
-                    items = [e for e in items if e.get('colorId') == str(color_id)]
+                for e in items:
+                    print(e.get('summary'), e.get('colorId'))
+                if color_id > 1:
+                    items = [
+                        e for e in items
+                        if (e.get('colorId') is None if color_id == 0 else e.get('colorId') == str(color_id))
+                    ]
 
                 events.extend(items)
 

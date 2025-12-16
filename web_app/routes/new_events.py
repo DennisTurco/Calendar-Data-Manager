@@ -16,8 +16,14 @@ bp = Blueprint("new_events", __name__, url_prefix="/new-events")
 
 @bp.route("/", methods=["GET", "POST"])
 def new_events():
+    cred_cache_id = session.get("cred_cache_id")
+    credentials: Credentials = CacheManager.get(cred_cache_id)
+    if not credentials:
+        return redirect(url_for("login.login"))
+
     if request.method == "POST":
-        return _create_event()
+        return _create_event(credentials)
+    
     return render_template(
         "new-events.html",
         active_page="new events",
@@ -26,12 +32,7 @@ def new_events():
         timezones=TIMEZONE
     )
 
-def _create_event():
-    cred_cache_id = session.get("cred_cache_id")
-    credentials: Credentials = CacheManager.get(cred_cache_id)
-    if not credentials:
-        return redirect(url_for("login.login"))
-
+def _create_event(credentials: Credentials):
     summary = request.form.get("summary")
     description = request.form.get("description")
     color = request.form.get("color")
