@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/icon.png') }}">
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen font-sans">
+
+    <form action="{{ url_for('login.google_login') }}" method="post">
+        <button type="submit"
+                class="flex items-center justify-center gap-2 w-full py-3 px-4 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
+                title="Login using your Google account">
+            <img src="/static/images/google.png" class="w-5 h-5" alt="Arrow">
+            Login with Google
+        </button>
+    </form>
+
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <div class="mt-4 text-red-600 text-center">
+        {% for msg in messages %}
+            <p>{{ msg }}</p>
+        {% endfor %}
+        </div>
+    {% endif %}
+    {% endwith %}
+
+    <!-- Modal Template -->
+    <div id="error-modal" class="fixed inset-0 bg-black bg-opacity-40 hidden items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-xl shadow-lg max-w-sm w-full text-center">
+            <h2 class="text-lg font-bold mb-4">Credentials error</h2>
+            <p class="mb-6">Do you wish to retry?</p>
+            <div class="flex justify-around">
+                <button id="modal-no" class="px-4 py-2 bg-gray-400 rounded hover:bg-gray-500">No</button>
+                <button id="modal-yes" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Yes</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simulate login
+        document.getElementById('google-login').addEventListener('click', () => {
+            // Simulate credentials error
+            const modal = document.getElementById('error-modal');
+            modal.classList.remove('hidden');
+
+            // Yes button
+            document.getElementById('modal-yes').onclick = () => {
+                modal.classList.add('hidden');
+                alert("Retry login flow here"); // Replace with actual login logic
+            };
+
+            // No button
+            document.getElementById('modal-no').onclick = () => {
+                modal.classList.add('hidden');
+            };
+        });
+    </script>
+
+</body>
+</html>

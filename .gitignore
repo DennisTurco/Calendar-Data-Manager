@@ -14,3 +14,12 @@ GUI.spec
 __pycache__
 .vscode
 .venv
+
+# ignore all .log files
+*/*.log
+
+# Ignore PyCharm project files
+.idea/
+
+
+personal

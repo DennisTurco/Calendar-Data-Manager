@@ -1,4 +1,4 @@
-![logo](imgs/icon.png)
+![logo](common/imgs/icon.png)
 
 # Calendar Data Manager
 
@@ -35,6 +35,14 @@ This project is entirely free, devoid of any paid content or advertisements. It 
 
 ## 🐛 Report a BUG
 To report a BUG -> [ISSUE](https://github.com/DennisTurco/Calendar-Data-Manager/issues)
+
+
+## Technical Information
+
+### Web App
+
+- Do not make any changes to the web_app/static folder, the images are synchronized to the common/assets/images.
+  If for any reasons are not correctly synchronized, Open cmd in administrator mode, navigate to web_app/static and write: `mklink /D images ..\..\common\assets\images `
 
 
 ## Licence

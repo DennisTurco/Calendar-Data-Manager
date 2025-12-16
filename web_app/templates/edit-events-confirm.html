@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Confirm Update</title>
+</head>
+<body>
+    <h1>Confirm Update</h1>
+
+    <h2>Old Events:</h2>
+    <ul>
+        {% for e in old_events %}
+            <li>{{ e.summary }} ({{ e.color_index }})</li>
+        {% endfor %}
+    </ul>
+
+    <h2>New Event:</h2>
+    <p>Summary: {{ new_event.summary }}</p>
+    <p>Description: {{ new_event.description }}</p>
+    <p>Color: {{ new_event.color_index }}</p>
+
+    <form method="POST" action="{{ url_for('edit_events.confirm_update') }}">
+        <button type="submit">Confirm</button>
+        <a href="{{ url_for('edit_events.edit_events') }}">Cancel</a>
+    </form>
+</body>
+</html>

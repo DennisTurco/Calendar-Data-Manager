@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Get Events</title>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/icon.png') }}">
+</head>
+
+<body class="bg-gray-100 text-gray-900 min-h-screen font-sans">
+
+    {% include "components/toast.html" %}
+    {% include "navbar.html" %}
+    {% include "sidebar.html" %}
+
+    <!-- MAIN WRAPPER -->
+    <main class="w-full pl-0 md:pl-48 pt-16">
+        <div class="mx-auto max-w-3xl px-4 flex flex-col items-center">
+
+            <!-- HEADER -->
+            <header class="mt-12 text-center">
+                <div class="flex items-center justify-center gap-3">
+                    <h1 class="text-4xl font-semibold">Get Events & Plot</h1>
+
+                    {% if section_message %}
+                    <button type="button"
+                        onclick="openModal('info_get')"
+                        class="text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 rounded"
+                        title="More info">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none"
+                             viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                  d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/>
+                        </svg>
+                    </button>
+                    {% endif %}
+                </div>
+
+                {% with
+                modal_id="info_get",
+                modal_title="Section Information",
+                modal_content=section_message
+                %}
+                {% include "components/info_modal.html" %}
+                {% endwith %}
+            </header>
+
+            <!-- FORM -->
+            <form method="POST"
+                  action="/get-events"
+                  class="mt-12 w-full max-w-xl bg-white p-8 rounded-2xl shadow-sm flex flex-col gap-6">
+
+                <!-- Event filters -->
+                <div class="flex flex-col">
+                    <label class="mb-1 text-gray-700 font-medium">Summary</label>
+                    <input type="text" name="summary" class="input-field">
+                </div>
+
+                <div class="flex flex-col">
+                    <label class="mb-1 text-gray-700 font-medium">Description</label>
+                    <textarea name="description" rows="3" class="input-field"></textarea>
+                </div>
+
+                <!-- Color -->
+                <div class="flex flex-col">
+                    <label class="mb-1 text-gray-700 font-medium">Color</label>
+                    <select name="color" class="input-field">
+                        <option value="">Any</option>
+                        {% for color in event_colors %}
+                        <option value="{{ color }}">{{ color }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Dates -->
+                <div class="flex flex-col md:flex-row gap-4">
+                    <div class="flex flex-col flex-1">
+                        <label for="date_from" class="mb-1 text-gray-700 font-medium">Date From</label>
+                        <input type="datetime-local" name="date_from" id="date_from" class="input-field" required>
+                    </div>
+
+                    <div class="flex flex-col flex-1">
+                        <label for="date_to" class="mb-1 text-gray-700 font-medium">Date To</label>
+                        <input type="datetime-local" name="date_to" id="date_to" class="input-field" required>
+                    </div>
+                </div>
+
+                <!-- Timezone -->
+                <div class="flex flex-col">
+                    <label for="timezone" class="mb-1 text-gray-700 font-medium">Timezone</label>
+                    <select name="timezone" id="timezone" class="input-field">
+                        {% for tz in timezones %}
+                        <option value="{{ tz }}">
+                            {{ tz }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Graph Types -->
+                <div class="space-y-3">
+                    <h2 class="section-header font-medium">Graph Types</h2>
+
+                    <div class="flex flex-wrap gap-4" id="graphCheckboxes">
+                        {% for graph_type in graph_types %}
+                        <label class="checkbox-label flex items-center gap-2">
+                            <input type="checkbox" name="{{ graph_type | replace(' ', '_') }}" class="h-5 w-5">
+                            {{ graph_type }}
+                        </label>
+                        {% endfor %}
+                    </div>
+
+                    <div class="flex gap-2 mt-2">
+                        <button type="button" class="button-primary" id="selectAllBtn">Select All</button>
+                        <button type="button" class="button-secondary" id="deselectAllBtn">Deselect All</button>
+                    </div>
+                </div>
+
+                <!-- Submit -->
+                <div class="flex justify-center gap-4 mt-6">
+                    <button type="submit"
+                            name="action"
+                            value="get_and_plot"
+                            class="button-primary px-6 py-3 flex items-center gap-2">
+                        <img src="{{ url_for('static', filename='images/chart.png') }}" class="w-5 h-5">
+                        Get & Plot
+                    </button>
+                </div>
+            </form>
+        </div>
+
+    </main>
+
+    <script src="{{ url_for('static', filename='js/modal.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/default_timezone.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/toast.js') }}"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const selectAllBtn = document.getElementById('selectAllBtn');
+            const deselectAllBtn = document.getElementById('deselectAllBtn');
+            const checkboxes = document.querySelectorAll('#graphCheckboxes input[type="checkbox"]');
+
+            selectAllBtn.addEventListener('click', () => {
+                checkboxes.forEach(cb => cb.checked = true);
+            });
+
+            deselectAllBtn.addEventListener('click', () => {
+                checkboxes.forEach(cb => cb.checked = false);
+            });
+        });
+    </script>
+
+</body>
+</html>

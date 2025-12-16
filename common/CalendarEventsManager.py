@@ -1,7 +1,7 @@
 import datetime
 import requests
 import os.path
-from typing import Dict
+from typing import Any, Dict, Optional
 
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
@@ -9,17 +9,20 @@ from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 
-from Logger import Logger
+from desktop_app.LogService import LogService
 
 class CalendarEventsManager:
-    
+
+    def __init__(self):
+        pass
+
     SCOPE = [
         'https://www.googleapis.com/auth/calendar',
         'openid',
         'https://www.googleapis.com/auth/userinfo.email',
         'https://www.googleapis.com/auth/userinfo.profile'
     ]
-    
+
     @staticmethod
     def get_user_info(credentials: Credentials):
         user_info_service = build('oauth2', 'v2', credentials=credentials)
@@ -29,21 +32,21 @@ class CalendarEventsManager:
         email = user_info.get('email')
         picture_url = user_info.get('picture')
 
-        Logger.write_log(f"User '{name}' logged with email '{email}'", Logger.LogType.INFO)
+        LogService.get_logger(__name__).info(f"User '{name}' logged with email '{email}'")
 
         return name, email, picture_url
-    
+
     @staticmethod
-    def connectionSetup(credentials_path: str, scopes: str, token_path: str) -> Credentials:
-        if token_path == None or len(token_path) == 0: raise ValueError("Token path can't be empty")
-        if credentials_path == None or len(credentials_path) == 0: raise ValueError("Credentials path can't be empty")
-        if scopes == None or len(scopes) == 0: raise ValueError("Scopes link can't be empty")
-        
+    def connection_setup(credentials_path: str, scopes: list[str], token_path: str):
+        if token_path is None or len(token_path) == 0: raise ValueError("Token path can't be empty")
+        if credentials_path is None or len(credentials_path) == 0: raise ValueError("Credentials path can't be empty")
+        if scopes is None or len(scopes) == 0: raise ValueError("Scopes link can't be empty")
+
         credentials = None
-        
+
         if os.path.exists(token_path):
             credentials = Credentials.from_authorized_user_file(token_path)
-        
+
         if not credentials or not credentials.valid:
             if credentials and credentials.expired and credentials.refresh_token:
                 credentials.refresh(Request())  # Refresh the token
@@ -52,22 +55,22 @@ class CalendarEventsManager:
                     flow = InstalledAppFlow.from_client_secrets_file(credentials_path, scopes)
                     credentials = flow.run_local_server(port=0)
                 except Exception as e:
-                    print(f"Errore: {e}")
+                    print(f"Error: {e}")
                     return None
-                
+
             with open(token_path, "w") as token:
                 token.write(credentials.to_json())
-        
+
         return credentials
-    
+
     # TODO: Test me
     @staticmethod
-    def refreshToken():
+    def refresh_token():
         client_secret = "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"
         client_id = "629129916032-161pnnbejkg238auc0rethmlg1njc6om.apps.googleusercontent.com"
         refresh_token = "1//09PbgtBFQPy8dCgYIARAAGAkSNwF-L9IreGgrAtTftppccc4ClFOpbEBq3G6rAJ11uUbvX8roppBgsrvHXBx88QEn5pJh2A5Nols"
         token_url = 'https://oauth2.googleapis.com/token'
-        
+
         data = {
             'client_id': client_id,
             'client_secret': client_secret,
@@ -87,54 +90,53 @@ class CalendarEventsManager:
             print(new_refresh_token)
         else:
             print("Error refreshing access token:", response.text)
- 
+
     @staticmethod
-    def createEvent(creds: Credentials, summary: str, description: str, start_date: datetime, end_date: datetime, color_event_id: int = 1, timeZone: str = 'UTC'):
-        if creds == None: raise ValueError("Credentials can't be null")
-        
+    def create_event(creds: Credentials, summary: str, description: str, start_date: datetime.datetime, end_date: datetime.datetime, color_event_id: int = 1, time_zone: str = 'UTC'):
+        if creds is None: raise ValueError("Credentials can't be null")
+
         service = build("calendar", "v3", credentials=creds)
-        
+
         # set the event
         event = {
             'summary': summary,
             'description': description,
             'start': {
                 'dateTime': start_date.isoformat(),
-                'timeZone': timeZone,
+                'timeZone': time_zone,
             },
             'end': {
                 'dateTime': end_date.isoformat(),
-                'timeZone': timeZone,
+                'timeZone': time_zone,
             },
             'colorId': color_event_id,
         }
 
         # create the event
         service.events().insert(calendarId='primary', body=event).execute()
-    
+
     @staticmethod
-    def getTitleByID(creds: Credentials, ID: str) -> str:
-        if creds == None: raise ValueError("Credentials can't be null")
-        if ID == None: raise ValueError("ID can't be null")
-        
+    def get_title_by_id(creds: Credentials, event_id: str) -> str:
+        if creds is None: raise ValueError("Credentials can't be null")
+        if event_id is None: raise ValueError("ID can't be null")
+
         try:
             # Call the Google Calendar API to get the event by ID
             service = build("calendar", "v3", credentials=creds)
-            event = service.events().get(calendarId='primary', eventId=ID).execute()
-            
+            event = service.events().get(calendarId='primary', eventId=event_id).execute()
+
             title = event['summary'] # Extract and return the event title
             return title
         except HttpError as http_error:
-            raise HttpError(f"HTTP error occurred: {str(http_error)}")
+            raise HttpError(f"HTTP error occurred: {str(http_error)}", None)
         except Exception as generic_exception:
             raise Exception(f"An error occurred: {str(generic_exception)}")
 
-    
     @staticmethod
-    def getTitleByDate(creds: Credentials, start_date: str, end_date: str) -> str:
-        if creds == None: raise ValueError("Credentials can't be null")
-        if start_date == None or end_date == None: raise ValueError("Date can't be empty")
-        
+    def get_title_by_date(creds: Credentials, start_date: str, end_date: str) -> str | None:
+        if creds is None: raise ValueError("Credentials can't be null")
+        if start_date is None or end_date is None: raise ValueError("Date can't be empty")
+
         try:
             service = build("calendar", "v3", credentials=creds)
             events_result = service.events().list(
@@ -155,15 +157,15 @@ class CalendarEventsManager:
             else:
                 return None
         except HttpError as http_error:
-            raise HttpError(f"HTTP error occurred: {str(http_error)}")
+            raise HttpError(f"HTTP error occurred: {str(http_error)}", None)
         except Exception as generic_exception:
             raise Exception(f"An error occurred: {str(generic_exception)}")
-    
+
     @staticmethod
-    def getIDByTitle(creds: Credentials, title: str) -> str:
-        if creds == None: raise ValueError("Credentials can't be null")
-        if title == None: raise ValueError("Title can't be empty")
-        
+    def get_id_by_title(creds: Credentials, title: str) -> str | None:
+        if creds is None: raise ValueError("Credentials can't be null")
+        if title is None: raise ValueError("Title can't be empty")
+
         try:
             service = build("calendar", "v3", credentials=creds)
             events_result = service.events().list(
@@ -172,25 +174,25 @@ class CalendarEventsManager:
                 maxResults=1,
                 singleEvents=True,
             ).execute()
-            
+
             events = events_result.get('items', [])
-            
+
             if events:
                 event = events[0]
-                ID = event['id']
-                return ID
+                event_id = event['id']
+                return event_id
             else:
-                return None  
+                return None
         except HttpError as http_error:
-            raise HttpError(f"HTTP error occurred: {str(http_error)}")
+            raise HttpError(f"HTTP error occurred: {str(http_error)}", None)
         except Exception as generic_exception:
             raise Exception(f"An error occurred: {str(generic_exception)}")
-    
+
     @staticmethod
-    def getIDByDate(creds: Credentials, start_date: str, end_date: str):
-        if creds == None: raise ValueError("Credentials can't be null")
-        if start_date == None or end_date == None: raise ValueError("Date can't be empty")
-        
+    def get_id_by_date(creds: Credentials, start_date: str, end_date: str) -> Any | None:
+        if creds is None: raise ValueError("Credentials can't be null")
+        if start_date is None or end_date is None: raise ValueError("Date can't be empty")
+
         try:
             service = build("calendar", "v3", credentials=creds)
             events_result = service.events().list(
@@ -206,123 +208,117 @@ class CalendarEventsManager:
 
             if events:
                 event = events[0]
-                ID = event['id']
-                return ID
+                event_id = event['id']
+                return event_id
             else:
                 return None
         except HttpError as http_error:
-            raise HttpError(f"HTTP error occurred: {str(http_error)}")
+            raise HttpError(f"HTTP error occurred: {str(http_error)}", None)
         except Exception as generic_exception:
             raise Exception(f"An error occurred: {str(generic_exception)}")
-    
+
     @staticmethod
-    def getDescriptionByID(creds: Credentials, ID: str) -> str:
-        if creds == None: raise ValueError("Credentials can't be null")
-        if ID == None: raise ValueError("ID can't be null")
-        
+    def get_description_by_id(creds: Credentials, event_id: str) -> str:
+        if creds is None: raise ValueError("Credentials can't be null")
+        if event_id is None: raise ValueError("ID can't be null")
+
         try:
             # Call the Google Calendar API to get the event by ID
             service = build("calendar", "v3", credentials=creds)
-            event = service.events().get(calendarId='primary', eventId=ID).execute()
-            
+            event = service.events().get(calendarId='primary', eventId=event_id).execute()
+
             description = event.get('description') # Extract and return the event description
             return description
         except HttpError as http_error:
-            raise HttpError(f"HTTP error occurred: {str(http_error)}")        
+            raise HttpError(f"HTTP error occurred: {str(http_error)}", None)
         except Exception as generic_exception:
             raise Exception(f"An error occurred: {str(generic_exception)}")
-    
-    # TODO: test 
+
+    # TODO: test
     # TODO: add like mode
     @staticmethod
-    def getAllDescriptionsByTitle(creds: Credentials, title: str, like_mode: bool = False):
-        if creds == None: raise ValueError("Credentials can't be null")
-        if title == None: raise ValueError("Title can't be null")
-        
+    def get_all_descriptions_by_title(creds: Credentials, title: str) -> Any | None:
+        if creds is None: raise ValueError("Credentials can't be null")
+        if title is None: raise ValueError("Title can't be null")
+
         try:
             service = build("calendar", "v3", credentials=creds)
             events = []
-            
+
             now = datetime.datetime.now().isoformat() + "Z"
-            start_date_search = None 
+            start_date_search = None
             end_date_search = None
-            while (True):
+            while True:
                 # set the events list
                 events_result = service.events().list(
-                    calendarId="primary", 
-                    maxResults=500, 
-                    timeMin=start_date_search, 
-                    timeMax=now, 
-                    singleEvents=True, 
+                    calendarId="primary",
+                    maxResults=500,
+                    timeMin=start_date_search,
+                    timeMax=now,
+                    singleEvents=True,
                     orderBy="startTime").execute()
-                
+
                 events = events + events_result.get('items', [])
-                
-                # i quit if i found all the events -> it happens when the date of the last element inside the list is the same for two times
+
+                # I quit if I found all the events -> it happens when the date of the last element inside the list is the same for two times
                 if events[len(events)-1]['end'].get('dateTime') == end_date_search:
                     break
 
                 end_date_search = events[len(events)-1]['end'].get('dateTime')
-                
+
                 start_date_search = end_date_search
-            
+
             if events:
                 return events
             else:
-                return None  
+                return None
         except HttpError as http_error:
-            raise HttpError(f"HTTP error occurred: {str(http_error)}")
+            raise HttpError(f"HTTP error occurred: {str(http_error)}", None)
         except Exception as generic_exception:
             raise Exception(f"An error occurred: {str(generic_exception)}")
-    
+
     @staticmethod
-    def getEventByID(creds: Credentials, ID: str):
-        if creds == None: raise ValueError("Credentials can't be null")
-        if ID == None: raise ValueError("ID can't be null")
-        
+    def get_event_by_id(creds: Credentials, event_id: str) -> list[Any]:
+        if creds is None: raise ValueError("Credentials can't be null")
+        if event_id is None: raise ValueError("ID can't be null")
+
         try:
             # Call the Google Calendar API to get the event by ID
             service = build("calendar", "v3", credentials=creds)
-            event = service.events().get(calendarId='primary', eventId=ID).execute()
-            
+            event = service.events().get(calendarId='primary', eventId=event_id).execute()
+
             if event is not None:
                 return [event]  # Wrap the event in a list
             else:
-                return None
+                return []
         except HttpError as http_error:
-            raise HttpError(f"HTTP error occurred: {str(http_error)}")
+            raise HttpError(f"HTTP error occurred: {str(http_error)}", None)
         except Exception as generic_exception:
             raise Exception(f"An error occurred: {str(generic_exception)}")
-    
+
     # TODO: add like mode for title and description
     @staticmethod
-    def getEvents(creds: Credentials, title: str = None, like_mode: bool = False, description: str = None, start_date: str = None, end_date: str = None, time_zone: str = 'UTC', color_id: int = -1):
-        if creds is None: raise ValueError("Credentials can't be null")
+    def get_events(creds: Credentials,
+                   title: str = None,
+                   description: str = None,
+                   start_date: datetime.datetime = None,
+                   end_date: datetime.datetime = None,
+                   time_zone: str = 'UTC',
+                   color_id: int = 1) -> list[dict]:
 
-        try:
-            service = build("calendar", "v3", credentials=creds)
-            events = []
+        if creds is None:
+            raise ValueError("Credentials can't be null")
 
-            start_date_time = None
-            end_date_time = None
-            end_date_time_search = None
+        service = build("calendar", "v3", credentials=creds)
+        events = []
 
-            if start_date:
-                # Check if start_date is already a datetime object
-                if isinstance(start_date, datetime.datetime):
-                    start_date_time = start_date.isoformat() + 'Z'
+        start_date_time = start_date.isoformat() + 'Z' if start_date else None
+        end_date_time = end_date.isoformat() + 'Z' if end_date else datetime.datetime.now().isoformat() + 'Z'
 
-            if end_date:
-                # Check if end_date is already a datetime object
-                if isinstance(end_date, datetime.datetime):
-                    end_date_time = end_date.isoformat() + 'Z'
-            elif end_date is None or len(end_date) == 0:
-                # Parsing and formatting end_date
-                end_date_time = datetime.datetime.now().isoformat() + "Z"
+        page_token = None
 
-            end_date_time_search = end_date_time
-
-            while True:
+        while True:
+            try:
                 events_result = service.events().list(
                     calendarId="primary",
                     maxResults=2500,
@@ -331,64 +327,57 @@ class CalendarEventsManager:
                     singleEvents=True,
                     orderBy="startTime",
                     timeZone=time_zone,
-                    fields="items"
+                    fields="items,nextPageToken",
+                    pageToken=page_token
                 ).execute()
 
-                if title != None and len(title) > 0:
-                    events += [event for event in events_result.get('items', []) if title.lower() in event.get('summary', '').lower()]
-                else:
-                    events += [event for event in events_result.get('items', [])]
+                items = events_result.get('items', [])
 
-                if len(events) == 0:
-                    return None
+                if title:
+                    items = [e for e in items if title.lower() in e.get('summary', '').lower()]
+                if description:
+                    items = [e for e in items if description.lower() in e.get('description', '').lower()]
+                for e in items:
+                    print(e.get('summary'), e.get('colorId'))
+                if color_id > 1:
+                    items = [
+                        e for e in items
+                        if (e.get('colorId') is None if color_id == 0 else e.get('colorId') == str(color_id))
+                    ]
 
-                # Exit if all events are found (when the date of the last element inside the list is the same for two times)
-                if events[-1]['end'].get('dateTime') == end_date_time_search:
+                events.extend(items)
+
+                page_token = events_result.get('nextPageToken')
+                if not page_token:
                     break
 
-                end_date_time_search = events[-1]['end'].get('dateTime')
+            except Exception as e:
+                raise Exception(f"Error fetching events: {e}")
 
-                start_date_time = end_date_time_search
+        return events
 
-            # Filter events by color_id
-            if color_id != -1 and color_id != 0:
-                events = [event for event in events if event.get('colorId') == str(color_id)]
-
-            # Filter events by description
-            if description and len(description) > 2:  # as default it contains '\n' string
-                events = [event for event in events if description.lower() in event.get('description', '').lower()]
-            
-            if events:
-                return events
-            else:
-                return None      
-        except HttpError as http_error:
-            raise HttpError(f"HTTP error occurred: {str(http_error)}")
-        except Exception as generic_exception:
-            raise Exception(f"An error occurred: {str(generic_exception)}")
-
-    # TODO: test me 
+    # TODO: test me
     @staticmethod
-    def editEventTitleByID(creds: Credentials, ID: str, title: str):
-        if creds == None: raise ValueError("Credentials can't be null")
-        if ID == None: raise ValueError("ID can't be null")
-        if title == None: raise ValueError("Title can't be empty")
-        
+    def edit_event_title_by_id(creds: Credentials, event_id: str, title: str):
+        if creds is None: raise ValueError("Credentials can't be null")
+        if event_id is None: raise ValueError("ID can't be null")
+        if title is None: raise ValueError("Title can't be empty")
+
         try:
             service = build("calendar", "v3", credentials=creds)
-            event = service.events().get(calendarId='primary', eventId=ID).execute()
-            event['summary'] = title 
+            event = service.events().get(calendarId='primary', eventId=event_id).execute()
+            event['summary'] = title
         except HttpError as http_error:
-            raise HttpError(f"HTTP error occurred: {str(http_error)}")
+            raise HttpError(f"HTTP error occurred: {str(http_error)}", None)
         except Exception as generic_exception:
             raise Exception(f"An error occurred: {str(generic_exception)}")
-    
+
     @staticmethod
-    def editEventsTitleByTitle(creds: Credentials, old_title: str, new_title: str, start_date: datetime = None, end_date: datetime = None):
-        if creds == None: raise ValueError("Credentials can't be null")
-        if old_title == None: raise ValueError("Old Title can't be empty")
-        if new_title == None: raise ValueError("New Title can't be empty")
-        
+    def edit_events_title_by_title(creds: Credentials, old_title: str, new_title: str, start_date: Optional[datetime.datetime] = None, end_date: Optional[datetime.datetime] = None):
+        if creds is None: raise ValueError("Credentials can't be null")
+        if old_title is None: raise ValueError("Old Title can't be empty")
+        if new_title is None: raise ValueError("New Title can't be empty")
+
         try:
             service = build("calendar", "v3", credentials=creds)
             events = service.events().list(
@@ -400,7 +389,7 @@ class CalendarEventsManager:
                 singleEvents=True,
                 orderBy='startTime'
             ).execute()
-            
+
             updated_events = []
             if 'items' in events:
                 for event in events['items']:
@@ -415,111 +404,107 @@ class CalendarEventsManager:
             return updated_events
 
         except HttpError as http_error:
-            raise HttpError(f"HTTP error occurred: {str(http_error)}")
+            raise HttpError(f"HTTP error occurred: {str(http_error)}", None)
         except Exception as generic_exception:
             raise Exception(f"An error occurred: {str(generic_exception)}")
-    
+
     # TODO: test me
     @staticmethod
-    def editEventDateByID(creds: Credentials, ID: str, start_date: datetime, end_date: datetime, timeZone: str = 'UTC'):
-        if creds == None: raise ValueError("Credentials can't be null")
-        if ID == None: raise ValueError("ID can't be null")
+    def edit_event_date_by_id(creds: Credentials, id_event: str, start_date: datetime.datetime, end_date: datetime.datetime, time_zone: str = 'UTC'):
+        if creds is None: raise ValueError("Credentials can't be null")
+        if id_event is None: raise ValueError("ID can't be null")
         if start_date == None or end_date == None: raise ValueError("Date can't be empty")
-        
+
         try:
             service = build("calendar", "v3", credentials=creds)
-            event = service.events().get(calendarId='primary', eventId=ID).execute()
-            
+            event = service.events().get(calendarId='primary', eventId=id_event).execute()
+
             # Update the start and end times along with the time zone
-            event['start'] = {'dateTime': start_date, 'timeZone': timeZone}
-            event['end'] = {'dateTime': end_date, 'timeZone': timeZone}
+            event['start'] = {'dateTime': start_date, 'timeZone': time_zone}
+            event['end'] = {'dateTime': end_date, 'timeZone': time_zone}
 
             # Update the event in the calendar
             service.events().update(
                 calendarId='primary',
-                eventId=ID,
+                eventId=id_event,
                 body=event
             ).execute()
-        
+
         except HttpError as http_error:
-            raise HttpError(f"HTTP error occurred: {str(http_error)}")
+            raise HttpError(f"HTTP error occurred: {str(http_error)}", None)
         except Exception as generic_exception:
             raise Exception(f"An error occurred: {str(generic_exception)}")
-    
-    # TODO: test me 
+
+    # TODO: test me
     @staticmethod
-    def editDescriptionEventByID(creds: Credentials, ID: str, description: str):
-        if creds == None: raise ValueError("Credentials can't be null")
-        if ID == None: raise ValueError("ID can't be null")
-        if description == None: raise ValueError("Description can't be null")
-        
+    def edit_description_event_by_id(creds: Credentials, event_id: str, description: str):
+        if creds is None: raise ValueError("Credentials can't be null")
+        if event_id is None: raise ValueError("ID can't be null")
+        if description is None: raise ValueError("Description can't be null")
+
         try:
             service = build("calendar", "v3", credentials=creds)
-            event = service.events().get(calendarId='primary', eventId=ID).execute()
-            
-            # Update the descritpion
-            event['description'] = description
+            event = service.events().get(calendarId='primary', eventId=event_id).execute()
 
-            # Update the event in the calendar
+            # Update
+            event['description'] = description
             service.events().update(
                 calendarId='primary',
-                eventId=ID,
+                eventId=event_id,
                 body=event
             ).execute()
-        
+
         except HttpError as http_error:
-            raise HttpError(f"HTTP error occurred: {str(http_error)}")
+            raise HttpError(f"HTTP error occurred: {str(http_error)}", None)
         except Exception as generic_exception:
             raise Exception(f"An error occurred: {str(generic_exception)}")
-    
-    # TODO: test me 
+
+    # TODO: test me
     # TODO: add like mode
     @staticmethod
-    def editDescriptionEventsByTitle(creds: Credentials, title: str, description: str, like_mode: bool = False):
-        if creds == None: raise ValueError("Credentials can't be null")
-        if title == None: raise ValueError("Title can't be null")
-        if description == None: raise ValueError("Description can't be null")
-        
+    def edit_description_events_by_title(creds: Credentials, title: str, description: str):
+        if creds is None: raise ValueError("Credentials can't be null")
+        if title is None: raise ValueError("Title can't be null")
+        if description is None: raise ValueError("Description can't be null")
+
         try:
             service = build("calendar", "v3", credentials=creds)
             events = service.events().get(calendarId='primary', summary=title).execute()
-            
-            for event in events:
-                # Update the description
-                event['description'] = description
 
-                # Update the event in the calendar
+            for event in events:
+                # Update
+                event['description'] = description
                 service.events().update(
                     calendarId='primary',
                     eventId=event['id'],
                     body=event
                 ).execute()
-        
+
         except HttpError as http_error:
-            raise HttpError(f"HTTP error occurred: {str(http_error)}")
+            raise HttpError(f"HTTP error occurred: {str(http_error)}", None)
         except Exception as generic_exception:
             raise Exception(f"An error occurred: {str(generic_exception)}")
 
     @staticmethod
-    def editEvent(creds: Credentials, old_events: Dict, summary_new: str, description_new: str, color_id_new, start_date: str = None, end_date: str = None, time_zone: str = 'UTC'):
-        if creds == None: raise ValueError("Credentials can't be null")
-        
+    def edit_event(creds: Credentials, old_events: Dict, summary_new: str, description_new: str, color_id_new, time_zone: str = 'UTC'):
+        if creds is None: raise ValueError("Credentials can't be null")
+
         try:
             service = build("calendar", "v3", credentials=creds)
 
-            if old_events == None or len(old_events) == 0: 
-                return
-            
+            if old_events is None or len(old_events) == 0:
+                return None
+
             # update events
             updated_events = []
             for event in old_events:
                 event['summary'] = summary_new
                 event['colorId'] = color_id_new
-                if description_new != None and len(description_new) > 2:   # as default it contains '\n' string
+                if description_new is not None and len(description_new) > 2:   # as default it contains '\n' string
                     event['description'] = description_new
-                
+
                 event['start']['timeZone'] = time_zone
-                
+
                 updated_event = service.events().update(
                     calendarId='primary',
                     eventId=event['id'],
@@ -531,49 +516,49 @@ class CalendarEventsManager:
 
         except HttpError as http_error:
             print(http_error)
-            raise HttpError(f"HTTP error occurred: {str(http_error)}")
+            raise HttpError(f"HTTP error occurred: {str(http_error)}", None)
         except Exception as generic_exception:
             print(generic_exception)
-            raise Exception(f"An error occurred: {str(generic_exception)}")  
-    
+            raise Exception(f"An error occurred: {str(generic_exception)}")
+
     @staticmethod
-    def simulateEventUpdates(creds: Credentials, old_events: Dict, summary_new: str, description_new: str, color_id_new, start_date: str = None, end_date: str = None, time_zone: str = 'UTC'):
+    def simulate_event_updates(creds: Credentials, old_events: Dict, summary_new: str, description_new: str, color_id_new, time_zone: str = 'UTC'):
         if creds is None:
             raise ValueError("Credentials can't be null")
 
         try:
             if old_events is None or len(old_events) == 0:
                 return []
-            
+
             # Simulate updates
             simulated_events = []
             for event in old_events:
-                simulated_event = event.copy()  # copy the origina event to avoid edit
+                simulated_event = event.copy()  # copy the original event to avoid edit
                 simulated_event['summary'] = summary_new
                 simulated_event['colorId'] = color_id_new
                 if description_new is not None and len(description_new) > 2:
                     simulated_event['description'] = description_new
-                
+
                 simulated_event['start']['timeZone'] = time_zone
-                
+
                 simulated_events.append(simulated_event)
-            
+
             return simulated_events
 
         except Exception as generic_exception:
             print(generic_exception)
             raise Exception(f"An error occurred: {str(generic_exception)}")
-    
+
     @staticmethod
-    def deleteEventByID(creds: Credentials, ID: str):
-        if creds == None: raise ValueError("Credentials can't be null")
-        if ID == None: raise ValueError("ID can't be null")
+    def delete_event_by_id(creds: Credentials, event_id: str):
+        if creds is None: raise ValueError("Credentials can't be null")
+        if event_id is None: raise ValueError("ID can't be null")
 
         service = build('calendar', 'v3', credentials=creds)
 
         try:
-            service.events().delete(calendarId='primary', eventId=ID).execute()
+            service.events().delete(calendarId='primary', eventId=event_id).execute()
         except HttpError as http_error:
-            raise HttpError(f"HTTP error occurred: {str(http_error)}")
+            raise HttpError(f"HTTP error occurred: {str(http_error)}", None)
         except Exception as generic_exception:
             raise Exception(f"An error occurred: {str(generic_exception)}")
