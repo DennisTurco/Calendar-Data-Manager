@@ -19,13 +19,13 @@
     <div class="absolute left-0 top-full h-2 w-full"></div>
 
     <div
-        class="absolute left-0 top-full w-48 bg-white rounded shadow-lg
+        class="absolute left-0 top-full w-48 bg-white dark:bg-gray-700 rounded shadow-lg
                opacity-0 invisible group-hover:opacity-100 group-hover:visible
                transition duration-150 z-50">
 
         {% for item in items %}
             <a href="{{ item.href }}"
-               class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+               class="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600">
                 {{ item.title }}
             </a>
         {% endfor %}
@@ -53,6 +53,15 @@
     <!-- Spacer -->
     <div class="flex-1"></div>
 
+    <!-- Dark mode toggle -->
+    <button id="darkModeToggle"
+            onclick="toggleDarkMode()"
+            class="text-gray-300 hover:text-white focus:outline-none mr-3 p-2 rounded-full hover:bg-gray-700 transition"
+            title="Toggle dark mode"
+            aria-label="Toggle dark mode">
+        <!-- Icon injected by darkmode.js -->
+    </button>
+
     <!-- User profile desktop -->
     {% if user %}
     <div class="hidden md:block relative group">
@@ -61,19 +70,19 @@
             <span class="hidden lg:inline">{{ user.email }}</span>
         </button>
 
-        <div class="absolute right-0 mt-2 w-48 bg-white rounded shadow-lg hidden group-hover:block z-50">
+        <div class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 rounded shadow-lg hidden group-hover:block z-50">
             <a href="https://calendar.google.com/" target="_blank"
-               class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Google Calendar</a>
+               class="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600">Google Calendar</a>
             <a href="/logout"
-               class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Log out</a>
+               class="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600">Log out</a>
         </div>
     </div>
     {% endif %}
 
     <!-- Mobile hamburger -->
     <button onclick="toggleSidebar()"
-        class="md:hidden text-white ml-4 focus:outline-none"
-        aria-label="Apri menu">
+        class="md:hidden text-white ml-2 focus:outline-none"
+        aria-label="Open menu">
         <svg xmlns="http://www.w3.org/2000/svg"
             class="w-7 h-7"
             fill="none"
@@ -91,26 +100,31 @@
 <div id="mobileMenu"
      class="hidden fixed top-16 left-0 right-0 bg-gray-800 text-white px-4 py-4 space-y-4 z-40 md:hidden">
 
-    <a href="/exit" class="block py-2 border-b border-gray-700">Exit</a>
-
     <details>
-        <summary class="cursor-pointer py-2">Settings</summary>
-        <div class="pl-4 space-y-2 text-sm">
-            <a href="/appearance/dark">Dark</a>
-            <a href="/appearance/light">Light</a>
-            <a href="/scaling/120">120%</a>
-            <a href="/scaling/110">110%</a>
-            <a href="/scaling/100">100%</a>
+        <summary class="cursor-pointer py-2 border-b border-gray-700">About</summary>
+        <div class="pl-4 space-y-2 text-sm mt-2">
+            <a href="https://github.com/DennisTurco/Calendar-Data-Manager" target="_blank" class="block py-1 hover:text-blue-400">Website</a>
+            <a href="https://www.buymeacoffee.com/denno" target="_blank" class="block py-1 hover:text-blue-400">Donate - Buy me a coffee</a>
+            <a href="https://www.paypal.com/donate/?hosted_button_id=M7CJXS929334U" target="_blank" class="block py-1 hover:text-blue-400">Donate - Paypal</a>
         </div>
     </details>
 
     <details>
-        <summary class="cursor-pointer py-2">Help</summary>
-        <div class="pl-4 space-y-2 text-sm">
-            <a href="mailto:?subject=Calendar Data Manager - Support">Support</a>
-            <a href="#">Report a bug</a>
+        <summary class="cursor-pointer py-2 border-b border-gray-700">Help</summary>
+        <div class="pl-4 space-y-2 text-sm mt-2">
+            <a href="mailto:assistenza.shard@gmail.com?subject=Calendar Data Manager - Support" class="block py-1 hover:text-blue-400">Support</a>
+            <a href="https://github.com/DennisTurco/Calendar-Data-Manager/issues" target="_blank" class="block py-1 hover:text-blue-400">Report a bug</a>
         </div>
     </details>
+
+    <!-- Dark mode toggle mobile -->
+    <div class="py-2 border-b border-gray-700">
+        <button onclick="toggleDarkMode(); toggleMobileMenu();"
+                class="flex items-center gap-2 text-gray-300 hover:text-white text-sm">
+            <span id="darkModeToggleMobileIcon"></span>
+            Toggle Dark / Light Mode
+        </button>
+    </div>
 
     {% if user %}
     <div class="border-t border-gray-700 pt-4">
@@ -119,8 +133,8 @@
             <span class="text-sm">{{ user.email }}</span>
         </div>
         <a href="https://calendar.google.com/" target="_blank"
-           class="block py-2">Google Calendar</a>
-        <a href="/logout" class="block py-2">Log out</a>
+           class="block py-2 hover:text-blue-400">Google Calendar</a>
+        <a href="/logout" class="block py-2 hover:text-blue-400">Log out</a>
     </div>
     {% endif %}
 </div>

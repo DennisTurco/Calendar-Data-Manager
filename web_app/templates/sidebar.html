@@ -11,25 +11,28 @@
 
     <!-- Logo -->
     <a href="/" class="mb-6">
-        <img src="{{ url_for('static', filename='images/icon.png') }}" class="w-16 h-16" alt="App Logo">
+        <img src="{{ url_for('static', filename='images/icon.png') }}" class="w-14 h-14" alt="App Logo">
     </a>
 
     <!-- Title -->
-    <h2 class="text-white font-bold text-lg mb-6 hidden md:block">Menu</h2>
+    <h2 class="text-gray-300 font-semibold text-xs uppercase tracking-widest mb-4 hidden md:block">Navigation</h2>
 
     <!-- Sidebar buttons -->
-    <nav class="flex flex-col gap-3 w-full px-4">
-        <a href="/new-events" class="sidebar-btn">
-            <img src="{{ url_for('static', filename='images/plus.png') }}" class="w-5 h-5">
+    <nav class="flex flex-col gap-2 w-full px-3">
+        <a href="/new-events"
+           class="sidebar-btn {% if active_page == 'new events' %}active{% endif %}">
+            <img src="{{ url_for('static', filename='images/plus.png') }}" class="w-4 h-4 opacity-80">
             New Events
         </a>
-        <a href="/edit-events" class="sidebar-btn">
-            <img src="{{ url_for('static', filename='images/edit.png') }}" class="w-5 h-5">
+        <a href="/edit-events"
+           class="sidebar-btn {% if active_page == 'edit events' %}active{% endif %}">
+            <img src="{{ url_for('static', filename='images/edit.png') }}" class="w-4 h-4 opacity-80">
             Edit Events
         </a>
-        <a href="/get-events" class="sidebar-btn">
-            <img src="{{ url_for('static', filename='images/list.png') }}" class="w-5 h-5">
-            Get Events List
+        <a href="/get-events"
+           class="sidebar-btn {% if active_page == 'get events' %}active{% endif %}">
+            <img src="{{ url_for('static', filename='images/list.png') }}" class="w-4 h-4 opacity-80">
+            Get Events
         </a>
     </nav>
 
@@ -38,8 +41,8 @@
 
     <!-- Google Calendar button -->
     <a href="https://calendar.google.com/" target="_blank"
-       class="sidebar-btn mb-4">
-        <img src="{{ url_for('static', filename='images/google.png') }}" class="w-5 h-5">
+       class="sidebar-btn mb-4 text-blue-300 hover:text-blue-200">
+        <img src="{{ url_for('static', filename='images/google.png') }}" class="w-4 h-4">
         Google Calendar
     </a>
 </aside>

@@ -3,13 +3,17 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Get Events</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graphs</title>
+    <script>tailwind.config = { darkMode: 'class' }</script>
     <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/icon.png') }}">
+    <!-- Apply theme early to avoid flash -->
+    <script src="{{ url_for('static', filename='js/darkmode.js') }}"></script>
 </head>
 
-<body class="bg-gray-100 text-gray-900 min-h-screen font-sans">
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen font-sans transition-colors duration-200">
 
     {% include "components/toast.html" %}
     {% include "navbar.html" %}
@@ -20,42 +24,35 @@
         <!-- HEADER -->
         <header class="mt-12 text-center">
             <div class="flex items-center justify-center gap-3">
-                <h1 class="text-4xl font-semibold">Graphs</h1>
-
-                {% if section_message %}
-                <button type="button"
-                    onclick="openModal('info_get')"
-                    class="text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 rounded"
-                    title="More info">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/>
-                    </svg>
-                </button>
-                {% endif %}
+                <h1 class="text-4xl font-semibold text-gray-800 dark:text-white">Graphs</h1>
             </div>
-
-            {% with
-            modal_id="info_get",
-            modal_title="Section Information",
-            modal_content=section_message
-            %}
-            {% include "components/info_modal.html" %}
-            {% endwith %}
+            <div class="mt-3">
+                <a href="/get-events" class="button-secondary inline-flex items-center gap-2 px-4 py-2 text-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                    Back to filters
+                </a>
+            </div>
         </header>
 
-        <main class="mx-auto max-w-5xl px-4 mt-12 flex flex-col gap-8">
+        <div class="mx-auto max-w-5xl px-4 mt-8 flex flex-col gap-8 pb-12">
             {% if graph_htmls %}
                 {% for graph_html in graph_htmls %}
-                    <div class="w-full">
+                    <div class="w-full bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-4 overflow-x-auto">
                         {{ graph_html | safe }}
                     </div>
                 {% endfor %}
             {% else %}
-                <p class="text-center text-gray-500">No graphs to display.</p>
+                <div class="text-center text-gray-500 dark:text-gray-400 py-16">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 mx-auto mb-4 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                    </svg>
+                    <p class="text-lg">No graphs to display.</p>
+                    <a href="/get-events" class="button-primary inline-flex mt-4 px-5 py-2">Go back and fetch events</a>
+                </div>
             {% endif %}
-        </main>
+        </div>
 
     </main>
 

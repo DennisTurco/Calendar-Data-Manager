@@ -2,62 +2,49 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login – Calendar Data Manager</title>
+    <script>tailwind.config = { darkMode: 'class' }</script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/icon.png') }}">
+    <script src="{{ url_for('static', filename='js/darkmode.js') }}"></script>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen font-sans">
+<body class="bg-gray-100 dark:bg-gray-900 flex flex-col items-center justify-center min-h-screen font-sans transition-colors duration-200">
 
-    <form action="{{ url_for('login.google_login') }}" method="post">
-        <button type="submit"
-                class="flex items-center justify-center gap-2 w-full py-3 px-4 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
-                title="Login using your Google account">
-            <img src="/static/images/google.png" class="w-5 h-5" alt="Arrow">
-            Login with Google
+    <!-- Dark mode toggle (top right) -->
+    <div class="fixed top-4 right-4">
+        <button id="darkModeToggle"
+                onclick="toggleDarkMode()"
+                class="text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-100 p-2 rounded-full bg-white dark:bg-gray-800 shadow transition"
+                title="Toggle dark mode" aria-label="Toggle dark mode">
         </button>
-    </form>
-
-    {% with messages = get_flashed_messages() %}
-    {% if messages %}
-        <div class="mt-4 text-red-600 text-center">
-        {% for msg in messages %}
-            <p>{{ msg }}</p>
-        {% endfor %}
-        </div>
-    {% endif %}
-    {% endwith %}
-
-    <!-- Modal Template -->
-    <div id="error-modal" class="fixed inset-0 bg-black bg-opacity-40 hidden items-center justify-center z-50">
-        <div class="bg-white p-6 rounded-xl shadow-lg max-w-sm w-full text-center">
-            <h2 class="text-lg font-bold mb-4">Credentials error</h2>
-            <p class="mb-6">Do you wish to retry?</p>
-            <div class="flex justify-around">
-                <button id="modal-no" class="px-4 py-2 bg-gray-400 rounded hover:bg-gray-500">No</button>
-                <button id="modal-yes" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Yes</button>
-            </div>
-        </div>
     </div>
 
-    <script>
-        // Simulate login
-        document.getElementById('google-login').addEventListener('click', () => {
-            // Simulate credentials error
-            const modal = document.getElementById('error-modal');
-            modal.classList.remove('hidden');
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-10 max-w-sm w-full mx-4 text-center">
+        <img src="{{ url_for('static', filename='images/icon.png') }}" class="w-16 h-16 mx-auto mb-4" alt="App icon">
+        <h1 class="text-2xl font-semibold text-gray-800 dark:text-white mb-1">Calendar Data Manager</h1>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mb-8">Sign in to manage your Google Calendar</p>
 
-            // Yes button
-            document.getElementById('modal-yes').onclick = () => {
-                modal.classList.add('hidden');
-                alert("Retry login flow here"); // Replace with actual login logic
-            };
+        <form action="{{ url_for('login.google_login') }}" method="post">
+            <button type="submit"
+                    class="flex items-center justify-center gap-3 w-full py-3 px-4 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-medium transition shadow"
+                    title="Login using your Google account">
+                <img src="/static/images/google.png" class="w-5 h-5" alt="Google">
+                Sign in with Google
+            </button>
+        </form>
 
-            // No button
-            document.getElementById('modal-no').onclick = () => {
-                modal.classList.add('hidden');
-            };
-        });
-    </script>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="mt-4 space-y-1">
+            {% for msg in messages %}
+                <p class="text-red-500 text-sm">{{ msg }}</p>
+            {% endfor %}
+            </div>
+        {% endif %}
+        {% endwith %}
+    </div>
 
 </body>
 </html>

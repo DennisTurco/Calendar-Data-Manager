@@ -3,13 +3,17 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Get Events</title>
+    <script>tailwind.config = { darkMode: 'class' }</script>
     <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/icon.png') }}">
+    <!-- Apply theme early to avoid flash -->
+    <script src="{{ url_for('static', filename='js/darkmode.js') }}"></script>
 </head>
 
-<body class="bg-gray-100 text-gray-900 min-h-screen font-sans">
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen font-sans transition-colors duration-200">
 
     {% include "components/toast.html" %}
     {% include "navbar.html" %}
@@ -17,17 +21,17 @@
 
     <!-- MAIN WRAPPER -->
     <main class="w-full pl-0 md:pl-48 pt-16">
-        <div class="mx-auto max-w-3xl px-4 flex flex-col items-center">
+        <div class="mx-auto max-w-3xl px-4 flex flex-col items-center pb-12">
 
             <!-- HEADER -->
             <header class="mt-12 text-center">
                 <div class="flex items-center justify-center gap-3">
-                    <h1 class="text-4xl font-semibold">Get Events & Plot</h1>
+                    <h1 class="text-4xl font-semibold text-gray-800 dark:text-white">Get Events & Plot</h1>
 
                     {% if section_message %}
                     <button type="button"
                         onclick="openModal('info_get')"
-                        class="text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 rounded"
+                        class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400 rounded"
                         title="More info">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none"
                              viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
@@ -50,26 +54,33 @@
             <!-- FORM -->
             <form method="POST"
                   action="/get-events"
-                  class="mt-12 w-full max-w-xl bg-white p-8 rounded-2xl shadow-sm flex flex-col gap-6">
+                  id="getEventsForm"
+                  class="mt-10 w-full max-w-xl bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm dark:shadow-gray-900 flex flex-col gap-5">
 
                 <!-- Event filters -->
                 <div class="flex flex-col">
-                    <label class="mb-1 text-gray-700 font-medium">Summary</label>
-                    <input type="text" name="summary" class="input-field">
+                    <label class="mb-1 text-gray-700 dark:text-gray-300 font-medium">Summary</label>
+                    <input type="text" name="summary" class="input-field"
+                           placeholder="Filter by event summary…"
+                           value="{{ form_values.get('summary', '') }}">
                 </div>
 
                 <div class="flex flex-col">
-                    <label class="mb-1 text-gray-700 font-medium">Description</label>
-                    <textarea name="description" rows="3" class="input-field"></textarea>
+                    <label class="mb-1 text-gray-700 dark:text-gray-300 font-medium">Description</label>
+                    <textarea name="description" rows="2" class="input-field"
+                              placeholder="Filter by description…">{{ form_values.get('description', '') }}</textarea>
                 </div>
 
                 <!-- Color -->
                 <div class="flex flex-col">
-                    <label class="mb-1 text-gray-700 font-medium">Color</label>
+                    <label class="mb-1 text-gray-700 dark:text-gray-300 font-medium">Color</label>
                     <select name="color" class="input-field">
-                        <option value="">Any</option>
-                        {% for color in event_colors %}
-                        <option value="{{ color }}">{{ color }}</option>
+                        <option value="" {% if not form_values.get('color') %}selected{% endif %}>Any</option>
+                        {% for color_name, color_hex in event_colors.items() %}
+                        <option value="{{ color_name }}"
+                            {% if form_values.get('color') == color_name %}selected{% endif %}>
+                            {{ color_name }}
+                        </option>
                         {% endfor %}
                     </select>
                 </div>
@@ -77,22 +88,25 @@
                 <!-- Dates -->
                 <div class="flex flex-col md:flex-row gap-4">
                     <div class="flex flex-col flex-1">
-                        <label for="date_from" class="mb-1 text-gray-700 font-medium">Date From</label>
-                        <input type="datetime-local" name="date_from" id="date_from" class="input-field" required>
+                        <label for="date_from" class="mb-1 text-gray-700 dark:text-gray-300 font-medium">Date From</label>
+                        <input type="datetime-local" name="date_from" id="date_from" class="input-field" required
+                               value="{{ form_values.get('date_from', '') }}">
                     </div>
-
                     <div class="flex flex-col flex-1">
-                        <label for="date_to" class="mb-1 text-gray-700 font-medium">Date To</label>
-                        <input type="datetime-local" name="date_to" id="date_to" class="input-field" required>
+                        <label for="date_to" class="mb-1 text-gray-700 dark:text-gray-300 font-medium">Date To</label>
+                        <input type="datetime-local" name="date_to" id="date_to" class="input-field" required
+                               value="{{ form_values.get('date_to', '') }}">
                     </div>
                 </div>
 
                 <!-- Timezone -->
                 <div class="flex flex-col">
-                    <label for="timezone" class="mb-1 text-gray-700 font-medium">Timezone</label>
-                    <select name="timezone" id="timezone" class="input-field">
+                    <label for="timezone" class="mb-1 text-gray-700 dark:text-gray-300 font-medium">Timezone</label>
+                    <select name="timezone" id="timezone" class="input-field"
+                            {% if form_values.get('timezone') %}data-preserve-value="true"{% endif %}>
                         {% for tz in timezones %}
-                        <option value="{{ tz }}">
+                        <option value="{{ tz }}"
+                            {% if form_values.get('timezone') == tz %}selected{% endif %}>
                             {{ tz }}
                         </option>
                         {% endfor %}
@@ -101,56 +115,209 @@
 
                 <!-- Graph Types -->
                 <div class="space-y-3">
-                    <h2 class="section-header font-medium">Graph Types</h2>
+                    <hr class="section-divider">
+                    <h2 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Graph Types</h2>
 
-                    <div class="flex flex-wrap gap-4" id="graphCheckboxes">
+                    <div class="flex flex-wrap gap-3" id="graphCheckboxes">
                         {% for graph_type in graph_types %}
-                        <label class="checkbox-label flex items-center gap-2">
-                            <input type="checkbox" name="{{ graph_type | replace(' ', '_') }}" class="h-5 w-5">
-                            {{ graph_type }}
+                        {% set cb_name = graph_type | replace(' ', '_') %}
+                        <label class="checkbox-label flex items-center gap-2 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition">
+                            <input type="checkbox" name="{{ cb_name }}" class="h-4 w-4 accent-blue-500"
+                                   {% if form_values.get(cb_name) %}checked{% endif %}>
+                            <span class="text-sm text-gray-700 dark:text-gray-300">{{ graph_type }}</span>
                         </label>
                         {% endfor %}
                     </div>
 
-                    <div class="flex gap-2 mt-2">
-                        <button type="button" class="button-primary" id="selectAllBtn">Select All</button>
-                        <button type="button" class="button-secondary" id="deselectAllBtn">Deselect All</button>
+                    <div class="flex gap-2 mt-1">
+                        <button type="button" class="button-secondary text-xs px-3 py-1" id="selectAllBtn">Select All</button>
+                        <button type="button" class="button-secondary text-xs px-3 py-1" id="deselectAllBtn">Deselect All</button>
                     </div>
                 </div>
 
-                <!-- Submit -->
-                <div class="flex justify-center gap-4 mt-6">
+                <!-- Action buttons -->
+                <hr class="section-divider">
+                <div class="flex flex-wrap justify-center gap-3 mt-2">
+                    <!-- Get List button -->
+                    <button type="submit"
+                            name="action"
+                            value="get_list"
+                            class="button-success px-5 py-2.5 flex items-center gap-2"
+                            id="btnGetList">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+                        </svg>
+                        Get List
+                    </button>
+
+                    <!-- Get & Plot button -->
                     <button type="submit"
                             name="action"
                             value="get_and_plot"
-                            class="button-primary px-6 py-3 flex items-center gap-2">
-                        <img src="{{ url_for('static', filename='images/chart.png') }}" class="w-5 h-5">
+                            class="button-primary px-5 py-2.5 flex items-center gap-2"
+                            id="btnGetPlot">
+                        <img src="{{ url_for('static', filename='images/chart.png') }}" class="w-5 h-5" alt="">
                         Get & Plot
                     </button>
                 </div>
-            </form>
-        </div>
 
+                <!-- Share URL button -->
+                <div class="flex justify-center">
+                    <button type="button" onclick="copyShareUrl()" class="copy-url-btn" title="Copy a shareable link with current filters">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                        </svg>
+                        Copy shareable URL
+                    </button>
+                </div>
+            </form>
+
+            <!-- RESULTS TABLE -->
+            {% if summary_totals %}
+            <section class="mt-8 w-full max-w-xl" id="resultsSection">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm dark:shadow-gray-900 overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
+                        <div>
+                            <h2 class="text-lg font-semibold text-gray-800 dark:text-white">
+                                Events Summary
+                            </h2>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+                                {{ total_events }} event(s) found &nbsp;·&nbsp;
+                                Grand total:
+                                {% set gh = grand_total_hours | int %}
+                                {% set gm = ((grand_total_hours - gh) * 60) | int %}
+                                <strong>{{ gh }}h {{ "%02d"|format(gm) }}m</strong>
+                            </p>
+                        </div>
+                        <button onclick="copyTableAsText()" class="copy-url-btn" title="Copy table as text">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                            </svg>
+                            Copy
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="results-table" id="summaryTable">
+                            <thead>
+                                <tr>
+                                    <th>Summary</th>
+                                    <th class="text-right">Events</th>
+                                    <th class="text-right">Total Time</th>
+                                    <th class="text-right">Avg / Event</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in summary_totals %}
+                                <tr>
+                                    <td class="font-medium">{{ row.summary }}</td>
+                                    <td class="text-right tabular-nums">{{ row.count }}</td>
+                                    <td class="text-right tabular-nums">{{ row.duration_str }}</td>
+                                    <td class="text-right tabular-nums text-gray-500 dark:text-gray-400">
+                                        {% if row.count > 0 %}
+                                            {% set avg_mins = (row.total_hours * 60 / row.count) | int %}
+                                            {% set avg_h = avg_mins // 60 %}
+                                            {% set avg_m = avg_mins % 60 %}
+                                            {% if avg_h > 0 %}{{ avg_h }}h {{ "%02d"|format(avg_m) }}m{% else %}{{ avg_m }}m{% endif %}
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr class="total-row">
+                                    <td class="font-bold">Total</td>
+                                    <td class="text-right font-bold tabular-nums">{{ total_events }}</td>
+                                    <td class="text-right font-bold tabular-nums">
+                                        {% set gh = grand_total_hours | int %}
+                                        {% set gm = ((grand_total_hours - gh) * 60) | int %}
+                                        {{ gh }}h {{ "%02d"|format(gm) }}m
+                                    </td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+
+        </div>
     </main>
 
     <script src="{{ url_for('static', filename='js/modal.js') }}"></script>
     <script src="{{ url_for('static', filename='js/default_timezone.js') }}"></script>
     <script src="{{ url_for('static', filename='js/toast.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/url_params.js') }}"></script>
 
     <script>
+        // Select / Deselect all graph checkboxes
         document.addEventListener('DOMContentLoaded', () => {
             const selectAllBtn = document.getElementById('selectAllBtn');
             const deselectAllBtn = document.getElementById('deselectAllBtn');
             const checkboxes = document.querySelectorAll('#graphCheckboxes input[type="checkbox"]');
 
-            selectAllBtn.addEventListener('click', () => {
-                checkboxes.forEach(cb => cb.checked = true);
-            });
-
-            deselectAllBtn.addEventListener('click', () => {
-                checkboxes.forEach(cb => cb.checked = false);
-            });
+            selectAllBtn.addEventListener('click', () => checkboxes.forEach(cb => cb.checked = true));
+            deselectAllBtn.addEventListener('click', () => checkboxes.forEach(cb => cb.checked = false));
         });
+
+        // Loading state on submit
+        document.getElementById('getEventsForm').addEventListener('submit', function(e) {
+            const btn = document.activeElement;
+            if (btn && (btn.id === 'btnGetList' || btn.id === 'btnGetPlot')) {
+                btn.disabled = true;
+                btn.innerHTML = '<svg class="animate-spin w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path></svg> Loading…';
+            }
+        });
+
+        // Copy shareable URL from form values
+        function copyShareUrl() {
+            const form = document.getElementById('getEventsForm');
+            const params = new URLSearchParams();
+            const data = new FormData(form);
+            for (const [key, value] of data.entries()) {
+                if (value) params.set(key, value);
+            }
+            // Remove action param
+            params.delete('action');
+            const url = window.location.origin + window.location.pathname + '?' + params.toString();
+            navigator.clipboard.writeText(url).then(() => {
+                showCopyFeedback('URL copied to clipboard!');
+            }).catch(() => {
+                prompt('Copy this URL:', url);
+            });
+        }
+
+        // Copy summary table as plain text
+        function copyTableAsText() {
+            const table = document.getElementById('summaryTable');
+            if (!table) return;
+            let text = '';
+            for (const row of table.querySelectorAll('tr')) {
+                const cells = Array.from(row.querySelectorAll('th,td')).map(c => c.innerText.trim());
+                text += cells.join('\t') + '\n';
+            }
+            navigator.clipboard.writeText(text.trim()).then(() => {
+                showCopyFeedback('Table copied to clipboard!');
+            }).catch(() => {
+                alert('Copy failed.');
+            });
+        }
+
+        function showCopyFeedback(msg) {
+            const div = document.createElement('div');
+            div.textContent = msg;
+            div.className = 'fixed top-20 right-4 z-[9999] bg-green-500 text-white px-4 py-2 rounded-xl shadow-lg text-sm';
+            document.body.appendChild(div);
+            setTimeout(() => div.remove(), 2500);
+        }
+
+        // Scroll to results if present
+        {% if summary_totals %}
+        document.addEventListener('DOMContentLoaded', () => {
+            const section = document.getElementById('resultsSection');
+            if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+        {% endif %}
     </script>
 
 </body>

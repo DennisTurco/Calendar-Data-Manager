@@ -1,15 +1,29 @@
 {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
-    <div class="fixed top-20 right-4 z-[9999] space-y-3">
+    <div class="fixed top-20 right-4 z-[9999] space-y-2 max-w-sm w-full pr-2">
       {% for category, message in messages %}
         <div
           data-toast
-          class="px-4 py-3 rounded-xl shadow-lg text-white transition-opacity duration-300
+          class="flex items-start gap-3 px-4 py-3 rounded-xl shadow-lg text-white text-sm transition-all duration-300
           {% if category == 'error' %}bg-red-500
-          {% elif category == 'success' %}bg-green-500
+          {% elif category == 'success' %}bg-green-600
           {% else %}bg-blue-500{% endif %}"
         >
-          {{ message }}
+          <!-- Icon -->
+          {% if category == 'error' %}
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          {% elif category == 'success' %}
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          {% else %}
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/>
+          </svg>
+          {% endif %}
+          <span class="flex-1">{{ message }}</span>
         </div>
       {% endfor %}
     </div>
