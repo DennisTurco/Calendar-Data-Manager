@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Get Events</title>
-    <script>tailwind.config = { darkMode: 'class' }</script>
     <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>tailwind.config = { darkMode: 'class' }</script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/icon.png') }}">
     <!-- Apply theme early to avoid flash -->
@@ -173,23 +173,17 @@
             </form>
 
             <!-- RESULTS TABLE -->
-            {% if summary_totals %}
-            <section class="mt-8 w-full max-w-xl" id="resultsSection">
+            {% if events_list %}
+            <section class="mt-8 w-full max-w-4xl" id="resultsSection">
                 <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm dark:shadow-gray-900 overflow-hidden">
                     <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
                         <div>
-                            <h2 class="text-lg font-semibold text-gray-800 dark:text-white">
-                                Events Summary
-                            </h2>
+                            <h2 class="text-lg font-semibold text-gray-800 dark:text-white">Events List</h2>
                             <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-                                {{ total_events }} event(s) found &nbsp;·&nbsp;
-                                Grand total:
-                                {% set gh = grand_total_hours | int %}
-                                {% set gm = ((grand_total_hours - gh) * 60) | int %}
-                                <strong>{{ gh }}h {{ "%02d"|format(gm) }}m</strong>
+                                {{ total_events }} event(s) found
                             </p>
                         </div>
-                        <button onclick="copyTableAsText()" class="copy-url-btn" title="Copy table as text">
+                        <button onclick="copyEventsAsText()" class="copy-url-btn" title="Copy as text (notepad format)">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                             </svg>
@@ -197,44 +191,29 @@
                         </button>
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="results-table" id="summaryTable">
+                        <table class="results-table" id="eventsTable">
                             <thead>
                                 <tr>
+                                    <th class="text-right">#</th>
+                                    <th>ID</th>
                                     <th>Summary</th>
-                                    <th class="text-right">Events</th>
-                                    <th class="text-right">Total Time</th>
-                                    <th class="text-right">Avg / Event</th>
+                                    <th>Start</th>
+                                    <th>End</th>
+                                    <th class="text-right">Duration</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for row in summary_totals %}
+                                {% for row in events_list %}
                                 <tr>
+                                    <td class="text-right tabular-nums text-gray-400 dark:text-gray-500">{{ row.index }}</td>
+                                    <td class="font-mono text-xs text-gray-500 dark:text-gray-400 max-w-[10rem] truncate" title="{{ row.id }}">{{ row.id }}</td>
                                     <td class="font-medium">{{ row.summary }}</td>
-                                    <td class="text-right tabular-nums">{{ row.count }}</td>
-                                    <td class="text-right tabular-nums">{{ row.duration_str }}</td>
-                                    <td class="text-right tabular-nums text-gray-500 dark:text-gray-400">
-                                        {% if row.count > 0 %}
-                                            {% set avg_mins = (row.total_hours * 60 / row.count) | int %}
-                                            {% set avg_h = avg_mins // 60 %}
-                                            {% set avg_m = avg_mins % 60 %}
-                                            {% if avg_h > 0 %}{{ avg_h }}h {{ "%02d"|format(avg_m) }}m{% else %}{{ avg_m }}m{% endif %}
-                                        {% endif %}
-                                    </td>
+                                    <td class="tabular-nums text-sm">{{ row.start }}</td>
+                                    <td class="tabular-nums text-sm">{{ row.end }}</td>
+                                    <td class="text-right tabular-nums text-sm">{{ row.duration }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
-                            <tfoot>
-                                <tr class="total-row">
-                                    <td class="font-bold">Total</td>
-                                    <td class="text-right font-bold tabular-nums">{{ total_events }}</td>
-                                    <td class="text-right font-bold tabular-nums">
-                                        {% set gh = grand_total_hours | int %}
-                                        {% set gm = ((grand_total_hours - gh) * 60) | int %}
-                                        {{ gh }}h {{ "%02d"|format(gm) }}m
-                                    </td>
-                                    <td></td>
-                                </tr>
-                            </tfoot>
                         </table>
                     </div>
                 </div>
@@ -264,6 +243,13 @@
         document.getElementById('getEventsForm').addEventListener('submit', function(e) {
             const btn = document.activeElement;
             if (btn && (btn.id === 'btnGetList' || btn.id === 'btnGetPlot')) {
+                // Preserve the action value before disabling the button (disabled inputs are not submitted)
+                const hidden = document.createElement('input');
+                hidden.type = 'hidden';
+                hidden.name = 'action';
+                hidden.value = btn.value;
+                this.appendChild(hidden);
+
                 btn.disabled = true;
                 btn.innerHTML = '<svg class="animate-spin w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path></svg> Loading…';
             }
@@ -287,17 +273,23 @@
             });
         }
 
-        // Copy summary table as plain text
-        function copyTableAsText() {
-            const table = document.getElementById('summaryTable');
-            if (!table) return;
+        // Copy events list as plain text in desktop notepad format
+        function copyEventsAsText() {
+            const rows = document.querySelectorAll('#eventsTable tbody tr');
+            if (!rows.length) return;
             let text = '';
-            for (const row of table.querySelectorAll('tr')) {
-                const cells = Array.from(row.querySelectorAll('th,td')).map(c => c.innerText.trim());
-                text += cells.join('\t') + '\n';
-            }
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                const index    = cells[0].innerText.trim();
+                const id       = cells[1].getAttribute('title') || cells[1].innerText.trim();
+                const summary  = cells[2].innerText.trim();
+                const start    = cells[3].innerText.trim();
+                const end      = cells[4].innerText.trim();
+                const duration = cells[5].innerText.trim();
+                text += `INDEX: ${index} | ID: ${id} | SUMMARY: ${summary} | START: ${start} | END: ${end} | DURATION: ${duration}\n`;
+            });
             navigator.clipboard.writeText(text.trim()).then(() => {
-                showCopyFeedback('Table copied to clipboard!');
+                showCopyFeedback('Events copied to clipboard!');
             }).catch(() => {
                 alert('Copy failed.');
             });

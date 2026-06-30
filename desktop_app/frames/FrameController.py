@@ -15,6 +15,9 @@ def show_frame(frame_type: FrameTypes, common: CommonOperations):
     logger.info(f"Raising frame: {frame}")
     frame.tkraise()
 
+def get_frame(frame_type: FrameTypes, common: CommonOperations):
+    return __get_frame_by_type(frame_type, common)
+
 def page_controller(master, root, common: CommonOperations):
     # Create a container
     container = ctk.CTkFrame(root)

@@ -187,7 +187,8 @@ class GetEventsFrame(BaseFrame):
             self.__save_results_to_file()
 
             FrameController.show_frame(FrameTypes.GraphFrame, self._common)
-            # GraphFrame.set_file_path(FrameTypes.GraphFrame, text=tmp.name)
+            graph_frame = FrameController.get_frame(FrameTypes.GraphFrame, self._common)
+            graph_frame.set_file_path(tmp.name)
         except Exception as e:
             raise e
 

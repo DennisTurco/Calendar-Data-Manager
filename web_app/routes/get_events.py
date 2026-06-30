@@ -1,4 +1,3 @@
-from collections import defaultdict
 from datetime import datetime
 from flask import Blueprint, current_app, flash, redirect, render_template, request, session, url_for
 import markdown
@@ -17,7 +16,7 @@ from web_app.services.validate import Validate
 bp = Blueprint("get_events", __name__, url_prefix="/get-events")
 
 
-def _render_page(form_values=None, summary_totals=None, total_events=None, grand_total_hours=0.0):
+def _render_page(form_values=None, events_list=None, total_events=None):
     return render_template(
         "get-events.html",
         active_page="get events",
@@ -29,9 +28,8 @@ def _render_page(form_values=None, summary_totals=None, total_events=None, grand
         timezones=TIMEZONE,
         graph_types=GraphType.to_list(),
         form_values=form_values or {},
-        summary_totals=summary_totals,
+        events_list=events_list,
         total_events=total_events,
-        grand_total_hours=grand_total_hours,
     )
 
 
@@ -91,13 +89,12 @@ def _handle_post(credentials: Credentials):
             flash("No events found for the given criteria.", "info")
             return _render_page(form_values=form_values)
 
-        summary_totals, grand_total_hours = _compute_summary_totals(events)
+        events_list = _format_events_list(events)
         flash(f"{len(events)} event(s) found.", "success")
         return _render_page(
             form_values=form_values,
-            summary_totals=summary_totals,
+            events_list=events_list,
             total_events=len(events),
-            grand_total_hours=grand_total_hours,
         )
 
     # action == "get_and_plot"
@@ -124,43 +121,35 @@ def _handle_post(credentials: Credentials):
     return redirect(url_for("graph_viewer.view_graphs"))
 
 
-def _compute_summary_totals(events: list) -> tuple:
-    """Group events by summary, returning (list_of_totals, grand_total_hours)."""
-    totals = defaultdict(lambda: {"count": 0, "total_minutes": 0.0})
-
-    for event in events:
-        summary_name = event.get("summary") or "(no summary)"
+def _format_events_list(events: list) -> list:
+    """Return individual event rows matching the desktop viewer format."""
+    result = []
+    for index, event in enumerate(events, start=1):
         start = event.get("start", {})
         end = event.get("end", {})
-        start_val = start.get("dateTime") or start.get("date")
-        end_val = end.get("dateTime") or end.get("date")
+        start_val = start.get("dateTime") or start.get("date") or ""
+        end_val = end.get("dateTime") or end.get("date") or ""
 
-        totals[summary_name]["count"] += 1
-
+        duration_str = ""
         if start_val and end_val:
             try:
                 s = datetime.fromisoformat(start_val.replace("Z", "+00:00"))
                 e = datetime.fromisoformat(end_val.replace("Z", "+00:00"))
-                duration_minutes = (e - s).total_seconds() / 60
-                totals[summary_name]["total_minutes"] += duration_minutes
+                delta = e - s
+                total_seconds = int(delta.total_seconds())
+                h, remainder = divmod(total_seconds, 3600)
+                m, s_sec = divmod(remainder, 60)
+                duration_str = f"{h}:{m:02d}:{s_sec:02d}"
             except Exception:
                 pass
 
-    result = []
-    grand_minutes = 0.0
-    for name, data in totals.items():
-        mins = data["total_minutes"]
-        grand_minutes += mins
-        h = int(mins // 60)
-        m = int(mins % 60)
         result.append({
-            "summary": name,
-            "count": data["count"],
-            "total_hours": mins / 60,
-            "duration_str": f"{h}h {m:02d}m" if h > 0 else f"{m}m",
+            "index": index,
+            "id": event.get("id", ""),
+            "summary": event.get("summary") or "(no summary)",
+            "start": start_val,
+            "end": end_val,
+            "duration": duration_str,
         })
-
-    result.sort(key=lambda x: x["total_hours"], reverse=True)
-    grand_total_hours = grand_minutes / 60
-    return result, grand_total_hours
+    return result
 

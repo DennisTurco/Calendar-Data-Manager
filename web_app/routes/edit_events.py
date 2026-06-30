@@ -133,7 +133,7 @@ def _confirm_update(credentials: Credentials):
     old_events_cache_id = session.get("events_cache_id")
     old_events = CacheManager.get(old_events_cache_id)
 
-    time_range = TimeRange(pending["date_from"], pending["date_to"])
+    time_range = TimeRange(datetime.fromisoformat(pending["date_from"]), datetime.fromisoformat(pending["date_to"]))
     event_info = EventInfo(
         pending["summary_new"],
         pending["description_new"],

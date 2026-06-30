@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Events</title>
-    <script>tailwind.config = { darkMode: 'class' }</script>
     <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>tailwind.config = { darkMode: 'class' }</script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/icon.png') }}">
     <!-- Apply theme early to avoid flash -->
@@ -198,12 +198,15 @@
                 <!-- Events Display -->
                 <div class="space-y-2 max-h-80 overflow-y-auto pr-1">
                     {% for i in range(old_events|length) %}
+                    {% set ev = old_events[i] %}
+                    {% set ev_start = ev['start'].get('dateTime') or ev['start'].get('date', '') %}
+                    {% set ev_end   = ev['end'].get('dateTime')   or ev['end'].get('date', '') %}
                     <div class="rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
                         <div class="bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 text-sm px-3 py-2 font-mono">
-                            <span class="font-semibold">Before</span> · #{{ i }} · {{ old_events[i]['summary'] }} · {{ old_events[i]['start']['dateTime'] }} → {{ old_events[i]['end']['dateTime'] }}
+                            <span class="font-semibold">Before</span> · #{{ i + 1 }} · {{ ev['summary'] }} · {{ ev_start }} → {{ ev_end }}
                         </div>
                         <div class="bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 text-sm px-3 py-2 font-mono">
-                            <span class="font-semibold">After</span> · #{{ i }} · {{ new_event.summary }} · {{ new_event.range.date_from }} → {{ new_event.range.date_to }}
+                            <span class="font-semibold">After</span> · #{{ i + 1 }} · {{ new_event.summary or ev['summary'] }} · {{ new_event.range.date_from }} → {{ new_event.range.date_to }}
                         </div>
                     </div>
                     {% endfor %}
@@ -248,6 +251,13 @@
         document.getElementById('editEventsForm').addEventListener('submit', function () {
             const btn = document.getElementById('btnFetch');
             if (btn) {
+                // Preserve action value before disabling (disabled inputs are not submitted)
+                const hidden = document.createElement('input');
+                hidden.type = 'hidden';
+                hidden.name = 'action';
+                hidden.value = btn.value;
+                this.appendChild(hidden);
+
                 btn.disabled = true;
                 btn.innerHTML = '<svg class="animate-spin w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path></svg> Searching…';
             }
