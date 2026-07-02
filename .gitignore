@@ -1,6 +1,9 @@
 # Ignore Settings folder
 settings
 
+# Environment variables (contain secrets)
+.env
+
 # Ignore Test folder
 test
 personal

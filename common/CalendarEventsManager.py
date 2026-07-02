@@ -66,9 +66,10 @@ class CalendarEventsManager:
     # TODO: Test me
     @staticmethod
     def refresh_token():
-        client_secret = "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"
-        client_id = "629129916032-161pnnbejkg238auc0rethmlg1njc6om.apps.googleusercontent.com"
-        refresh_token = "1//09PbgtBFQPy8dCgYIARAAGAkSNwF-L9IreGgrAtTftppccc4ClFOpbEBq3G6rAJ11uUbvX8roppBgsrvHXBx88QEn5pJh2A5Nols"
+        import os
+        client_secret = os.environ["GOOGLE_CLIENT_SECRET"]
+        client_id = os.environ["GOOGLE_CLIENT_ID"]
+        refresh_token = os.environ["GOOGLE_REFRESH_TOKEN"]
         token_url = 'https://oauth2.googleapis.com/token'
 
         data = {
@@ -85,7 +86,6 @@ class CalendarEventsManager:
             new_access_token = token_data['access_token']
             new_refresh_token = token_data.get('refresh_token', refresh_token)
 
-            # Use the new access token for Google Calendar API requests.
             print(new_access_token)
             print(new_refresh_token)
         else:

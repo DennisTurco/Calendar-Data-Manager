@@ -1,50 +1,74 @@
 import os
-from flask import Blueprint, render_template, session, redirect, url_for, flash
-from common.services.EventsService import EventsService
-from common.JsonPreferences import JsonPreferences
+from flask import Blueprint, render_template, session, redirect, url_for, flash, request
+from google_auth_oauthlib.flow import Flow
 from web_app.CacheManager import CacheManager
-from google.oauth2.credentials import Credentials
 
 bp = Blueprint("login", __name__, url_prefix="/login")
+
+_SCOPES = [
+    "https://www.googleapis.com/auth/calendar",
+    "openid",
+    "https://www.googleapis.com/auth/userinfo.email",
+    "https://www.googleapis.com/auth/userinfo.profile",
+]
+
+
+def _build_flow(state: str = None) -> Flow:
+    client_config = {
+        "web": {
+            "client_id": os.environ["GOOGLE_CLIENT_ID"],
+            "client_secret": os.environ["GOOGLE_CLIENT_SECRET"],
+            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+            "token_uri": "https://oauth2.googleapis.com/token",
+        }
+    }
+    flow = Flow.from_client_config(client_config, scopes=_SCOPES, state=state)
+    flow.redirect_uri = os.environ["GOOGLE_REDIRECT_URI"]
+    return flow
+
 
 @bp.route("/", methods=["GET"])
 def login():
     return render_template("login.html")
 
-@bp.route("/google-login", methods=["POST"])
-def google_login():
 
-    session.clear()
+@bp.route("/google-auth", methods=["GET"])
+def google_auth():
+    flow = _build_flow()
+    authorization_url, state = flow.authorization_url(
+        access_type="offline",
+        include_granted_scopes="true",
+        prompt="consent",
+    )
+    session["oauth_state"] = state
+    return redirect(authorization_url)
 
-    list_res = JsonPreferences.read_from_json()
 
-    if not isinstance(list_res, dict) or len(list_res) <= 0:
-        flash("No credentials configuration found.")
+@bp.route("/callback", methods=["GET"])
+def callback():
+    if "error" in request.args:
+        flash(f"Login failed: {request.args.get('error')}", "error")
         return redirect(url_for("login.login"))
-
-    credentials_path = list_res.get("CredentialsPath", "./settings/client.json")
-    token_path = list_res.get("TokenPath", credentials_path.rsplit("/", 1)[0] + "/token.json")
 
     try:
-        credentials = EventsService.get_connection_setup(credentials_path, token_path)
-        if credentials:
-            session["google_authenticated"] = True
-            cred_cache_id = CacheManager.store(credentials, ttl=3600)
-            session["cred_cache_id"] = cred_cache_id
-
-            cred_cache_id = session.get("cred_cache_id")
-            credentials: Credentials = CacheManager.get(cred_cache_id)
-            if not credentials:
-                return redirect(url_for("login.login"))
-
-            return redirect(url_for("main.index"))
-        else:
-            flash("Login failed. Please retry.")
-            return redirect(url_for("login.login"))
+        flow = _build_flow(state=session.get("oauth_state"))
+        flow.fetch_token(authorization_response=request.url)
+        credentials = flow.credentials
     except Exception as e:
-        try:
-            os.remove(token_path)
-        except FileNotFoundError:
-            pass
-        flash(f"Credentials error: {e}")
+        flash(f"Authentication error: {e}", "error")
         return redirect(url_for("login.login"))
+
+    session.clear()
+    session["google_authenticated"] = True
+    session["cred_cache_id"] = CacheManager.store(credentials, ttl=3600)
+
+    return redirect(url_for("main.index"))
+
+
+@bp.route("/logout", methods=["GET"])
+def logout():
+    cred_cache_id = session.get("cred_cache_id")
+    if cred_cache_id:
+        CacheManager.delete(cred_cache_id)
+    session.clear()
+    return redirect(url_for("login.login"))

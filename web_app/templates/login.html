@@ -26,14 +26,12 @@
         <h1 class="text-2xl font-semibold text-gray-800 dark:text-white mb-1">Calendar Data Manager</h1>
         <p class="text-sm text-gray-500 dark:text-gray-400 mb-8">Sign in to manage your Google Calendar</p>
 
-        <form action="{{ url_for('login.google_login') }}" method="post">
-            <button type="submit"
-                    class="flex items-center justify-center gap-3 w-full py-3 px-4 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-medium transition shadow"
-                    title="Login using your Google account">
-                <img src="/static/images/google.png" class="w-5 h-5" alt="Google">
-                Sign in with Google
-            </button>
-        </form>
+        <a href="{{ url_for('login.google_auth') }}"
+           class="flex items-center justify-center gap-3 w-full py-3 px-4 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-medium transition shadow"
+           title="Login using your Google account">
+            <img src="/static/images/google.png" class="w-5 h-5" alt="Google">
+            Sign in with Google
+        </a>
 
         {% with messages = get_flashed_messages() %}
         {% if messages %}
