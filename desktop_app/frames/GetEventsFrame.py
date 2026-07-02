@@ -319,8 +319,10 @@ class GetEventsFrame(BaseFrame):
     def __save_results_to_file(self):
         try:
             # close the toplevel windows
-            if self.toplevel_window: self.close_top_frame_window()
-            if self.toplevel_entry_window: self.close_top_frame_entry_window()
+            if self.toplevel_window:
+                self.close_top_frame_window()
+            if self.toplevel_entry_window:
+                self.close_top_frame_entry_window()
 
             # if file doesn't exist, create it
             if not os.path.isfile(self.file_path.get()):

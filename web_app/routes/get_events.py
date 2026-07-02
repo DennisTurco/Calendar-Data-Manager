@@ -12,6 +12,7 @@ from common.enums.GraphType import GraphType
 from common.settings import TIMEZONE
 from web_app.CacheManager import CacheManager
 from web_app.services.validate import Validate
+from web_app.services.events_utils import EventsUtils
 
 bp = Blueprint("get_events", __name__, url_prefix="/get-events")
 
@@ -89,7 +90,7 @@ def _handle_post(credentials: Credentials):
             flash("No events found for the given criteria.", "info")
             return _render_page(form_values=form_values)
 
-        events_list = _format_events_list(events)
+        events_list = EventsUtils.format_events_list(events)
         flash(f"{len(events)} event(s) found.", "success")
         return _render_page(
             form_values=form_values,
@@ -119,37 +120,3 @@ def _handle_post(credentials: Credentials):
 
     current_app.logger.debug(f"SESSION: {dict(session)}")
     return redirect(url_for("graph_viewer.view_graphs"))
-
-
-def _format_events_list(events: list) -> list:
-    """Return individual event rows matching the desktop viewer format."""
-    result = []
-    for index, event in enumerate(events, start=1):
-        start = event.get("start", {})
-        end = event.get("end", {})
-        start_val = start.get("dateTime") or start.get("date") or ""
-        end_val = end.get("dateTime") or end.get("date") or ""
-
-        duration_str = ""
-        if start_val and end_val:
-            try:
-                s = datetime.fromisoformat(start_val.replace("Z", "+00:00"))
-                e = datetime.fromisoformat(end_val.replace("Z", "+00:00"))
-                delta = e - s
-                total_seconds = int(delta.total_seconds())
-                h, remainder = divmod(total_seconds, 3600)
-                m, s_sec = divmod(remainder, 60)
-                duration_str = f"{h}:{m:02d}:{s_sec:02d}"
-            except Exception:
-                pass
-
-        result.append({
-            "index": index,
-            "id": event.get("id", ""),
-            "summary": event.get("summary") or "(no summary)",
-            "start": start_val,
-            "end": end_val,
-            "duration": duration_str,
-        })
-    return result
-

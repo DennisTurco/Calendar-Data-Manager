@@ -2,6 +2,7 @@ from flask import Blueprint, flash, session, render_template
 from common.Plotter import Plotter
 from common.enums.GraphType import GraphType
 from web_app.CacheManager import CacheManager
+from web_app.services.events_utils import EventsUtils
 
 bp = Blueprint("graph_viewer", __name__, url_prefix="/graphs")
 
@@ -13,16 +14,24 @@ def view_graphs():
     events_json = CacheManager.get(cache_id)
     if not events_json or not selected_graphs:
         return "No graphs to display. Please fetch events first."
-    
+
     flash("Events fetched successfully! View your graphs below.", "success")
 
     events = Plotter.load_data_from_list(events_json)
+    events_list = EventsUtils.calculate_duration_and_aggregate_by_summary(events_json)
+    total_duration = EventsUtils.calculate_total_duration(events_list)
+    events_list = EventsUtils.convert_duration_time_to_string(events_list)
     graph_htmls = [_get_fig(events, g).to_html(full_html=False) for g in selected_graphs if _get_fig(events, g)]
 
     session.pop("events_cache_id", None)
     session.pop("selected_graphs", None)
 
-    return render_template("graphs.html", graph_htmls=graph_htmls)
+    return render_template(
+        "graphs.html",
+        graph_htmls=graph_htmls,
+        events_list=events_list,
+        total_duration=total_duration
+    )
 
 def _get_fig(events, graph_type):
     mapping = {

@@ -426,7 +426,7 @@ class CommonOperations:
     def get_events(creds, event_info: EventInfo) -> list[Any]:
         if event_info.id is not None and len(event_info.id) != 0:
             return EventsService.fetch_event_by_id(creds, event_info.id)
-            
+
         return EventsService.fetch_events(creds, event_info)
 
     def set_frames(self, frames):

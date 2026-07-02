@@ -37,6 +37,43 @@
         </header>
 
         <div class="mx-auto max-w-5xl px-4 mt-8 flex flex-col gap-8 pb-12">
+
+            <!-- RESULTS TABLE -->
+            {% if events_list %}
+            <section class="mt-8 w-full max-w-4xl" id="resultsSection">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm dark:shadow-gray-900 overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
+                        <div>
+                            <h2 class="text-lg font-semibold text-gray-800 dark:text-white">Events List</h2>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+                                {{ total_duration }} total hours
+                            </p>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="results-table" id="eventsTable">
+                            <thead>
+                                <tr>
+                                    <th class="text-right">#</th>
+                                    <th>Summary</th>
+                                    <th class="text-right">Total Duration</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in events_list %}
+                                <tr>
+                                    <td class="text-right tabular-nums text-gray-400 dark:text-gray-500">{{ row.index }}</td>
+                                    <td class="font-medium">{{ row.summary }}</td>
+                                    <td class="text-right tabular-nums text-sm">{{ row.duration }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+
             {% if graph_htmls %}
                 {% for graph_html in graph_htmls %}
                     <div class="w-full bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-4 overflow-x-auto">
