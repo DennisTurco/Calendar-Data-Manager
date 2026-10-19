@@ -28,3 +28,7 @@ __pycache__
 personal
 # Node tooling for web_app CSS build
 node_modules
+
+# Vercel build output (generated from web_app/static)
+public/
+.vercel

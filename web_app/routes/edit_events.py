@@ -3,7 +3,7 @@ from flask import Blueprint, flash, redirect, render_template, request, session,
 import markdown
 from google.oauth2.credentials import Credentials
 
-from common.CommonOperations import CommonOperations
+from common.services.EventQueries import EventQueries
 from common.InformationMessages import InformationMessages
 from common.ConfigKeys import ConfigKeys
 from common.entities.EventInfo import EventInfo
@@ -91,14 +91,14 @@ def edit_events():
                 return _render_page(form_values=form_values)
 
             old_event_info = _build_old_event_info(form_values)
-            old_events = CommonOperations.get_events(credentials, old_event_info)
+            old_events = EventQueries.get_events(credentials, old_event_info)
 
             if not old_events:
                 return _render_page(form_values=form_values, no_results=True)
 
             session["events_cache_id"] = CacheManager.store(old_events)
 
-            color_index_new = CommonOperations.get_color_id(form_values["color_new"])
+            color_index_new = EventQueries.get_color_id(form_values["color_new"])
             time_range_new = TimeRange(datetime.fromisoformat(date_from_str), datetime.fromisoformat(date_to_str))
             new_event_info = EventInfo(
                 form_values["summary_new"],
@@ -136,7 +136,7 @@ def edit_events():
 
 
 def _build_old_event_info(form_values: dict) -> EventInfo:
-    color_index_old = CommonOperations.get_color_id(form_values["color_old"])
+    color_index_old = EventQueries.get_color_id(form_values["color_old"])
     time_range = TimeRange(
         datetime.fromisoformat(form_values["date_from"]),
         datetime.fromisoformat(form_values["date_to"]),

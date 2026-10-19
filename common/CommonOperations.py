@@ -16,6 +16,7 @@ import customtkinter as ctk
 from common.entities.EventInfo import EventInfo
 from common.entities.TimeRange import TimeRange
 from common.services.EventsService import EventsService
+from common.services.EventQueries import EventQueries
 from common.settings import DATE_FORMATTER, DAY_FORMATTER
 from desktop_app.CTkXYFrame import *
 from CTkMessagebox import *
@@ -241,18 +242,7 @@ class CommonOperations:
 
     @staticmethod
     def get_color_id(color_selected, colors = ConfigKeys.Keys.EVENT_COLOR.value):
-        color_index = 0
-
-        for idx, color in enumerate(colors.keys()):
-            if color == color_selected:
-                color_index = idx+1
-                break
-
-        # check if the color is valid (it is not set 'No Color Filtering')
-        if color_index == 12: # 'No Color Filtering' has index == 12
-            color_index = -1
-
-        return color_index
+        return EventQueries.get_color_id(color_selected, colors)
 
     @staticmethod
     def file_viewer_window(toplevel_window, filepath, log_box):
@@ -424,10 +414,7 @@ class CommonOperations:
 
     @staticmethod
     def get_events(creds, event_info: EventInfo) -> list[Any]:
-        if event_info.id is not None and len(event_info.id) != 0:
-            return EventsService.fetch_event_by_id(creds, event_info.id)
-
-        return EventsService.fetch_events(creds, event_info)
+        return EventQueries.get_events(creds, event_info)
 
     def set_frames(self, frames):
         self._frames = frames

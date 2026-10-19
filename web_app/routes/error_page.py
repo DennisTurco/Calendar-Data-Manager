@@ -1,3 +1,4 @@
+import os
 from flask import render_template
 from common.ConfigKeys import ConfigKeys
 
@@ -6,8 +7,8 @@ def register_error_handlers(app):
     def internal_server_error(e):
         app.logger.error(f"Internal server error: {e}", exc_info=True)
         
-        # In development, mostra l'errore reale
-        error_message = getattr(e, "original_exception", e)
+        # Show the real error only in development: in production it could leak internal details
+        error_message = getattr(e, "original_exception", e) if os.environ.get("FLASK_ENV") == "development" else None
         
         return render_template(
             "500.html",

@@ -3,7 +3,7 @@ from flask import Blueprint, current_app, flash, redirect, render_template, requ
 import markdown
 from google.oauth2.credentials import Credentials
 
-from common.CommonOperations import CommonOperations
+from common.services.EventQueries import EventQueries
 from common.InformationMessages import InformationMessages
 from common.ConfigKeys import ConfigKeys
 from common.entities.EventInfo import EventInfo
@@ -82,11 +82,11 @@ def _handle_post(credentials: Credentials):
         return _render_page(form_values=form_values)
 
     time_range = TimeRange(date_from, date_to)
-    color_index = CommonOperations.get_color_id(color)
+    color_index = EventQueries.get_color_id(color)
     event_info = EventInfo(summary, description, time_range, color_index, timezone)
 
     if action == "get_list":
-        events = CommonOperations.get_events(credentials, event_info)
+        events = EventQueries.get_events(credentials, event_info)
         if not events:
             return _render_page(form_values=form_values, no_results=True)
 
@@ -107,7 +107,7 @@ def _handle_post(credentials: Credentials):
         flash("Please select at least one graph type", "error")
         return _render_page(form_values=form_values)
 
-    events = CommonOperations.get_events(credentials, event_info)
+    events = EventQueries.get_events(credentials, event_info)
 
     if not events:
         return _render_page(form_values=form_values, no_results=True)

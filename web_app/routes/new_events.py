@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, session, flash, redirect, request, url_for
 from google.oauth2.credentials import Credentials
-from common.CommonOperations import CommonOperations
+from common.services.EventQueries import EventQueries
 from common.entities.EventInfo import EventInfo
 from common.entities.TimeRange import TimeRange
 from common.services.EventsService import EventsService
@@ -46,7 +46,7 @@ def _create_event(credentials: Credentials):
     date_from_str = request.form.get("date_from", "")
     date_to_str = request.form.get("date_to", "")
     timezone = request.form.get("timezone", "")
-    color_id = CommonOperations.get_color_id(color)
+    color_id = EventQueries.get_color_id(color)
 
     form_values = {
         "summary": summary,

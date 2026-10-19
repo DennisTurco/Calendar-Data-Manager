@@ -1,10 +1,20 @@
 from typing import Any, Dict, List, Union
 import pandas as pd
-import matplotlib.pyplot as plt
 import plotly.express as px
 import webbrowser
 import tempfile
 import os
+
+
+class _LazyPyplot:
+    """matplotlib is only used by the desktop charts: import it on first use so the web app doesn't need it."""
+    def __getattr__(self, name):
+        import matplotlib.pyplot as _plt
+        return getattr(_plt, name)
+
+
+plt = _LazyPyplot()
+
 
 class Plotter:
 

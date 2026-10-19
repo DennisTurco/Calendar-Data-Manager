@@ -1,0 +1,26 @@
+# Web app deployment manifest (used by Vercel). The desktop app keeps using requirements.txt.
+[project]
+name = "calendar-data-manager-web"
+version = "1.0.3"
+description = "Calendar Data Manager — web app"
+requires-python = ">=3.12"
+dependencies = [
+    "Flask==3.1.2",
+    "python-dotenv==1.2.1",
+    "google-api-python-client==2.187.0",
+    "google-auth==2.41.1",
+    "google-auth-httplib2==0.2.1",
+    "google-auth-oauthlib==1.2.3",
+    "requests==2.32.5",
+    "Markdown==3.10",
+    "pandas==2.3.3",
+    "plotly==6.5.0",
+    "redis==7.1.0",
+]
+
+[tool.vercel]
+entrypoint = "web_app.wsgi:app"
+
+[tool.vercel.scripts]
+# Copies web_app/static to public/static so Vercel serves CSS/JS/images from its CDN
+build = "python scripts/vercel_build.py"

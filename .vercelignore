@@ -1,0 +1,18 @@
+# Keep the deployment to the web app: the desktop app and local tooling aren't needed on Vercel.
+# requirements.txt is the desktop app's dependency list; the web app's lives in pyproject.toml.
+requirements.txt
+desktop_main.py
+GUI.spec
+informations.txt
+dist/
+build/
+settings/
+personal/
+test/
+.venv/
+.vs/
+.idea/
+.vscode/
+**/__pycache__/
+web_app/node_modules/
+public/

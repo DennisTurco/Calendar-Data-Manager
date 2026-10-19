@@ -43,6 +43,8 @@ To report a BUG -> [ISSUE](https://github.com/DennisTurco/Calendar-Data-Manager/
 
 - Do not make any changes to the web_app/static folder, the images are synchronized to the common/assets/images.
   If for any reasons are not correctly synchronized, Open cmd in administrator mode, navigate to web_app/static and write: `mklink /D images ..\..\common\assets\images `
+- Styles use a compiled Tailwind build: after changing templates run `npm install` (first time) and `npm run build:css` inside `web_app/`, then commit `web_app/static/css/tailwind.css`.
+- Deploying on Vercel (including Google login setup): see [docs/VercelDeploy.md](docs/VercelDeploy.md).
 
 
 ## Licence
