@@ -9,6 +9,21 @@ def _is_development() -> bool:
     return os.environ.get("FLASK_ENV") == "development"
 
 
+def _missing_config() -> list[tuple[str, str]]:
+    """Required settings that are missing, as (variable, why it matters). Values are never reported."""
+    problems = []
+    if not os.environ.get("FLASK_SECRET_KEY") and not _is_development():
+        problems.append(("FLASK_SECRET_KEY", "signs the session cookie; without it nobody can stay signed in"))
+    for name in ("GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET", "GOOGLE_REDIRECT_URI"):
+        if not os.environ.get(name):
+            problems.append((name, "needed for “Continue with Google” (from your OAuth client in Google Cloud Console)"))
+    # Serverless hosts run many short-lived instances, so the in-memory cache would lose the login
+    # between requests: require Redis there.
+    if os.environ.get("VERCEL") and not (os.environ.get("REDIS_URL") or os.environ.get("KV_URL")):
+        problems.append(("REDIS_URL", "keeps users signed in across requests on Vercel (add Upstash for Redis from the Marketplace)"))
+    return problems
+
+
 def create_app():
     load_dotenv()
 
@@ -18,10 +33,7 @@ def create_app():
 
     app = Flask(__name__)
 
-    secret_key = os.environ.get("FLASK_SECRET_KEY")
-    if not secret_key and not _is_development():
-        raise RuntimeError("FLASK_SECRET_KEY is not set: sessions (and Google login) cannot work without it.")
-    app.secret_key = secret_key
+    app.secret_key = os.environ.get("FLASK_SECRET_KEY")
 
     # Behind a reverse proxy (Vercel, Cloud Run, nginx…) the app receives plain HTTP: trust the
     # X-Forwarded-* headers so request.url is https:// and the OAuth callback is accepted.
@@ -35,14 +47,11 @@ def create_app():
             SEND_FILE_MAX_AGE_DEFAULT=60 * 60 * 24 * 365,  # static URLs are versioned (see below)
         )
 
-    # Server-side cache for credentials/events. Serverless hosts run many short-lived instances,
-    # so the in-memory fallback would lose the login between requests: require Redis there.
+    # Server-side cache for credentials/events (Redis when configured, in-memory otherwise)
     from web_app.CacheManager import CacheManager
     redis_url = os.environ.get("REDIS_URL") or os.environ.get("KV_URL")
     if redis_url:
         CacheManager.init_redis(redis_url=redis_url)
-    elif os.environ.get("VERCEL"):
-        raise RuntimeError("REDIS_URL is not set: on Vercel a Redis store (e.g. Upstash) is required to keep users logged in.")
 
     # Blueprints
     from web_app.routes.login import bp as login
@@ -90,5 +99,18 @@ def create_app():
     # Error handlers
     from web_app.routes import error_page
     error_page.register_error_handlers(app)
+
+    # Misconfigured deployment: answer every page with a clear "setup incomplete" screen
+    # (listing only variable names) instead of crashing with an opaque 500.
+    problems = _missing_config()
+    if problems:
+        app.logger.error("Configuration incomplete, missing: %s", ", ".join(name for name, _ in problems))
+        from flask import render_template, request
+
+        @app.before_request
+        def config_incomplete():
+            if request.endpoint == "static":
+                return None
+            return render_template("setup_incomplete.html", problems=problems), 503
 
     return app

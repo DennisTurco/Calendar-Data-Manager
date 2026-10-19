@@ -12,7 +12,7 @@ The web app (`web_app/`) runs on Vercel as a single Python function. The desktop
 | `vercel.json` | Function timeout (60 s), files excluded from the bundle, long cache for `/static/*` |
 | `.vercelignore` | Keeps the desktop app, the desktop `requirements.txt` and local tooling out of the deployment |
 
-The app refuses to start on Vercel without `REDIS_URL`/`KV_URL` or `FLASK_SECRET_KEY`, so a misconfiguration fails loudly instead of logging users out at random.
+If a required variable is missing (`FLASK_SECRET_KEY`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI`, and `REDIS_URL`/`KV_URL` on Vercel), every page shows a **"Setup incomplete"** screen listing the missing names (never their values). If the app crashes while starting, a **"The app failed to start"** page shows the error type and message; the full traceback is in the function logs (Vercel → Project → *Logs*).
 
 ## 1. Google Cloud Console (OAuth)
 
@@ -65,6 +65,8 @@ It injects `REDIS_URL` and/or `KV_URL` into the project; the app accepts either.
 
 | Symptom | Likely cause |
 |---|---|
+| "Setup incomplete" page | the listed environment variables are missing: add them and **redeploy** (variables apply only to new deployments) |
+| `500 FUNCTION_INVOCATION_FAILED` | the function crashed before Flask could answer: open the deployment's *Logs* / *Runtime Logs* for the traceback |
 | `redirect_uri_mismatch` from Google | `GOOGLE_REDIRECT_URI` differs from the URI registered in the Console (scheme, domain, trailing slash) |
 | `InsecureTransportError` / `(insecure_transport) OAuth 2 MUST utilize https` | request reached Flask as HTTP; `ProxyFix` in `web_app/__init__.py` handles Vercel's headers — check you're on the HTTPS URL |
 | Logged out on every page | Redis not connected (`REDIS_URL`/`KV_URL` missing) |
