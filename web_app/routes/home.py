@@ -2,19 +2,17 @@ from flask import Blueprint, current_app, redirect, render_template, session, ur
 from google.oauth2.credentials import Credentials
 
 from common.ConfigKeys import ConfigKeys
-from web_app.CacheManager import CacheManager
+from web_app.services.auth import load_credentials
 
 bp = Blueprint("main", __name__)
 
 @bp.route("/")
 def index():
 
-    cred_cache_id = session.get("cred_cache_id")
-    credentials: Credentials = CacheManager.get(cred_cache_id)
+    credentials: Credentials = load_credentials()
     if not credentials:
         return redirect(url_for("login.login"))
     
-    current_app.logger.debug(f"SESSION: {dict(session)}")
 
     return render_template(
         "index.html",

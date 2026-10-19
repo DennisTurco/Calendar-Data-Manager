@@ -8,7 +8,7 @@ from common.settings import TIMEZONE
 from common.ConfigKeys import ConfigKeys
 from common.InformationMessages import InformationMessages
 import markdown
-from web_app.CacheManager import CacheManager
+from web_app.services.auth import load_credentials
 from web_app.services.validate import Validate
 from datetime import datetime
 
@@ -28,8 +28,7 @@ def _render_page(form_values=None):
 
 @bp.route("/", methods=["GET", "POST"])
 def new_events():
-    cred_cache_id = session.get("cred_cache_id")
-    credentials: Credentials = CacheManager.get(cred_cache_id)
+    credentials: Credentials = load_credentials()
     if not credentials:
         return redirect(url_for("login.login"))
 

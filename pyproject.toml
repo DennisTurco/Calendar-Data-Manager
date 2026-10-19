@@ -15,7 +15,7 @@ dependencies = [
     "Markdown==3.10",
     "pandas==2.3.3",
     "plotly==6.5.0",
-    "redis==7.1.0",
+    "cryptography==50.0.2",
 ]
 
 [tool.vercel]

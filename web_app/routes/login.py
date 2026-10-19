@@ -1,7 +1,7 @@
 import os
 from flask import Blueprint, current_app, render_template, session, redirect, url_for, flash, request
 from google_auth_oauthlib.flow import Flow
-from web_app.CacheManager import CacheManager
+from web_app.services.auth import clear_credentials, save_credentials
 
 bp = Blueprint("login", __name__, url_prefix="/login")
 
@@ -63,8 +63,7 @@ def callback():
     user = _fetch_user_profile(flow)
 
     session.clear()
-    session["google_authenticated"] = True
-    session["cred_cache_id"] = CacheManager.store(credentials, ttl=3600)
+    save_credentials(credentials)
     if user:
         session["user"] = user
 
@@ -89,8 +88,6 @@ def _fetch_user_profile(flow: Flow) -> dict | None:
 
 @bp.route("/logout", methods=["GET"])
 def logout():
-    cred_cache_id = session.get("cred_cache_id")
-    if cred_cache_id:
-        CacheManager.delete(cred_cache_id)
+    clear_credentials()
     session.clear()
     return redirect(url_for("login.login"))

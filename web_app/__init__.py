@@ -17,10 +17,6 @@ def _missing_config() -> list[tuple[str, str]]:
     for name in ("GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET", "GOOGLE_REDIRECT_URI"):
         if not os.environ.get(name):
             problems.append((name, "needed for “Continue with Google” (from your OAuth client in Google Cloud Console)"))
-    # Serverless hosts run many short-lived instances, so the in-memory cache would lose the login
-    # between requests: require Redis there.
-    if os.environ.get("VERCEL") and not (os.environ.get("REDIS_URL") or os.environ.get("KV_URL")):
-        problems.append(("REDIS_URL", "keeps users signed in across requests on Vercel (add Upstash for Redis from the Marketplace)"))
     return problems
 
 
@@ -47,11 +43,10 @@ def create_app():
             SEND_FILE_MAX_AGE_DEFAULT=60 * 60 * 24 * 365,  # static URLs are versioned (see below)
         )
 
-    # Server-side cache for credentials/events (Redis when configured, in-memory otherwise)
-    from web_app.CacheManager import CacheManager
-    redis_url = os.environ.get("REDIS_URL") or os.environ.get("KV_URL")
-    if redis_url:
-        CacheManager.init_redis(redis_url=redis_url)
+    # Stateless: Google credentials live encrypted in the session cookie (no Redis/database needed),
+    # so any instance can serve any request. Tokens refreshed during a request are saved back.
+    from web_app.services.auth import persist_refreshed_credentials
+    app.after_request(persist_refreshed_credentials)
 
     # Blueprints
     from web_app.routes.login import bp as login

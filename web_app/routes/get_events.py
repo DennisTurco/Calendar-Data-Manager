@@ -1,5 +1,5 @@
 from datetime import datetime
-from flask import Blueprint, current_app, flash, redirect, render_template, request, session, url_for
+from flask import Blueprint, flash, redirect, render_template, request, url_for
 import markdown
 from google.oauth2.credentials import Credentials
 
@@ -10,9 +10,10 @@ from common.entities.EventInfo import EventInfo
 from common.entities.TimeRange import TimeRange
 from common.enums.GraphType import GraphType
 from common.settings import TIMEZONE
-from web_app.CacheManager import CacheManager
+from web_app.services.auth import load_credentials
 from web_app.services.validate import Validate
 from web_app.services.events_utils import EventsUtils
+from web_app.routes.graph_viewer import render_graphs
 
 bp = Blueprint("get_events", __name__, url_prefix="/get-events")
 
@@ -37,8 +38,7 @@ def _render_page(form_values=None, events_list=None, total_events=None, no_resul
 
 @bp.route("/", methods=["GET", "POST"])
 def get_events():
-    cred_cache_id = session.get("cred_cache_id")
-    credentials: Credentials = CacheManager.get(cred_cache_id)
+    credentials: Credentials = load_credentials()
     if not credentials:
         return redirect(url_for("login.login"))
 
@@ -112,9 +112,4 @@ def _handle_post(credentials: Credentials):
     if not events:
         return _render_page(form_values=form_values, no_results=True)
 
-    cache_id = CacheManager.store(events)
-    session["selected_graphs"] = selected_graphs
-    session["events_cache_id"] = cache_id
-
-    current_app.logger.debug(f"SESSION: {dict(session)}")
-    return redirect(url_for("graph_viewer.view_graphs"))
+    return render_graphs(events, selected_graphs)

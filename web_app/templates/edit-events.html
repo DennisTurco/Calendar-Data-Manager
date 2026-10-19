@@ -145,6 +145,11 @@
         <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 px-5 sm:px-6 py-4 border-t" style="border-color: var(--border); background: var(--surface-2); border-radius: 0 0 var(--radius) var(--radius)">
             <button type="button" class="btn btn-secondary" data-modal-close>Cancel</button>
             <form method="POST" action="{{ url_for('edit_events.edit_events') }}" data-loading-form>
+                {# The server keeps no state: send the previewed values and events fingerprint back #}
+                {% for key, value in form_values.items() %}
+                <input type="hidden" name="{{ key }}" value="{{ value }}">
+                {% endfor %}
+                <input type="hidden" name="fingerprint" value="{{ fingerprint }}">
                 <button type="submit" name="action" value="update" class="btn btn-primary w-full" data-loading-text="Updating…" autofocus>
                     {{ ui.icon('check') }} Update {{ preview_rows|length }} event{{ 's' if preview_rows|length != 1 }}
                 </button>

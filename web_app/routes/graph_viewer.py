@@ -1,7 +1,6 @@
-from flask import Blueprint, flash, session, render_template
+from flask import Blueprint, render_template
 from common.Plotter import Plotter
 from common.enums.GraphType import GraphType
-from web_app.CacheManager import CacheManager
 from web_app.services.events_utils import EventsUtils
 
 bp = Blueprint("graph_viewer", __name__, url_prefix="/graphs")
@@ -12,13 +11,12 @@ _CHART_COLORWAY = ["#2fa88a", "#6366f1", "#f59e0b", "#ec4899", "#0ea5e9", "#84cc
 
 @bp.route("/", methods=["GET"])
 def view_graphs():
-    cache_id = session.get("events_cache_id")
-    selected_graphs = session.get("selected_graphs")
+    # Charts are rendered directly by the "Get & plot" search (no server-side state to read here)
+    return render_template("graphs.html", active_page="get events", graph_htmls=[], events_list=[])
 
-    events_json = CacheManager.get(cache_id)
-    if not events_json or not selected_graphs:
-        return render_template("graphs.html", active_page="get events", graph_htmls=[], events_list=[])
 
+def render_graphs(events_json: list, selected_graphs: list[str]):
+    """Charts page for already-fetched events."""
     events = Plotter.load_data_from_list(events_json)
     aggregated = EventsUtils.calculate_duration_and_aggregate_by_summary(events_json)
     total_duration = EventsUtils.calculate_total_duration(aggregated)
@@ -39,9 +37,6 @@ def view_graphs():
             include_plotlyjs="cdn" if not graph_htmls else False,
             config={"displaylogo": False, "responsive": True},
         ))
-
-    session.pop("events_cache_id", None)
-    session.pop("selected_graphs", None)
 
     return render_template(
         "graphs.html",
