@@ -17,7 +17,7 @@ from web_app.services.events_utils import EventsUtils
 bp = Blueprint("get_events", __name__, url_prefix="/get-events")
 
 
-def _render_page(form_values=None, events_list=None, total_events=None):
+def _render_page(form_values=None, events_list=None, total_events=None, no_results=False):
     return render_template(
         "get-events.html",
         active_page="get events",
@@ -31,6 +31,7 @@ def _render_page(form_values=None, events_list=None, total_events=None):
         form_values=form_values or {},
         events_list=events_list,
         total_events=total_events,
+        no_results=no_results,
     )
 
 
@@ -87,11 +88,9 @@ def _handle_post(credentials: Credentials):
     if action == "get_list":
         events = CommonOperations.get_events(credentials, event_info)
         if not events:
-            flash("No events found for the given criteria.", "info")
-            return _render_page(form_values=form_values)
+            return _render_page(form_values=form_values, no_results=True)
 
         events_list = EventsUtils.format_events_list(events)
-        flash(f"{len(events)} event(s) found.", "success")
         return _render_page(
             form_values=form_values,
             events_list=events_list,
@@ -111,8 +110,7 @@ def _handle_post(credentials: Credentials):
     events = CommonOperations.get_events(credentials, event_info)
 
     if not events:
-        flash("No events found for the given criteria.", "info")
-        return _render_page(form_values=form_values)
+        return _render_page(form_values=form_values, no_results=True)
 
     cache_id = CacheManager.store(events)
     session["selected_graphs"] = selected_graphs

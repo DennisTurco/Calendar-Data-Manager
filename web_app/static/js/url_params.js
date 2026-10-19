@@ -1,6 +1,6 @@
 /**
  * Reads URL query parameters and pre-fills matching form fields on page load.
- * Supports: text inputs, textareas, selects, checkboxes.
+ * Supports: text inputs, textareas, selects, checkboxes and radio groups.
  *
  * Example URLs:
  *   /new-events?summary=Work&date_from=2024-01-01T09:00&color=Blue
@@ -11,8 +11,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!params.toString()) return;
 
     params.forEach(function (value, key) {
-        // Handle checkboxes by name
-        const checkboxes = document.querySelectorAll(`input[type="checkbox"][name="${key}"]`);
+        const checkboxes = document.querySelectorAll(`input[type="checkbox"][name="${CSS.escape(key)}"]`);
         if (checkboxes.length > 0) {
             checkboxes.forEach(cb => {
                 cb.checked = (value === 'true' || value === '1' || value === 'on');
@@ -20,7 +19,13 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        const el = document.querySelector(`[name="${key}"]`);
+        const radios = document.querySelectorAll(`input[type="radio"][name="${CSS.escape(key)}"]`);
+        if (radios.length > 0) {
+            radios.forEach(r => { r.checked = (r.value === value); });
+            return;
+        }
+
+        const el = document.querySelector(`[name="${CSS.escape(key)}"]`);
         if (!el) return;
 
         if (el.tagName === 'SELECT') {
@@ -33,5 +38,6 @@ document.addEventListener('DOMContentLoaded', function () {
         } else {
             el.value = value;
         }
+        el.dispatchEvent(new Event('change'));
     });
 });

@@ -26,3 +26,5 @@ __pycache__
 
 
 personal
+# Node tooling for web_app CSS build
+node_modules

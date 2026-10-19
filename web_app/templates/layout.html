@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% import "macros/ui.html" as ui %}
+
+{% block body %}
+<a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[80] btn btn-secondary">Skip to content</a>
+
+<!-- Mobile top bar -->
+<header class="topbar lg:hidden fixed top-0 inset-x-0 z-30 h-14 flex items-center gap-2 px-4">
+    <button type="button" class="btn btn-ghost btn-icon btn-sm -ml-1" data-sidebar-toggle aria-controls="sidebar" aria-expanded="false" aria-label="Open navigation">
+        {{ ui.icon('menu', 'w-5 h-5') }}
+    </button>
+    <a href="{{ url_for('main.index') }}" class="flex items-center gap-2 min-w-0 no-underline">
+        <img src="{{ url_for('static', filename='images/icon.png') }}" class="w-7 h-7" alt="">
+        <span class="font-semibold truncate">Calendar Data Manager</span>
+    </a>
+    <div class="flex-1"></div>
+    <button type="button" class="btn btn-ghost btn-icon btn-sm" data-theme-toggle aria-label="Toggle dark mode">
+        <span class="theme-icon-light">{{ ui.icon('moon', 'w-[18px] h-[18px]') }}</span>
+        <span class="theme-icon-dark">{{ ui.icon('sun', 'w-[18px] h-[18px]') }}</span>
+    </button>
+    {% if current_user %}
+    <button type="button" class="rounded-full" data-sidebar-toggle aria-label="Account: {{ current_user.name }}" title="{{ current_user.name }} · {{ current_user.email }}">
+        {% with avatar_size='w-8 h-8' %}{% include "components/user_avatar.html" %}{% endwith %}
+    </button>
+    {% endif %}
+</header>
+
+{% include "sidebar.html" %}
+
+<main id="main" class="lg:pl-64 pt-14 lg:pt-0 min-h-screen">
+    <div class="mx-auto w-full {% block container_class %}max-w-4xl{% endblock %} px-4 sm:px-6 lg:px-10 py-6 sm:py-10">
+        {% block content %}{% endblock %}
+    </div>
+</main>
+{% endblock %}

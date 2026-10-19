@@ -1,0 +1,16 @@
+{# Google profile picture (or initial) with a small Google badge. Expects `current_user`; optional `avatar_size` class. #}
+{% set _size = avatar_size or 'w-9 h-9' %}
+<span class="relative shrink-0 {{ _size }}">
+    {% if current_user.picture %}
+    <img src="{{ current_user.picture }}" alt="" referrerpolicy="no-referrer"
+         class="{{ _size }} rounded-full object-cover" style="box-shadow: 0 0 0 1px var(--border)"
+         onerror="this.replaceWith(this.nextElementSibling.content.cloneNode(true))">
+    <template>
+        <span class="{{ _size }} rounded-full grid place-items-center text-sm font-semibold" style="background: var(--accent-soft); color: var(--accent-text)">{{ (current_user.name or current_user.email or '?')[:1] | upper }}</span>
+    </template>
+    {% else %}
+    <span class="{{ _size }} rounded-full grid place-items-center text-sm font-semibold" style="background: var(--accent-soft); color: var(--accent-text)">{{ (current_user.name or current_user.email or '?')[:1] | upper }}</span>
+    {% endif %}
+    <img src="{{ url_for('static', filename='images/google-g.svg') }}" alt="Google account"
+         class="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full p-[2px] bg-white" style="box-shadow: 0 0 0 1.5px var(--sidebar-bg)">
+</span>

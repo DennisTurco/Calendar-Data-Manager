@@ -1,287 +1,172 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "layout.html" %}
+{% import "macros/ui.html" as ui %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Events</title>
-    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
-    <script>tailwind.config = { darkMode: 'class' }</script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/icon.png') }}">
-    <!-- Apply theme early to avoid flash -->
-    <script src="{{ url_for('static', filename='js/darkmode.js') }}"></script>
-</head>
+{% block title %}Edit events{% endblock %}
+{% block container_class %}max-w-5xl{% endblock %}
 
-<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen font-sans transition-colors duration-200">
+{% block content %}
+{{ ui.page_header('Edit events', 'Find matching events in a date range and update them all at once.', help_id='help_edit' if section_message else None) }}
+{% if section_message %}{{ ui.help_modal('help_edit', 'Editing events', section_message) }}{% endif %}
 
-    {% include "components/toast.html" %}
-    {% include 'navbar.html' %}
-    {% include 'sidebar.html' %}
-
-    <!-- MAIN WRAPPER -->
-    <main class="w-full pl-0 md:pl-48 pt-16">
-        <div class="mx-auto max-w-5xl px-4 flex flex-col items-center pb-12">
-
-            <!-- HEADER -->
-            <header class="mt-12 text-center">
-                <div class="flex items-center justify-center gap-3">
-                    <h1 class="text-4xl font-semibold text-gray-800 dark:text-white">Edit Events</h1>
-
-                    {% if section_message %}
-                    <button type="button" onclick="openModal('info_edit')"
-                        class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400 rounded"
-                        title="More info">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor" stroke-width="1.5">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z" />
-                        </svg>
-                    </button>
-                    {% endif %}
-                </div>
-
-                {% with
-                modal_id="info_edit",
-                modal_title="Section Information",
-                modal_content=section_message
-                %}
-                {% include "components/info_modal.html" %}
-                {% endwith %}
-            </header>
-
-            <!-- FORM -->
-            <form method="POST" action="/edit-events" id="editEventsForm"
-                class="mt-10 w-full bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm dark:shadow-gray-900 flex flex-col gap-6">
-
-                <!-- OLD & NEW Values -->
-                <div class="grid md:grid-cols-3 gap-6 items-start">
-
-                    <!-- OLD -->
-                    <div class="space-y-4 md:border-r md:border-gray-200 dark:md:border-gray-700 md:pr-4">
-                        <h2 class="text-sm font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider flex items-center gap-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-                            </svg>
-                            Old Values (filter)
-                        </h2>
-
-                        <div class="flex flex-col">
-                            <label class="mb-1 text-gray-700 dark:text-gray-300 font-medium text-sm">Summary</label>
-                            <input type="text" name="summary_old" placeholder="Any summary" class="input-field"
-                                   value="{{ form_values.get('summary_old', '') }}">
-                        </div>
-
-                        <div class="flex flex-col">
-                            <label class="mb-1 text-gray-700 dark:text-gray-300 font-medium text-sm">Description</label>
-                            <textarea name="description_old" rows="3" class="input-field" placeholder="Any description">{{ form_values.get('description_old', '') }}</textarea>
-                        </div>
-
-                        <div class="flex flex-col">
-                            <label class="mb-1 text-gray-700 dark:text-gray-300 font-medium text-sm">Color</label>
-                            <select name="color_old" class="input-field">
-                                {% for color_name, color_hex in event_colors_old.items() %}
-                                <option value="{{ color_name }}"
-                                    {% if form_values.get('color_old') == color_name %}selected{% endif %}>
-                                    {{ color_name }}
-                                </option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Arrow -->
-                    <div class="hidden md:flex justify-center items-center text-gray-400 dark:text-gray-500 pt-8">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-                        </svg>
-                    </div>
-                    <div class="md:hidden flex items-center gap-2 text-sm text-gray-400 dark:text-gray-500 font-medium">
-                        <hr class="flex-1 border-gray-300 dark:border-gray-600"> will become <hr class="flex-1 border-gray-300 dark:border-gray-600">
-                    </div>
-
-                    <!-- NEW -->
-                    <div class="space-y-4 md:pl-4">
-                        <h2 class="text-sm font-semibold text-green-600 dark:text-green-400 uppercase tracking-wider flex items-center gap-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-                            </svg>
-                            New Values
-                        </h2>
-
-                        <div class="flex flex-col">
-                            <label class="mb-1 text-gray-700 dark:text-gray-300 font-medium text-sm">Summary</label>
-                            <input type="text" name="summary_new" placeholder="New summary" class="input-field"
-                                   value="{{ form_values.get('summary_new', '') }}">
-                        </div>
-
-                        <div class="flex flex-col">
-                            <label class="mb-1 text-gray-700 dark:text-gray-300 font-medium text-sm">Description</label>
-                            <textarea name="description_new" rows="3" class="input-field" placeholder="New description">{{ form_values.get('description_new', '') }}</textarea>
-                        </div>
-
-                        <div class="flex flex-col">
-                            <label class="mb-1 text-gray-700 dark:text-gray-300 font-medium text-sm">Color</label>
-                            <select name="color_new" class="input-field">
-                                {% for color_name, color_hex in event_colors_new.items() %}
-                                <option value="{{ color_name }}"
-                                    {% if form_values.get('color_new', 'Light Blue') == color_name %}selected{% endif %}>
-                                    {{ color_name }}
-                                </option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </div>
-
-                </div>
-
-                <!-- Date & Timezone -->
-                <hr class="section-divider">
-                <div class="grid md:grid-cols-2 gap-4">
-                    <div class="flex flex-col">
-                        <label for="date_from" class="mb-1 text-gray-700 dark:text-gray-300 font-medium">Date From <span class="text-red-500">*</span></label>
-                        <input type="datetime-local" name="date_from" id="date_from" class="input-field" required
-                               value="{{ form_values.get('date_from', '') }}">
-                    </div>
-                    <div class="flex flex-col">
-                        <label for="date_to" class="mb-1 text-gray-700 dark:text-gray-300 font-medium">Date To <span class="text-red-500">*</span></label>
-                        <input type="datetime-local" name="date_to" id="date_to" class="input-field" required
-                               value="{{ form_values.get('date_to', '') }}">
-                    </div>
-                    <div class="md:col-span-2 flex flex-col">
-                        <label for="timezone" class="mb-1 text-gray-700 dark:text-gray-300 font-medium">Timezone</label>
-                        <select name="timezone" id="timezone" class="input-field"
-                                {% if form_values.get('timezone') %}data-preserve-value="true"{% endif %}>
-                            {% for tz in timezones %}
-                            <option value="{{ tz }}"
-                                {% if form_values.get('timezone') == tz %}selected{% endif %}>
-                                {{ tz }}
-                            </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Submit -->
-                <hr class="section-divider">
-                <div class="flex flex-wrap items-center justify-between gap-3">
-                    <div class="flex justify-center gap-3 flex-1">
-                        <button type="submit" name="action" value="fetch" id="btnFetch"
-                            class="button-primary px-6 py-2.5 flex items-center gap-2">
-                            <img src="{{ url_for('static', filename='images/edit.png') }}" class="w-5 h-5" alt="">
-                            Search & Edit
-                        </button>
-                    </div>
-                    <button type="button" onclick="copyShareUrl()" class="copy-url-btn" title="Copy shareable link">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-                        </svg>
-                        Copy URL
-                    </button>
-                </div>
-            </form>
-        </div>
-
-        <!-- CONFIRM MODAL -->
-        <div id="confirmModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-4xl max-h-[80vh] overflow-y-auto p-6 relative mx-4">
-
-                <!-- Modal Header -->
-                <div class="flex justify-between items-center mb-4 pb-3 border-b border-gray-200 dark:border-gray-700">
-                    <div>
-                        <h2 class="text-2xl font-semibold text-gray-800 dark:text-white">{{ old_events|length }} Event(s) Found</h2>
-                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Review the changes below before confirming</p>
-                    </div>
-                    <button onclick="closeConfirmModal()" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-2xl font-bold leading-none" aria-label="Close">&times;</button>
-                </div>
-
-                <!-- Events Display -->
-                <div class="space-y-2 max-h-80 overflow-y-auto pr-1">
-                    {% for i in range(old_events|length) %}
-                    {% set ev = old_events[i] %}
-                    {% set ev_start = ev['start'].get('dateTime') or ev['start'].get('date', '') %}
-                    {% set ev_end   = ev['end'].get('dateTime')   or ev['end'].get('date', '') %}
-                    <div class="rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
-                        <div class="bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 text-sm px-3 py-2 font-mono">
-                            <span class="font-semibold">Before</span> · #{{ i + 1 }} · {{ ev['summary'] }} · {{ ev_start }} → {{ ev_end }}
-                        </div>
-                        <div class="bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 text-sm px-3 py-2 font-mono">
-                            <span class="font-semibold">After</span> · #{{ i + 1 }} · {{ new_event.summary or ev['summary'] }} · {{ new_event.range.date_from }} → {{ new_event.range.date_to }}
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-
-                <!-- Buttons -->
-                <div class="flex justify-end mt-6 gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-                    <button onclick="closeConfirmModal()" class="button-secondary px-4 py-2">Cancel</button>
-                    <form method="POST" action="/edit-events" class="inline">
-                        <input type="hidden" name="action" value="update">
-                        <button type="submit" class="button-success px-4 py-2 flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-                            </svg>
-                            Confirm Update
-                        </button>
-                    </form>
-                </div>
+<form method="POST" action="{{ url_for('edit_events.edit_events') }}" id="editEventsForm" class="card" data-loading-form>
+    <div class="grid lg:grid-cols-2">
+        <!-- MATCH -->
+        <div class="card-body flex flex-col gap-5 lg:border-r" style="border-color: var(--border)">
+            <div>
+                <h2 class="section-title">
+                    <span class="inline-grid place-items-center w-6 h-6 rounded-full text-xs font-semibold" style="background: var(--surface-2)">1</span>
+                    Find events
+                </h2>
+                <p class="section-hint">Leave a field empty to match anything.</p>
             </div>
+            <div>
+                <label for="summary_old" class="label">Title contains</label>
+                <input type="text" name="summary_old" id="summary_old" class="input" autocomplete="off"
+                       placeholder="Any title" value="{{ form_values.get('summary_old', '') }}">
+            </div>
+            <div>
+                <label for="description_old" class="label">Description contains</label>
+                <input type="text" name="description_old" id="description_old" class="input" autocomplete="off"
+                       placeholder="Any description" value="{{ form_values.get('description_old', '') }}">
+            </div>
+            {{ ui.color_picker('color_old', event_colors, form_values.get('color_old', ''), any_label='Any color', label='Current color') }}
         </div>
 
-    </main>
+        <hr class="divider lg:hidden">
 
-    <script src="{{ url_for('static', filename='js/modal.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/default_timezone.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/toast.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/url_params.js') }}"></script>
+        <!-- APPLY -->
+        <div class="card-body flex flex-col gap-5">
+            <div>
+                <h2 class="section-title">
+                    <span class="inline-grid place-items-center w-6 h-6 rounded-full text-xs font-semibold" style="background: var(--accent-soft); color: var(--accent-text)">2</span>
+                    Apply changes
+                </h2>
+                <p class="section-hint">These values are written to every matched event.</p>
+            </div>
+            <div>
+                <label for="summary_new" class="label">New title</label>
+                <input type="text" name="summary_new" id="summary_new" class="input" autocomplete="off"
+                       placeholder="New title" value="{{ form_values.get('summary_new', '') }}">
+                <p id="summaryWarning" class="text-xs mt-1.5 flex items-center gap-1" style="color: var(--warning)" {% if form_values.get('summary_new') %}hidden{% endif %}>
+                    {{ ui.icon('alert-triangle', 'w-3.5 h-3.5') }} If left empty, matched events will lose their title.
+                </p>
+            </div>
+            <div>
+                <label for="description_new" class="label">New description<span class="opt">optional · empty keeps the current one</span></label>
+                <textarea name="description_new" id="description_new" rows="2" class="input"
+                          placeholder="New description">{{ form_values.get('description_new', '') }}</textarea>
+            </div>
+            {{ ui.color_picker('color_new', event_colors, form_values.get('color_new', ''), label='New color') }}
+        </div>
+    </div>
 
-    <script>
-        function openConfirmModal() {
-            document.getElementById('confirmModal').classList.remove('hidden');
-        }
-        function closeConfirmModal() {
-            document.getElementById('confirmModal').classList.add('hidden');
-        }
+    <hr class="divider">
 
-        {% if show_confirm_modal %}
-            openConfirmModal();
+    <div class="card-body flex flex-col gap-4">
+        <h2 class="section-title">{{ ui.icon('clock', 'w-4 h-4 text-muted') }} Search in date range</h2>
+        {{ ui.date_range(form_values, timezones) }}
+    </div>
+
+    <div class="card-footer flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3">
+        <button type="button" class="btn btn-ghost btn-sm self-start sm:self-auto" data-share-form="editEventsForm" title="Copy a link that pre-fills this form">
+            {{ ui.icon('link') }} Copy link
+        </button>
+        <button type="submit" name="action" value="fetch" class="btn btn-primary" data-loading-text="Searching…">
+            {{ ui.icon('search') }} Preview changes
+        </button>
+    </div>
+</form>
+
+{% if no_results %}
+{{ ui.empty_state(hints=['Widening the search date range (the quick ranges above help)', 'Shortening the “Title contains” text', 'Choosing “Any color” as the current color']) }}
+{% endif %}
+
+{% if show_confirm_modal %}
+<!-- CONFIRM MODAL -->
+<div id="confirmModal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+    <div class="modal-backdrop" data-modal-close></div>
+    <div class="modal-panel max-w-4xl">
+        <div class="flex items-start justify-between gap-4 px-5 sm:px-6 py-4 border-b" style="border-color: var(--border)">
+            <div>
+                <h2 id="confirmTitle" class="font-semibold text-lg">Update {{ preview_rows|length }} event{{ 's' if preview_rows|length != 1 }}?</h2>
+                <p class="text-muted text-sm mt-0.5">Review the changes below. This can't be undone from here.</p>
+            </div>
+            <button type="button" class="btn btn-ghost btn-icon btn-sm" data-modal-close aria-label="Close">{{ ui.icon('x') }}</button>
+        </div>
+
+        {% if not form_values.get('summary_new') %}
+        <div class="px-5 sm:px-6 pt-4">
+            <div class="alert alert-warning">{{ ui.icon('alert-triangle') }} <span>No new title was given: the titles of these events will be cleared.</span></div>
+        </div>
         {% endif %}
 
-        // Loading state
-        document.getElementById('editEventsForm').addEventListener('submit', function () {
-            const btn = document.getElementById('btnFetch');
-            if (btn) {
-                // Preserve action value before disabling (disabled inputs are not submitted)
-                const hidden = document.createElement('input');
-                hidden.type = 'hidden';
-                hidden.name = 'action';
-                hidden.value = btn.value;
-                this.appendChild(hidden);
+        <div class="modal-body">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th class="num">#</th>
+                        <th>Title</th>
+                        <th>Color</th>
+                        <th class="hidden sm:table-cell">When</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in preview_rows %}
+                    <tr>
+                        <td class="num text-subtle align-top">{{ row.index }}</td>
+                        <td class="align-top">
+                            {% if row.summary_old != row.summary_new %}
+                            <div class="diff-old text-sm">{{ row.summary_old or '(no title)' }}</div>
+                            <div class="diff-new">{{ row.summary_new or '(no title)' }}</div>
+                            {% else %}
+                            <div class="font-medium">{{ row.summary_old }}</div>
+                            {% endif %}
+                        </td>
+                        <td class="align-top nowrap">
+                            <div class="flex items-center gap-1.5 text-sm">
+                                <span class="swatch-dot" style="background: {{ row.color_old.hex or 'transparent' }}"></span>
+                                {% if row.color_old.name != row.color_new.name %}
+                                {{ ui.icon('arrow-right', 'w-3.5 h-3.5 text-subtle') }}
+                                <span class="swatch-dot" style="background: {{ row.color_new.hex }}"></span>
+                                <span class="sr-only">{{ row.color_old.name }} to {{ row.color_new.name }}</span>
+                                <span class="hidden md:inline">{{ row.color_new.name }}</span>
+                                {% else %}
+                                <span class="hidden md:inline text-muted">{{ row.color_old.name }}</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td class="align-top hidden sm:table-cell text-muted text-sm tabular nowrap">{{ row.start }} → {{ row.end }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
 
-                btn.disabled = true;
-                btn.innerHTML = '<svg class="animate-spin w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path></svg> Searching…';
-            }
-        });
+        <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 px-5 sm:px-6 py-4 border-t" style="border-color: var(--border); background: var(--surface-2); border-radius: 0 0 var(--radius) var(--radius)">
+            <button type="button" class="btn btn-secondary" data-modal-close>Cancel</button>
+            <form method="POST" action="{{ url_for('edit_events.edit_events') }}" data-loading-form>
+                <button type="submit" name="action" value="update" class="btn btn-primary w-full" data-loading-text="Updating…" autofocus>
+                    {{ ui.icon('check') }} Update {{ preview_rows|length }} event{{ 's' if preview_rows|length != 1 }}
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
 
-        function copyShareUrl() {
-            const form = document.getElementById('editEventsForm');
-            const params = new URLSearchParams();
-            const fields = ['summary_old', 'description_old', 'color_old', 'summary_new', 'description_new', 'color_new', 'date_from', 'date_to', 'timezone'];
-            fields.forEach(name => {
-                const el = form.querySelector(`[name="${name}"]`);
-                if (el && el.value) params.set(name, el.value);
-            });
-            const url = window.location.origin + window.location.pathname + '?' + params.toString();
-            navigator.clipboard.writeText(url).then(() => {
-                const div = document.createElement('div');
-                div.textContent = 'URL copied!';
-                div.className = 'fixed top-20 right-4 z-[9999] bg-green-500 text-white px-4 py-2 rounded-xl shadow-lg text-sm';
-                document.body.appendChild(div);
-                setTimeout(() => div.remove(), 2500);
-            }).catch(() => { prompt('Copy this URL:', url); });
-        }
-    </script>
-
-</body>
-
-</html>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/default_timezone.js') }}"></script>
+<script src="{{ url_for('static', filename='js/url_params.js') }}"></script>
+<script>
+    (function () {
+        const input = document.getElementById('summary_new');
+        const warning = document.getElementById('summaryWarning');
+        const sync = () => { warning.hidden = input.value.trim() !== ''; };
+        input.addEventListener('input', sync);
+        input.addEventListener('change', sync);
+    })();
+    {% if show_confirm_modal %}openModal('confirmModal');{% endif %}
+    {% if no_results %}document.getElementById('emptyState').scrollIntoView({ behavior: 'smooth', block: 'center' });{% endif %}
+</script>
+{% endblock %}

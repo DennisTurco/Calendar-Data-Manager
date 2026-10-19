@@ -1,99 +1,108 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "layout.html" %}
+{% import "macros/ui.html" as ui %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Graphs</title>
-    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
-    <script>tailwind.config = { darkMode: 'class' }</script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/icon.png') }}">
-    <!-- Apply theme early to avoid flash -->
-    <script src="{{ url_for('static', filename='js/darkmode.js') }}"></script>
-</head>
+{% block title %}Charts{% endblock %}
+{% block container_class %}max-w-6xl{% endblock %}
 
-<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen font-sans transition-colors duration-200">
+{% block content %}
+{% call ui.page_header('Charts', 'Where your time went in the selected range.') %}
+<a href="{{ url_for('get_events.get_events') }}" class="btn btn-secondary btn-sm">{{ ui.icon('arrow-left') }} Back to filters</a>
+{% endcall %}
 
-    {% include "components/toast.html" %}
-    {% include "navbar.html" %}
-    {% include "sidebar.html" %}
+{% if graph_htmls or events_list %}
+<section class="grid gap-4 grid-cols-2 lg:grid-cols-3 mb-6" aria-label="Summary">
+    <div class="card p-4 sm:p-5">
+        <p class="stat-label">Total time</p>
+        <p class="stat-value">{{ total_duration }}</p>
+        {% if total_events %}<p class="text-subtle text-xs mt-1">≈ {{ '%.1f' % (total_duration_hours / total_events) }} h per event</p>{% endif %}
+    </div>
+    <div class="card p-4 sm:p-5">
+        <p class="stat-label">Events</p>
+        <p class="stat-value">{{ total_events }}</p>
+    </div>
+    <div class="card p-4 sm:p-5 col-span-2 lg:col-span-1">
+        <p class="stat-label">Distinct titles</p>
+        <p class="stat-value">{{ events_list|length }}</p>
+    </div>
+</section>
 
-    <main class="w-full pl-0 md:pl-48 pt-16">
+<div class="grid gap-6 lg:grid-cols-2">
+    {% for graph_html in graph_htmls %}
+    <div class="card p-3 sm:p-4 overflow-hidden {% if graph_htmls|length == 1 or (loop.last and loop.length is odd) %}lg:col-span-2{% endif %}">
+        {{ graph_html | safe }}
+    </div>
+    {% endfor %}
+</div>
 
-        <!-- HEADER -->
-        <header class="mt-12 text-center">
-            <div class="flex items-center justify-center gap-3">
-                <h1 class="text-4xl font-semibold text-gray-800 dark:text-white">Graphs</h1>
-            </div>
-            <div class="mt-3">
-                <a href="/get-events" class="button-secondary inline-flex items-center gap-2 px-4 py-2 text-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
-                    </svg>
-                    Back to filters
-                </a>
-            </div>
-        </header>
-
-        <div class="mx-auto max-w-5xl px-4 mt-8 flex flex-col gap-8 pb-12">
-
-            <!-- RESULTS TABLE -->
-            {% if events_list %}
-            <section class="mt-8 w-full max-w-4xl" id="resultsSection">
-                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm dark:shadow-gray-900 overflow-hidden">
-                    <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
-                        <div>
-                            <h2 class="text-lg font-semibold text-gray-800 dark:text-white">Events List</h2>
-                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-                                {{ total_duration }} total hours
-                            </p>
+{% if events_list %}
+<section class="card mt-6 overflow-hidden" aria-labelledby="breakdownTitle">
+    <div class="card-header">
+        <h2 id="breakdownTitle" class="font-semibold">Time by title</h2>
+        <p class="text-muted text-sm">Sorted by total duration</p>
+    </div>
+    <div class="overflow-auto max-h-[70vh]">
+        <table class="table" data-sortable>
+            <thead>
+                <tr>
+                    {{ ui.sort_th('#', 'num', 'num') }}
+                    {{ ui.sort_th('Title') }}
+                    {{ ui.sort_th('Share', 'num', 'w-1/3 hidden sm:table-cell') }}
+                    {{ ui.sort_th('Duration', 'num', 'num') }}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in events_list %}
+                <tr>
+                    <td class="num text-subtle">{{ row.index }}</td>
+                    <td class="font-medium">{{ row.summary }}</td>
+                    <td class="hidden sm:table-cell" data-value="{{ row.share }}">
+                        <div class="flex items-center gap-3">
+                            <div class="bar-track flex-1"><div class="bar-fill" style="width: {{ '%.1f' % row.share }}%"></div></div>
+                            <span class="text-muted text-xs tabular w-12 text-right">{{ '%.1f' % row.share }}%</span>
                         </div>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="results-table" id="eventsTable">
-                            <thead>
-                                <tr>
-                                    <th class="text-right">#</th>
-                                    <th>Summary</th>
-                                    <th class="text-right">Total Duration</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for row in events_list %}
-                                <tr>
-                                    <td class="text-right tabular-nums text-gray-400 dark:text-gray-500">{{ row.index }}</td>
-                                    <td class="font-medium">{{ row.summary }}</td>
-                                    <td class="text-right tabular-nums text-sm">{{ row.duration }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-            {% endif %}
-
-            {% if graph_htmls %}
-                {% for graph_html in graph_htmls %}
-                    <div class="w-full bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-4 overflow-x-auto">
-                        {{ graph_html | safe }}
-                    </div>
+                    </td>
+                    <td class="num" data-value="{{ row.duration_seconds }}" title="{{ row.duration }}">{{ row.duration_human }}</td>
+                </tr>
                 {% endfor %}
-            {% else %}
-                <div class="text-center text-gray-500 dark:text-gray-400 py-16">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 mx-auto mb-4 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-                    </svg>
-                    <p class="text-lg">No graphs to display.</p>
-                    <a href="/get-events" class="button-primary inline-flex mt-4 px-5 py-2">Go back and fetch events</a>
-                </div>
-            {% endif %}
-        </div>
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endif %}
 
-    </main>
+{% else %}
+<div class="card flex flex-col items-center text-center px-6 py-16">
+    <span class="action-icon w-12 h-12 grid place-items-center rounded-xl mb-4" style="background: var(--accent-soft); color: var(--accent)">{{ ui.icon('chart', 'w-6 h-6') }}</span>
+    <h2 class="font-semibold">No charts to show</h2>
+    <p class="text-muted text-sm mt-1 max-w-sm">Charts are generated from a search. Pick a date range and at least one chart type, then use “Get &amp; plot”.</p>
+    <a href="{{ url_for('get_events.get_events') }}" class="btn btn-primary mt-6">{{ ui.icon('search') }} Find events</a>
+</div>
+{% endif %}
+{% endblock %}
 
-    <script src="{{ url_for('static', filename='js/toast.js') }}"></script>
-
-</body>
-</html>
+{% block scripts %}
+{% if graph_htmls %}
+<script>
+    // Match chart text and grid colors to the current theme
+    (function () {
+        function themeChart() {
+            if (!window.Plotly) return;
+            const css = getComputedStyle(document.documentElement);
+            const text = css.getPropertyValue('--text-muted').trim();
+            const title = css.getPropertyValue('--text').trim();
+            const grid = css.getPropertyValue('--border').trim();
+            document.querySelectorAll('.plotly-graph-div').forEach(div => {
+                Plotly.relayout(div, {
+                    'font.color': text,
+                    'title.font.color': title,
+                    'xaxis.gridcolor': grid, 'yaxis.gridcolor': grid,
+                    'xaxis.linecolor': grid, 'yaxis.linecolor': grid,
+                });
+            });
+        }
+        themeChart();
+        document.addEventListener('cdm:themechange', themeChart);
+    })();
+</script>
+{% endif %}
+{% endblock %}

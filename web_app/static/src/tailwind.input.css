@@ -1,0 +1,4 @@
+/* Source for static/css/tailwind.css — rebuild with `npm run build:css` (in web_app/) after changing templates. */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

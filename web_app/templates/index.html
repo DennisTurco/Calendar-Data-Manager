@@ -1,83 +1,62 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calendar Data Manager</title>
-    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
-    <script>tailwind.config = { darkMode: 'class' }</script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/icon.png') }}">
-    <!-- Apply theme early to avoid flash -->
-    <script src="{{ url_for('static', filename='js/darkmode.js') }}"></script>
-</head>
+{% extends "layout.html" %}
+{% import "macros/ui.html" as ui %}
 
-<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 flex flex-col items-center min-h-screen font-sans transition-colors duration-200">
+{% block title %}Home{% endblock %}
 
-{% include 'navbar.html' %}
-
-<!-- Header Icon -->
-<div class="mt-20">
-    <img src="{{ url_for('static', filename='images/icon.png') }}" class="w-24 h-24 drop-shadow-md" alt="App icon">
-</div>
-
-<!-- Title -->
-<h1 class="mt-8 text-4xl font-semibold mb-2 text-gray-800 dark:text-white">
-    Calendar Data Manager
-</h1>
-<p class="text-gray-500 dark:text-gray-400 text-sm mb-8">Manage your Google Calendar events</p>
-
-<!-- Main buttons -->
-<div class="flex flex-col items-center mt-4 space-y-4 w-full max-w-sm px-4">
-
-    <a href="/new-events" class="button-main flex items-center justify-center gap-2">
-        <img src="{{ url_for('static', filename='images/plus.png') }}" class="w-5 h-5" alt="">
-        New Events
-    </a>
-
-    <a href="/edit-events" class="button-main flex items-center justify-center gap-2">
-        <img src="{{ url_for('static', filename='images/edit.png') }}" class="w-5 h-5" alt="">
-        Edit Events
-    </a>
-
-    <a href="/get-events" class="button-main flex items-center justify-center gap-2">
-        <img src="{{ url_for('static', filename='images/list.png') }}" class="w-5 h-5" alt="">
-        Get Events
-    </a>
-</div>
-
-<!-- Donation section -->
-<div class="fixed bottom-6 left-6 text-gray-500 dark:text-gray-400">
-
-    {% if show_msg_section %}
-    <p class="text-sm italic mb-2 opacity-80">
-        Support the project or learn more:
-    </p>
+{% block content %}
+<section class="mb-8 sm:mb-10">
+    {% if current_user and current_user.name %}
+    <p class="text-muted text-sm font-medium mb-3">Welcome back, {{ current_user.name.split(' ')[0] }} 👋</p>
+    {% else %}
+    <span class="badge badge-accent mb-4">{{ ui.icon('calendar', 'w-3.5 h-3.5') }} Google Calendar toolkit</span>
     {% endif %}
+    <h1 class="text-3xl sm:text-4xl font-bold tracking-tight">Manage your calendar in bulk.</h1>
+    <p class="page-subtitle max-w-xl mt-3 text-base">
+        Create events, update many of them at once, and turn your time into numbers and charts.
+    </p>
+</section>
 
-    <div class="flex flex-row space-x-3">
-        {% if show_github %}
-        <a href="{{ github_link }}" target="_blank" class="icon-link">
-            <img src="{{ url_for('static', filename='images/github.png') }}" alt="GitHub">
-        </a>
-        {% endif %}
-        {% if show_buymeacoffee %}
-        <a href="{{ buymeacoffee_link }}" target="_blank" class="icon-link">
-            <img src="{{ url_for('static', filename='images/donation.png') }}" alt="Buy Me a Coffee">
-        </a>
-        {% endif %}
-        {% if show_paypal %}
-        <a href="{{ paypal_link }}" target="_blank" class="icon-link">
-            <img src="{{ url_for('static', filename='images/paypal.png') }}" alt="PayPal">
-        </a>
+<section class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" aria-label="Actions">
+    {% set actions = [
+        ('new_events.new_events',   'calendar-plus', 'New event',          'Add a single event with title, color, date range and timezone.'),
+        ('edit_events.edit_events', 'edit',          'Edit events',        'Find events by title, description or color and update them all at once.'),
+        ('get_events.get_events',   'chart',         'Get events & charts','List events in a range, export them and plot where your time goes.'),
+    ] %}
+    {% for endpoint, icon_name, title, desc in actions %}
+    <a href="{{ url_for(endpoint) }}" class="card action-card">
+        <div class="flex items-center justify-between">
+            <span class="action-icon">{{ ui.icon(icon_name, 'w-5 h-5') }}</span>
+            <span class="action-go">{{ ui.icon('arrow-right', 'w-5 h-5') }}</span>
+        </div>
+        <div>
+            <h2 class="font-semibold text-[15px]">{{ title }}</h2>
+            <p class="text-muted text-sm mt-1 leading-relaxed">{{ desc }}</p>
+        </div>
+    </a>
+    {% endfor %}
+</section>
+
+{% if show_github or show_buymeacoffee or show_paypal %}
+<section class="card mt-8 p-5 flex flex-col sm:flex-row sm:items-center gap-4">
+    <div class="flex-1">
+        <h2 class="font-semibold text-[15px]">Enjoying Calendar Data Manager?</h2>
+        {% if show_msg_section %}
+        <p class="text-muted text-sm mt-1">It's free and open source. Star it on GitHub or support its development.</p>
         {% endif %}
     </div>
-</div>
+    <div class="flex flex-wrap gap-2">
+        {% if show_github %}
+        <a href="{{ github_link }}" target="_blank" rel="noopener" class="btn btn-secondary btn-sm">{{ ui.icon('github') }} GitHub</a>
+        {% endif %}
+        {% if show_buymeacoffee %}
+        <a href="{{ buymeacoffee_link }}" target="_blank" rel="noopener" class="btn btn-secondary btn-sm">{{ ui.icon('coffee') }} Buy me a coffee</a>
+        {% endif %}
+        {% if show_paypal %}
+        <a href="{{ paypal_link }}" target="_blank" rel="noopener" class="btn btn-secondary btn-sm">{{ ui.icon('heart') }} PayPal</a>
+        {% endif %}
+    </div>
+</section>
+{% endif %}
 
-<!-- Version -->
-<div class="fixed bottom-4 right-4 text-gray-400 dark:text-gray-600 text-sm">
-    Version {{ version }}
-</div>
-
-</body>
-</html>
+<p class="text-subtle text-xs mt-8">Version {{ version }}</p>
+{% endblock %}

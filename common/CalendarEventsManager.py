@@ -1,4 +1,6 @@
 import datetime
+import re
+import unicodedata
 import requests
 import os.path
 from typing import Any, Dict, Optional
@@ -10,6 +12,18 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 
 from desktop_app.LogService import LogService
+
+_QUOTE_VARIANTS = str.maketrans({"‘": "'", "’": "'", "‛": "'", "´": "'", "`": "'",
+                                  "“": '"', "”": '"', "„": '"'})
+
+
+def _normalize_text(value: str | None) -> str:
+    """Normalize text for tolerant matching: unicode form, quote variants, whitespace and case."""
+    text = unicodedata.normalize("NFKC", value or "").translate(_QUOTE_VARIANTS)
+    text = re.sub(r"\s+", " ", text)
+    text = re.sub(r"\s*([()\[\]{},.;:!?'\"-])\s*", r"\1", text)  # spacing around punctuation is irrelevant
+    return text.strip().casefold()
+
 
 class CalendarEventsManager:
 
@@ -333,12 +347,12 @@ class CalendarEventsManager:
 
                 items = events_result.get('items', [])
 
-                if title:
-                    items = [e for e in items if title.lower() in e.get('summary', '').lower()]
-                if description:
-                    items = [e for e in items if description.lower() in e.get('description', '').lower()]
-                for e in items:
-                    print(e.get('summary'), e.get('colorId'))
+                title_query = _normalize_text(title)
+                description_query = _normalize_text(description)
+                if title_query:
+                    items = [e for e in items if title_query in _normalize_text(e.get('summary'))]
+                if description_query:
+                    items = [e for e in items if description_query in _normalize_text(e.get('description'))]
                 if color_id > 1:
                     items = [
                         e for e in items

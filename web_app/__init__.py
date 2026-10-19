@@ -38,6 +38,21 @@ def create_app():
     from web_app.routes.graph_viewer import bp as graph_viewer
     app.register_blueprint(graph_viewer)
 
+    # Cache-busting: url_for('static', ...) gets ?v=<mtime> so browsers pick up CSS/JS changes immediately
+    @app.url_defaults
+    def static_cache_buster(endpoint, values):
+        if endpoint == "static" and "filename" in values and "v" not in values:
+            path = os.path.join(app.static_folder, values["filename"])
+            if os.path.isfile(path):
+                values["v"] = int(os.stat(path).st_mtime)
+
+    # Signed-in Google profile (set at login) available to every template as `current_user`
+    from flask import session
+
+    @app.context_processor
+    def inject_current_user():
+        return {"current_user": session.get("user")}
+
     # Error handlers
     from web_app.routes import error_page
     error_page.register_error_handlers(app)

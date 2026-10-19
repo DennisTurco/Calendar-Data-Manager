@@ -12,23 +12,46 @@ from common.services.EventsService import EventsService
 from common.settings import TIMEZONE
 from web_app.CacheManager import CacheManager
 from web_app.services.validate import Validate
+from web_app.services.events_utils import EventsUtils
 
 bp = Blueprint("edit_events", __name__, url_prefix="/edit-events")
 
 
-def _render_page(form_values=None, old_events=None, new_event=None, show_confirm_modal=False):
+def _render_page(form_values=None, old_events=None, new_event=None, show_confirm_modal=False, no_results=False):
+    form_values = form_values or {}
     return render_template(
         "edit-events.html",
         active_page="edit events",
-        section_message=markdown.markdown(InformationMessages.get_events_info_message, extensions=["extra", "nl2br"]),
-        event_colors_old=ConfigKeys.Keys.EVENT_COLOR.value,
-        event_colors_new=ConfigKeys.Keys.EVENT_COLOR.value,
+        section_message=markdown.markdown(InformationMessages.update_events_info_message, extensions=["extra", "nl2br"]),
+        event_colors=ConfigKeys.Keys.EVENT_COLOR.value,
         timezones=TIMEZONE,
-        old_events=old_events or [],
+        preview_rows=_build_preview_rows(old_events or [], form_values) if show_confirm_modal else [],
         new_event=new_event,
         show_confirm_modal=show_confirm_modal,
-        form_values=form_values or {},
+        no_results=no_results,
+        form_values=form_values,
     )
+
+
+def _build_preview_rows(old_events: list, form_values: dict) -> list:
+    """Describe, per matched event, what the update will change (mirrors CalendarEventsManager.edit_event)."""
+    colors = ConfigKeys.Keys.EVENT_COLOR.value
+    color_names = list(colors.keys())
+    new_color_name = form_values.get("color_new") or color_names[0]
+    rows = []
+    for i, ev in enumerate(old_events, start=1):
+        start = ev.get("start", {})
+        end = ev.get("end", {})
+        rows.append({
+            "index": i,
+            "summary_old": ev.get("summary", ""),
+            "summary_new": form_values.get("summary_new", ""),
+            "color_old": EventsUtils.event_color(ev.get("colorId")),
+            "color_new": {"name": new_color_name, "hex": colors.get(new_color_name)},
+            "start": EventsUtils.format_display_datetime(start.get("dateTime") or start.get("date", "")),
+            "end": EventsUtils.format_display_datetime(end.get("dateTime") or end.get("date", "")),
+        })
+    return rows
 
 
 @bp.route("/", methods=["GET", "POST"])
@@ -71,8 +94,7 @@ def edit_events():
             old_events = CommonOperations.get_events(credentials, old_event_info)
 
             if not old_events:
-                flash("No events found for the given criteria.", "info")
-                return _render_page(form_values=form_values)
+                return _render_page(form_values=form_values, no_results=True)
 
             session["events_cache_id"] = CacheManager.store(old_events)
 
@@ -132,6 +154,10 @@ def _confirm_update(credentials: Credentials):
     pending = session.get("pending_update")
     old_events_cache_id = session.get("events_cache_id")
     old_events = CacheManager.get(old_events_cache_id)
+
+    if not pending or not old_events:
+        flash("Your preview expired. Please search again before confirming.", "error")
+        return redirect(url_for("edit_events.edit_events"))
 
     time_range = TimeRange(datetime.fromisoformat(pending["date_from"]), datetime.fromisoformat(pending["date_to"]))
     event_info = EventInfo(

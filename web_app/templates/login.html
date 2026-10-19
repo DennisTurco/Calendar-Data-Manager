@@ -1,48 +1,41 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login – Calendar Data Manager</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>tailwind.config = { darkMode: 'class' }</script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/icon.png') }}">
-    <script src="{{ url_for('static', filename='js/darkmode.js') }}"></script>
-</head>
-<body class="bg-gray-100 dark:bg-gray-900 flex flex-col items-center justify-center min-h-screen font-sans transition-colors duration-200">
+{% extends "base.html" %}
+{% import "macros/ui.html" as ui %}
 
-    <!-- Dark mode toggle (top right) -->
-    <div class="fixed top-4 right-4">
-        <button id="darkModeToggle"
-                onclick="toggleDarkMode()"
-                class="text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-100 p-2 rounded-full bg-white dark:bg-gray-800 shadow transition"
-                title="Toggle dark mode" aria-label="Toggle dark mode">
-        </button>
+{% block title %}Sign in{% endblock %}
+
+{% block body %}
+<div class="fixed top-4 right-4">
+    <button type="button" class="btn btn-secondary btn-icon btn-sm" data-theme-toggle aria-label="Toggle dark mode">
+        <span class="theme-icon-light">{{ ui.icon('moon') }}</span>
+        <span class="theme-icon-dark">{{ ui.icon('sun') }}</span>
+    </button>
+</div>
+
+<main class="min-h-screen grid place-items-center px-4 py-16">
+    <div class="w-full max-w-sm">
+        <div class="text-center mb-8">
+            <img src="{{ url_for('static', filename='images/icon.png') }}" class="w-14 h-14 mx-auto mb-5" alt="">
+            <h1 class="text-2xl font-bold tracking-tight">Calendar Data Manager</h1>
+            <p class="text-muted text-sm mt-2">Sign in with Google to manage your calendar.</p>
+        </div>
+
+        <div class="card p-6">
+            <a href="{{ url_for('login.google_auth') }}" class="btn btn-secondary btn-block !min-h-[2.75rem]">
+                <img src="{{ url_for('static', filename='images/google-g.svg') }}" class="w-5 h-5" alt="">
+                Continue with Google
+            </a>
+
+            <ul class="mt-6 flex flex-col gap-3 text-sm text-muted">
+                <li class="flex gap-3">{{ ui.icon('calendar-plus', 'w-4 h-4 mt-0.5 text-accent shrink-0') }} Create events with colors and timezones</li>
+                <li class="flex gap-3">{{ ui.icon('layers', 'w-4 h-4 mt-0.5 text-accent shrink-0') }} Bulk-edit titles, descriptions and colors</li>
+                <li class="flex gap-3">{{ ui.icon('chart', 'w-4 h-4 mt-0.5 text-accent shrink-0') }} Export events and chart your time</li>
+            </ul>
+        </div>
+
+        <p class="text-subtle text-xs text-center mt-6 leading-relaxed">
+            Your Google account is only used to read and update your own calendar.
+            <a href="https://github.com/DennisTurco/Calendar-Data-Manager" target="_blank" rel="noopener" class="underline hover:no-underline">Source on GitHub</a>
+        </p>
     </div>
-
-    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-10 max-w-sm w-full mx-4 text-center">
-        <img src="{{ url_for('static', filename='images/icon.png') }}" class="w-16 h-16 mx-auto mb-4" alt="App icon">
-        <h1 class="text-2xl font-semibold text-gray-800 dark:text-white mb-1">Calendar Data Manager</h1>
-        <p class="text-sm text-gray-500 dark:text-gray-400 mb-8">Sign in to manage your Google Calendar</p>
-
-        <a href="{{ url_for('login.google_auth') }}"
-           class="flex items-center justify-center gap-3 w-full py-3 px-4 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-medium transition shadow"
-           title="Login using your Google account">
-            <img src="/static/images/google.png" class="w-5 h-5" alt="Google">
-            Sign in with Google
-        </a>
-
-        {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            <div class="mt-4 space-y-1">
-            {% for msg in messages %}
-                <p class="text-red-500 text-sm">{{ msg }}</p>
-            {% endfor %}
-            </div>
-        {% endif %}
-        {% endwith %}
-    </div>
-
-</body>
-</html>
+</main>
+{% endblock %}

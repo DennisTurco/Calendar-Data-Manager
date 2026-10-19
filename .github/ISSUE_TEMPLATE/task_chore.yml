@@ -1,0 +1,61 @@
+name: 🧹 Task / Chore
+description: Technical work that isn't a bug fix or user-facing feature (refactor, docs, dependencies, CI, etc.)
+title: "🧹 [TASK] "
+labels: ["task"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this for internal/technical work - refactors, dependency updates, docs, CI/build changes, tech debt.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: A clear and concise description of the task.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: type
+    attributes:
+      label: Type
+      options:
+        - Refactor
+        - Documentation
+        - Dependency Update
+        - CI / Build
+        - Tech Debt
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - Critical
+        - High
+        - Medium
+        - Low
+        - Lowest
+      default: 2
+    validations:
+      required: true
+
+  - type: textarea
+    id: details
+    attributes:
+      label: Details
+      description: What needs to be done, and why. Include acceptance criteria if relevant.
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Related issues, PRs, or references.
+    validations:
+      required: false

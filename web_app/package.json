@@ -1,0 +1,12 @@
+{
+  "name": "calendar-data-manager-web",
+  "private": true,
+  "description": "Build tooling for the web UI styles (Tailwind CSS). The compiled CSS is committed, so Python-only deploys don't need Node.",
+  "scripts": {
+    "build:css": "tailwindcss -c tailwind.config.js -i static/src/tailwind.input.css -o static/css/tailwind.css --minify",
+    "watch:css": "tailwindcss -c tailwind.config.js -i static/src/tailwind.input.css -o static/css/tailwind.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "3.4.17"
+  }
+}

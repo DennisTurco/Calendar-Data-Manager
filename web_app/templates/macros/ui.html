@@ -1,0 +1,179 @@
+{# Shared UI macros. Import with: {% import "macros/ui.html" as ui %} #}
+
+{% set _icons = {
+    'home': '<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/>',
+    'calendar-plus': '<path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M10 16h4"/><path d="M12 14v4"/>',
+    'calendar': '<rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/>',
+    'edit': '<path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.375 2.625a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4Z"/>',
+    'chart': '<path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/>',
+    'list': '<path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/>',
+    'external': '<path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>',
+    'github': '<path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/>',
+    'bug': '<path d="m8 2 1.88 1.88"/><path d="M14.12 3.88 16 2"/><path d="M9 7.13v-1a3.003 3.003 0 1 1 6 0v1"/><path d="M12 20c-3.3 0-6-2.7-6-6v-3a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v3c0 3.3-2.7 6-6 6"/><path d="M12 20v-9"/><path d="M6.53 9C4.6 8.8 3 7.1 3 5"/><path d="M6 13H2"/><path d="M3 21c0-2.1 1.7-3.9 3.8-4"/><path d="M20.97 5c0 2.1-1.6 3.8-3.5 4"/><path d="M22 13h-4"/><path d="M17.2 17c2.1.1 3.8 1.9 3.8 4"/>',
+    'mail': '<rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>',
+    'heart': '<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>',
+    'coffee': '<path d="M10 2v2"/><path d="M14 2v2"/><path d="M6 2v2"/><path d="M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1"/>',
+    'logout': '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/>',
+    'sun': '<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>',
+    'moon': '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
+    'menu': '<path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/>',
+    'x': '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+    'info': '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
+    'link': '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
+    'copy': '<rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>',
+    'download': '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/>',
+    'search': '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+    'chevron-up': '<path d="m18 15-6-6-6 6"/>',
+    'calendar-x': '<rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/><path d="m14 14-4 4"/><path d="m10 14 4 4"/>',
+    'arrow-right': '<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>',
+    'arrow-left': '<path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>',
+    'check': '<path d="M20 6 9 17l-5-5"/>',
+    'check-circle': '<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>',
+    'alert-circle': '<circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/>',
+    'alert-triangle': '<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
+    'clock': '<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
+    'filter': '<path d="M22 3H2l8 9.46V19l4 2v-8.54z"/>',
+    'globe': '<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>',
+    'tag': '<path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"/>',
+    'wand': '<path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72"/><path d="m14 7 3 3"/><path d="M5 6v4"/><path d="M19 14v4"/><path d="M10 2v2"/><path d="M7 8H3"/><path d="M21 16h-4"/><path d="M11 3H9"/>',
+    'layers': '<path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/>',
+} %}
+
+{% macro icon(name, cls='w-4 h-4', stroke=2) -%}
+<svg xmlns="http://www.w3.org/2000/svg" class="{{ cls }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="{{ stroke }}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{{ _icons.get(name, '') | safe }}</svg>
+{%- endmacro %}
+
+{# Page header: title, optional subtitle, optional help modal trigger, and a slot for actions via caller() #}
+{% macro page_header(title, subtitle=None, help_id=None) -%}
+<header class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between mb-6">
+    <div class="min-w-0">
+        <h1 class="page-title">{{ title }}</h1>
+        {% if subtitle %}<p class="page-subtitle">{{ subtitle }}</p>{% endif %}
+    </div>
+    <div class="flex items-center gap-2 shrink-0">
+        {% if caller %}{{ caller() }}{% endif %}
+        {% if help_id %}
+        <button type="button" class="btn btn-ghost btn-sm -ml-2.5 sm:ml-0" data-modal-open="{{ help_id }}">
+            {{ icon('info') }} How it works
+        </button>
+        {% endif %}
+    </div>
+</header>
+{%- endmacro %}
+
+{# Help modal with markdown content #}
+{% macro help_modal(id, title, content) -%}
+<div id="{{ id }}" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="{{ id }}_title">
+    <div class="modal-backdrop" data-modal-close></div>
+    <div class="modal-panel max-w-xl">
+        <div class="flex items-center justify-between gap-4 px-5 py-4 border-b" style="border-color: var(--border)">
+            <h2 id="{{ id }}_title" class="font-semibold">{{ title }}</h2>
+            <button type="button" class="btn btn-ghost btn-icon btn-sm" data-modal-close aria-label="Close">{{ icon('x') }}</button>
+        </div>
+        <div class="modal-body px-5 py-4 prose-help">{{ content | safe }}</div>
+        <div class="flex justify-end px-5 py-3 border-t" style="border-color: var(--border)">
+            <button type="button" class="btn btn-primary btn-sm" data-modal-close>Got it</button>
+        </div>
+    </div>
+</div>
+{%- endmacro %}
+
+{# Radio-based color picker. `colors` is {name: hex}. #}
+{% macro color_picker(name, colors, selected='', any_label=None, label='Color', hint=None) -%}
+<fieldset>
+    <legend class="label">{{ label }}{% if hint %}<span class="opt">{{ hint }}</span>{% endif %}</legend>
+    <div class="swatches" role="radiogroup">
+        {% if any_label %}
+        <label class="swatch">
+            <input type="radio" name="{{ name }}" value="" {% if not selected %}checked{% endif %}>
+            <span class="swatch-dot is-any"></span>{{ any_label }}
+        </label>
+        {% endif %}
+        {% for color_name, color_hex in colors.items() %}
+        <label class="swatch">
+            <input type="radio" name="{{ name }}" value="{{ color_name }}"
+                   {% if selected == color_name or (not selected and not any_label and loop.first) %}checked{% endif %}>
+            <span class="swatch-dot" style="background: {{ color_hex }}"></span>{{ color_name }}
+        </label>
+        {% endfor %}
+    </div>
+</fieldset>
+{%- endmacro %}
+
+{# Date range + timezone block #}
+{% macro date_range(form_values, timezones, required=True) -%}
+<div class="presets -mt-1" data-date-presets role="group" aria-label="Quick date ranges">
+    {% for key, label in [('today', 'Today'), ('week', 'This week'), ('month', 'This month'), ('last30', 'Last 30 days'), ('year', 'This year'), ('lastyear', 'Last year')] %}
+    <button type="button" class="preset" data-preset="{{ key }}" aria-pressed="false">{{ label }}</button>
+    {% endfor %}
+</div>
+<div class="grid gap-4 sm:grid-cols-2">
+    <div>
+        <label for="date_from" class="label">From{% if required %}<span class="req">*</span>{% endif %}</label>
+        <input type="datetime-local" name="date_from" id="date_from" class="input" {% if required %}required{% endif %}
+               value="{{ form_values.get('date_from', '') }}">
+    </div>
+    <div>
+        <label for="date_to" class="label">To{% if required %}<span class="req">*</span>{% endif %}</label>
+        <input type="datetime-local" name="date_to" id="date_to" class="input" {% if required %}required{% endif %}
+               value="{{ form_values.get('date_to', '') }}">
+    </div>
+    <div class="sm:col-span-2">
+        <label for="timezone" class="label">Timezone</label>
+        <select name="timezone" id="timezone" class="input"
+                {% if form_values.get('timezone') %}data-preserve-value="true"{% endif %}>
+            {% for tz in timezones %}
+            <option value="{{ tz }}" {% if form_values.get('timezone') == tz %}selected{% endif %}>{{ tz }}</option>
+            {% endfor %}
+        </select>
+    </div>
+</div>
+{%- endmacro %}
+
+{# Sortable column header. `kind` is 'text' or 'num'. #}
+{% macro sort_th(label, kind='text', cls='') -%}
+<th class="{{ cls }}" data-sort="{{ kind }}" tabindex="0">{{ label }}<span class="sort-icon">{{ icon('chevron-up', 'w-3.5 h-3.5', 2.5) }}</span></th>
+{%- endmacro %}
+
+{# Shimmering placeholder shown while a search runs. `kind` is 'table' or 'charts'. #}
+{% macro skeleton(id, kind='table') -%}
+<section id="{{ id }}" class="mt-6" hidden aria-busy="true" aria-label="Loading">
+    {% if kind == 'charts' %}
+    <div class="grid gap-4 grid-cols-2 lg:grid-cols-3 mb-6">
+        {% for _ in range(3) %}<div class="card p-5 {% if loop.last %}col-span-2 lg:col-span-1{% endif %}"><div class="skeleton h-3 w-20"></div><div class="skeleton h-7 w-28 mt-3"></div></div>{% endfor %}
+    </div>
+    <div class="grid gap-6 lg:grid-cols-2">
+        {% for _ in range(2) %}
+        <div class="card p-5">
+            <div class="skeleton h-4 w-40 mb-6"></div>
+            <div class="flex items-end gap-3 h-48">
+                {% for h in [40, 70, 55, 90, 35, 65, 80] %}<div class="skeleton flex-1" style="height: {{ h }}%"></div>{% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="card overflow-hidden">
+        <div class="card-header"><div class="skeleton h-4 w-24"></div><div class="skeleton h-3 w-32 mt-2"></div></div>
+        {% for _ in range(6) %}
+        <div class="flex items-center gap-4 px-5 py-3.5 border-b last:border-0" style="border-color: var(--border)">
+            <div class="skeleton h-3 w-6"></div><div class="skeleton h-3 flex-1 max-w-[14rem]"></div>
+            <div class="skeleton h-3 w-28 hidden sm:block"></div><div class="skeleton h-3 w-28 hidden sm:block"></div><div class="skeleton h-3 w-12"></div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</section>
+{%- endmacro %}
+
+{# Inline "no results" panel with hints #}
+{% macro empty_state(id='emptyState', title='No events found', hints=[]) -%}
+<section id="{{ id }}" class="card mt-6 px-6 py-12 flex flex-col items-center text-center">
+    <span class="empty-icon mb-4">{{ icon('calendar-x', 'w-6 h-6') }}</span>
+    <h2 class="font-semibold">{{ title }}</h2>
+    <p class="text-muted text-sm mt-1">Nothing matched these filters in the selected range. Try:</p>
+    <ul class="text-sm text-muted mt-3 flex flex-col gap-1.5 text-left">
+        {% for hint in hints %}<li class="flex gap-2">{{ icon('check', 'w-4 h-4 mt-0.5 text-accent shrink-0') }} {{ hint }}</li>{% endfor %}
+    </ul>
+</section>
+{%- endmacro %}

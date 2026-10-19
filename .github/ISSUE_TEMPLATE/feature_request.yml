@@ -1,0 +1,48 @@
+name: ✨ Feature Request
+description: Suggest a new feature or improvement
+title: "✨ [FEATURE] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting an idea! Please fill out the sections below.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: A clear and concise description of the feature you'd like.
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: Describe the solution you have in mind. Include any UI/UX ideas, API changes, or flow diagrams if relevant.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this feature to you?
+      options:
+        - Critical (blocking my usage)
+        - High (would greatly improve my workflow)
+        - Medium (nice to have soon)
+        - Low (someday/maybe)
+        - Lowest (someday/maybe)
+      default: 2
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Any mockups, references, or related issues.
+    validations:
+      required: false
