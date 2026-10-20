@@ -5,9 +5,9 @@ class ConfigKeys:
     class Keys(Enum):
         EVENT_COLOR = {"Light Blue": "#7986cb", "Green": "#33b679", "Purple": "#8e24aa", "Pink": "#e67c73", "Yellow": "#f6bf26", "Orange": "#f4511e", "Blue": "#039be5", "Grey": "#616161", "Dark Blue": "#3f51b5", "Dark Green": "#0b8043", "Red": "#d50000"}
         GOOGLE_CALENDAR_LINK = "https://calendar.google.com/"
-        TUTORIAL_SETUP_LINK = "https://github.com/DennisTurco/Calendar-Data-Manager/blob/master/docs/GoogleCloudAPISetup.md"
-        GITHUB_ISSUES_LINK = "https://github.com/DennisTurco/Calendar-Data-Manager/issues"
-        GITHUB_PAGE_LINK = "https://github.com/DennisTurco/Calendar-Data-Manager"
+        TUTORIAL_SETUP_LINK = "https://github.com/DennisTurco/CalendarManager/blob/master/docs/GoogleCloudAPISetup.md"
+        GITHUB_ISSUES_LINK = "https://github.com/DennisTurco/CalendarManager/issues"
+        GITHUB_PAGE_LINK = "https://github.com/DennisTurco/CalendarManager"
         DONATE_BUYMEACOFFE_PAGE_LINK = "https://www.buymeacoffee.com/denno"
         DONATE_PAYPAL_PAGE_LINK = "https://www.paypal.com/donate/?hosted_button_id=M7CJXS929334U"
         SHARD_WEBSITE = "https://www.shardpc.it/"

@@ -13,7 +13,7 @@ class InformationMessages:
 Once you've filled in the event details, simply click Create to add the event to your calendar. This tool makes it easy to create events quickly and organize your calendar effectively.
 '''
 
-    update_events_info_message = '''This section of the Calendar Data Manager enables you to update multiple events in your Google Calendar simultaneously, saving you time and effort. Here's how it works:
+    update_events_info_message = '''This section of the Calendar Manager enables you to update multiple events in your Google Calendar simultaneously, saving you time and effort. Here's how it works:
 
 - **Filter Existing Events**: Use fields such as Summary, Description, Color, and a Date Interval to select the events you want to edit. You can refine your search by combining these criteria.
 - **Apply New Values**: Define the updates you want to make, such as changing the summary, description, or event color.
@@ -22,7 +22,7 @@ Once you've filled in the event details, simply click Create to add the event to
 Once you've set your filters and new values, click the Edit button to apply the changes instantly across all matching events. This tool ensures a seamless way to manage your calendar efficiently.'''
 
 
-    get_events_info_message = '''This section of the Calendar Data Manager allows you to efficiently retrieve and analyze your Google Calendar events. Here's what you can do:
+    get_events_info_message = '''This section of the Calendar Manager allows you to efficiently retrieve and analyze your Google Calendar events. Here's what you can do:
 
 - **Filter by Date Interval**: Specify a time range to narrow down the events you want to retrieve. You can set the start and end dates, along with the timezone, for precise filtering.
 - **Save Results**: Export the retrieved events list to a file in `.csv` or `.txt` format for further analysis or sharing. You can choose the file location, name, and whether to overwrite an existing file.
@@ -31,7 +31,7 @@ Once you've set your filters and new values, click the Edit button to apply the 
 Once you've configured your filters, click Get to retrieve the data or Get and Plot to visualize it right away!
         '''
     
-    graph_info_message = '''The Create Graph section of the Calendar Data Manager lets you transform your event data into insightful visualizations for better analysis. Here's what you can do:
+    graph_info_message = '''The Create Graph section of the Calendar Manager lets you transform your event data into insightful visualizations for better analysis. Here's what you can do:
 
 - **Select File for Analysis**: Choose a previously generated `.csv` or `.txt` file that contains your calendar event data. You can preview the file content before proceeding.
 - **Choose Graph Types**: Select from various visualization options, including:

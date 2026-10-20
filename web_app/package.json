@@ -1,5 +1,5 @@
 {
-  "name": "calendar-data-manager-web",
+  "name": "calendarmanager-web",
   "private": true,
   "description": "Build tooling for the web UI styles (Tailwind CSS). The compiled CSS is committed, so Python-only deploys don't need Node.",
   "scripts": {

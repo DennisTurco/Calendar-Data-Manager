@@ -1,8 +1,8 @@
 # Web app deployment manifest (used by Vercel). The desktop app keeps using requirements.txt.
 [project]
-name = "calendar-data-manager-web"
+name = "calendarmanager-web"
 version = "1.0.3"
-description = "Calendar Data Manager — web app"
+description = "Calendar Manager — web app"
 requires-python = ">=3.12"
 dependencies = [
     "Flask==3.1.2",

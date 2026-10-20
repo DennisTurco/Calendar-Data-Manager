@@ -18,7 +18,7 @@ class MainFrame(BaseFrame):
         title_font = ctk.CTkFont(family="Georgia", weight='bold', slant='italic', size=45)
 
         ctk.CTkLabel(self, text="", image=img.icon, fg_color="transparent").pack(padx=20, pady=(50, 20))
-        ctk.CTkLabel(self, text="Calendar Data Manager", font=title_font, text_color='#e06c29', fg_color="transparent").pack(padx=20, pady=50)
+        ctk.CTkLabel(self, text="Calendar Manager", font=title_font, text_color='#e06c29', fg_color="transparent").pack(padx=20, pady=50)
         #ctk.CTkLabel(self, text="Choose the action", fg_color="transparent", font=("Arial", 32)).pack(20, 20)
         ctk.CTkButton(master=self, image=img.plus_image, text="New Events", command=lambda: FrameController.show_frame(FrameTypes.NewEventsFrame, self._common)).pack(padx=20, pady=10, anchor='center')
         ctk.CTkButton(master=self, image=img.edit_image, text="Edit Events", command=lambda: FrameController.show_frame(FrameTypes.EditEventsFrame, self._common)).pack(padx=20, pady=10, anchor='center')

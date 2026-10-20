@@ -1,6 +1,6 @@
 ![logo](common/imgs/icon.png)
 
-# Calendar Data Manager
+# Calendar Manager
 
 ## 📜 Description
 This program, with a simple graphical interface, allows you to manage Google Calendar events in a powerful way, specifically you can:
@@ -19,7 +19,7 @@ This project is entirely free, devoid of any paid content or advertisements. It 
 
 ## ✨ Installation
 1. ### Download the installer and install the application
-    [Installation Lik](https://github.com/DennisTurco/Calendar-Data-Manager/releases)
+    [Installation Lik](https://github.com/DennisTurco/CalendarManager/releases)
 
     Once the installation is complete, you can run the application, but you must complete the first setup procedure by entering the data to connect the application to Google Calendar with your personal account.
 
@@ -34,7 +34,7 @@ This project is entirely free, devoid of any paid content or advertisements. It 
 * [Errors](https://developers.google.com/calendar/api/guides/errors?hl=en)
 
 ## 🐛 Report a BUG
-To report a BUG -> [ISSUE](https://github.com/DennisTurco/Calendar-Data-Manager/issues)
+To report a BUG -> [ISSUE](https://github.com/DennisTurco/CalendarManager/issues)
 
 
 ## Technical Information

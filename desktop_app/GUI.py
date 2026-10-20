@@ -49,7 +49,7 @@ class App:
     def __init_window(self):
         self.root.iconbitmap(Images().icon_ico)
 
-        self.root.title("Calendar Data Manager")
+        self.root.title("Calendar Manager")
         CommonOperations.center_window(self.root, ConfigKeys.Keys.APP_WIDTH.value, ConfigKeys.Keys.APP_HEIGHT.value)
         self.root.minsize(1100, 900)
 
@@ -122,7 +122,7 @@ class App:
 
         dropdown6 = CustomDropdownMenu(widget=button_6)
         if ConfigKeys.Keys.MENUITEM_SUPPORT.value:
-            subject: str = "Calendar Data Manager - Support"
+            subject: str = "Calendar Manager - Support"
             dropdown6.add_option(option="Support", command=lambda: webbrowser.open(f"mailto:{ConfigKeys.Keys.SHARD_EMAIL.value}?subject={subject}"))
         if ConfigKeys.Keys.MENUITEM_BUGREPORT.value:
             dropdown6.add_option(option="Report a bug", command=lambda: webbrowser.open(ConfigKeys.Keys.GITHUB_ISSUES_LINK.value))
